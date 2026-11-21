@@ -134,3 +134,7 @@ class SignUpModel(BaseModel):
 class SignInModel(BaseModel):
     email: str
     password: str
+
+
+class ClientApiDocs(BaseModel):
+    file_contents: str | None
