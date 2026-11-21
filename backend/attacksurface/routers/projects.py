@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 
 from attacksurface.database import supabase
 from attacksurface.fixture_loader import load_fixture
-from attacksurface.schemas import Project, ProjectCreate
+from attacksurface.schemas import ClientApiDocs, Project, ProjectCreate
 from attacksurface.validation import is_valid_root_domain
 
 router = APIRouter(prefix="/projects", tags=["projects"])
@@ -50,3 +50,20 @@ def get_project(project_id: str) -> Project:
     resp = supabase.table("projects").select("*").eq("id", project_id).execute()
 
     return Project.model_validate(resp.data[0])
+
+
+@router.get("/{project_id}/api_docs")
+def get_api_docs(project_id: str) -> ClientApiDocs:
+    resp = supabase.table("projects").select("api_docs").eq("id", project_id).execute()
+
+    return ClientApiDocs(file_contents=resp.data[0]["api_docs"])
+
+
+@router.post("/{project_id}/api_docs")
+def post_api_docs(project_id: str, payload: ClientApiDocs):
+    resp = (
+        supabase.table("projects")
+        .update({"api_docs": payload.file_contents})
+        .eq("id", project_id)
+        .execute()
+    )

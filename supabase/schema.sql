@@ -7,6 +7,7 @@ create table if not exists projects (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   root_domain text not null,
+  api_docs text null,
   authorization_confirmed boolean not null default false,
   created_at timestamptz not null default now(),
   constraint projects_root_domain_not_blank check (length(trim(root_domain)) > 0)
