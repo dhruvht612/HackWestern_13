@@ -6,21 +6,21 @@ install-frontend:
 	npm install
 
 install-backend:
-	python -m pip install -r backend/requirements.txt
+	uv sync --project backend --locked --all-groups
 
 frontend:
 	npm run dev
 
 backend:
-	cd backend && python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+	cd backend && uv run --locked fastapi dev --host 0.0.0.0 --port 8000
 
 dev:
-	npx --yes concurrently -k -n backend,frontend -c blue,cyan "cd backend && python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000" "npm run dev"
+	npx --yes concurrently -k -n backend,frontend -c blue,cyan "cd backend && uv run --locked fastapi dev --host 0.0.0.0 --port 8000" "npm run dev"
 
 test:
-	cd backend && python -m pytest -q
+	uv run --project backend --locked pytest -q
 	npm run typecheck
 
 lint:
 	npm run lint
-	cd backend && python -m ruff check .
+	uv run --project backend --locked ruff check backend
