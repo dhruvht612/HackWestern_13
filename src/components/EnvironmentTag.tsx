@@ -2,10 +2,10 @@ import { cn } from "@/lib/utils";
 
 // Environment is told by line, not hue, so it never competes with severity color.
 const styles: Record<string, string> = {
-  prod: "border-ink bg-ink text-bond",
-  staging: "border-ink text-ink",
-  dev: "border-dashed border-ink text-ink",
-  unknown: "border-dotted border-ink-faint text-ink-soft",
+  prod: "border-camel bg-camel text-navy",
+  staging: "border-camel text-fg",
+  dev: "border-dashed border-camel text-fg",
+  unknown: "border-dotted border-fg-faint text-fg-soft",
 };
 
 export function EnvironmentTag({ env }: { env: "prod" | "staging" | "dev" | "unknown" | string }) {

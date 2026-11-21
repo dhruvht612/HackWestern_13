@@ -29,8 +29,8 @@ export function AssetsPage() {
   const columns: Column<Row>[] = [
     { key: "hostname", header: "Hostname", render: (r) => <span className="mono font-bold">{r.hostname}</span> },
     { key: "env", header: "Environment", render: (r) => <EnvironmentTag env={r.environment} /> },
-    { key: "ips", header: "IP addresses", render: (r) => <span className="mono text-[13px] text-ink-soft">{r.ip_addresses.join(", ")}</span> },
-    { key: "tech", header: "Technology", render: (r) => <span className="text-ink-soft">{r.technology}</span> },
+    { key: "ips", header: "IP addresses", render: (r) => <span className="mono text-[13px] text-fg-soft">{r.ip_addresses.join(", ")}</span> },
+    { key: "tech", header: "Technology", render: (r) => <span className="text-fg-soft">{r.technology}</span> },
     {
       key: "https",
       header: "HTTPS",
@@ -40,7 +40,7 @@ export function AssetsPage() {
     {
       key: "severity",
       header: "Worst",
-      render: (r) => (r.topSeverity ? <SeverityBadge severity={r.topSeverity} /> : <span className="text-ink-faint">None</span>),
+      render: (r) => (r.topSeverity ? <SeverityBadge severity={r.topSeverity} /> : <span className="text-fg-faint">None</span>),
     },
   ];
 

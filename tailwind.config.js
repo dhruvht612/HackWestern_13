@@ -1,22 +1,28 @@
 /** @type {import('tailwindcss').Config} */
+
+// Every color resolves to a CSS variable in src/styles/globals.css; nothing is hardcoded here.
+const c = (name) => `rgb(var(--rgb-${name}) / <alpha-value>)`;
+
 export default {
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        // The Attacker's Dossier: folder stock, bond paper, carbon ink, one stamp red.
-        manila: { DEFAULT: "#D9A13B", deep: "#C38D2E", dark: "#4A3410" },
-        bond: "#F8F7F3",
-        ink: { DEFAULT: "#141414", soft: "#4A4A46", faint: "#6E6C64" },
-        stamp: "#C8102E",
-        carbon: "#1F3A93",
-        // Stamp red belongs to the P0 mark alone and carbon blue to focus alone, so severity keeps its own inks.
+        // 60: Abyss Navy and its depth steps
+        navy: { DEFAULT: c("primary"), deep: c("primary-deep"), raised: c("primary-raised"), high: c("primary-high") },
+        // 30: Camel Suede
+        camel: c("secondary"),
+        // 10: Electric Kiwi
+        kiwi: { DEFAULT: c("accent"), hover: c("accent-hover") },
+        // Neutral text
+        fg: { DEFAULT: c("text-primary"), soft: c("text-secondary"), faint: c("text-muted") },
+        // Semantic severity (always paired with a label)
         severity: {
-          critical: "#7A1530",
-          high: "#D9480F",
-          medium: "#A87C00",
-          low: "#2E6E62",
-          info: "#6B6B66",
+          critical: c("sev-critical"),
+          high: c("sev-high"),
+          medium: c("sev-medium"),
+          low: c("sev-low"),
+          info: c("sev-info"),
         },
       },
       fontFamily: {
@@ -25,8 +31,8 @@ export default {
         display: ["Archivo", '"Public Sans"', "ui-sans-serif", "sans-serif"],
       },
       boxShadow: {
-        sheet: "0 1px 1px rgba(74,52,16,0.18), 0 18px 36px -14px rgba(74,52,16,0.55)",
-        lift: "0 2px 4px rgba(20,20,20,0.18), 0 10px 18px -8px rgba(20,20,20,0.4)",
+        sheet: "inset 0 0 0 1px rgb(var(--rgb-secondary) / 0.16), 0 18px 40px -16px rgb(0 0 0 / 0.65)",
+        lift: "0 8px 18px -8px rgb(var(--rgb-accent) / 0.35)",
       },
     },
   },

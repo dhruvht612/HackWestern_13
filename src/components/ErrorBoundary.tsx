@@ -13,8 +13,8 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
       return (
         <div className="sheet m-6 border-2 border-severity-critical p-6">
           <h2 className="display text-xl font-extrabold text-severity-critical">This page failed to render</h2>
-          <p className="mono mt-2 text-sm text-ink">{this.state.error?.message}</p>
-          <p className="mt-3 text-sm text-ink-soft">Reload the page. If it keeps happening, check the browser console.</p>
+          <p className="mono mt-2 text-sm text-fg">{this.state.error?.message}</p>
+          <p className="mt-3 text-sm text-fg-soft">Reload the page. If it keeps happening, check the browser console.</p>
         </div>
       );
     }

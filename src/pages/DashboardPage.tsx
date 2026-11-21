@@ -36,7 +36,7 @@ export function DashboardPage() {
     return (
       <div className="border-2 border-severity-critical p-6 text-sm">
         <div className="font-semibold">Couldn’t load the dashboard.</div>
-        <p className="mt-1 text-ink-soft">Check that the API is running, or switch to mock mode with VITE_USE_MOCKS=true.</p>
+        <p className="mt-1 text-fg-soft">Check that the API is running, or switch to mock mode with VITE_USE_MOCKS=true.</p>
       </div>
     );
 
@@ -80,11 +80,11 @@ export function DashboardPage() {
     <div className="space-y-9">
       <PageHeader title="Dashboard" description="What the latest scan put on file, and what to fix first." />
 
-      <dl className="mono grid grid-cols-[6rem_minmax(0,1fr)] border-b border-ink/25 text-[13.5px] sm:grid-cols-[7.5rem_minmax(0,1fr)]">
+      <dl className="mono grid grid-cols-[6rem_minmax(0,1fr)] border-b border-camel/25 text-[13.5px] sm:grid-cols-[7.5rem_minmax(0,1fr)]">
         {ledger.map(([k, v]) => (
           <div key={k} className="contents">
-            <dt className="border-t border-ink/15 py-2 text-ink-soft first-of-type:border-t-0">{k}</dt>
-            <dd className="tabular border-t border-ink/15 py-2 text-ink">
+            <dt className="border-t border-camel/15 py-2 text-camel first-of-type:border-t-0">{k}</dt>
+            <dd className="tabular border-t border-camel/15 py-2 text-fg">
               {/* dates and hostnames must not break at their hyphens */}
               {v.split(/(\s+)/).map((t, i) => (t.includes("-") ? <span key={i} className="whitespace-nowrap">{t}</span> : t))}
             </dd>
@@ -93,31 +93,31 @@ export function DashboardPage() {
       </dl>
 
       <section>
-        <div className="flex items-baseline justify-between border-b-2 border-ink pb-2">
+        <div className="flex items-baseline justify-between border-b-2 border-camel pb-2">
           <h2 className="display text-2xl font-extrabold">Fix first</h2>
-          <Link to={`/projects/${projectId}/findings`} className="inline-flex items-center gap-1 text-[13px] font-semibold underline underline-offset-4 hover:text-carbon">
+          <Link to={`/projects/${projectId}/findings`} className="inline-flex items-center gap-1 text-[13px] font-semibold underline underline-offset-4 hover:text-kiwi">
             All findings <ArrowRight size={13} aria-hidden="true" />
           </Link>
         </div>
-        <ol className="divide-y divide-ink/15">
+        <ol className="divide-y divide-camel/15">
           {topPriorities.map((f, i) => {
             const lead = i === 0;
             const priority = memoFor(f.id)?.suggested_priority;
             return (
               <li key={f.id} className="relative grid grid-cols-[2rem_minmax(0,1fr)] gap-3 py-5 sm:pr-48">
-                <span className={cn("tabular font-mono text-lg font-bold", lead ? "text-ink" : "text-ink-faint")}>{i + 1}.</span>
+                <span className={cn("tabular font-mono text-lg font-bold", lead ? "text-fg" : "text-fg-faint")}>{i + 1}.</span>
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <SeverityBadge severity={f.severity} />
                     {priority && !(lead && priority === "P0") ? (
-                      <span className="border-[1.5px] border-ink px-1.5 font-mono text-[11px] font-bold">{priority}</span>
+                      <span className="border-[1.5px] border-camel px-1.5 font-mono text-[11px] font-bold">{priority}</span>
                     ) : null}
-                    <span className="mono text-[13px] text-ink-soft">{hostOf(f.asset_id)}</span>
+                    <span className="mono text-[13px] text-fg-soft">{hostOf(f.asset_id)}</span>
                   </div>
                   <div className={cn("mt-1.5", lead ? "text-lg font-bold" : "font-semibold")}>{f.title}</div>
-                  <p className={cn("mt-1 text-sm", lead ? "text-ink" : "text-ink-faint")}>{f.remediation}</p>
+                  <p className={cn("mt-1 text-sm", lead ? "text-fg" : "text-fg-faint")}>{f.remediation}</p>
                   {lead && priority === "P0" ? (
-                    <Stamp lines={["P0", "Fix first"]} tone="red" rotate={-6} className="mt-3 w-32 sm:absolute sm:right-2 sm:top-5 sm:mt-0 sm:w-40" />
+                    <Stamp lines={["P0", "Fix first"]} tone="accent" rotate={-6} className="mt-3 w-32 sm:absolute sm:right-2 sm:top-5 sm:mt-0 sm:w-40" />
                   ) : null}
                 </div>
               </li>
@@ -128,12 +128,12 @@ export function DashboardPage() {
 
       <div className="grid gap-9 xl:grid-cols-2">
         <section>
-          <h2 className="field-label border-b border-ink/25 pb-2 !text-ink">Findings by severity</h2>
+          <h2 className="field-label border-b border-camel/25 pb-2 !text-fg">Findings by severity</h2>
           <ul className="mt-3 space-y-2.5">
             {severityCounts.map(({ sev, count }) => (
               <li key={sev} className="grid grid-cols-[6rem_minmax(0,1fr)_2rem] items-center gap-3">
                 <SeverityBadge severity={sev} className="justify-self-start" />
-                <span className="h-3 border-y border-ink/10">
+                <span className="h-3 border-y border-camel/10">
                   <span className="block h-full" style={{ width: `${(count / maxSev) * 100}%`, background: severityColors[sev] }} />
                 </span>
                 <span className="tabular text-right font-mono text-sm font-bold">{count}</span>
@@ -143,31 +143,31 @@ export function DashboardPage() {
         </section>
 
         <section>
-          <h2 className="field-label border-b border-ink/25 pb-2 !text-ink">Exposure by host (weighted)</h2>
+          <h2 className="field-label border-b border-camel/25 pb-2 !text-fg">Exposure by host (weighted)</h2>
           <ul className="mt-3 space-y-2.5">
             {riskByAsset.map((r, i) => (
               <li key={r.host} className="grid grid-cols-[minmax(0,11rem)_minmax(0,1fr)_2rem] items-center gap-3">
-                <span className={cn("mono truncate text-[13px]", i === 0 ? "text-ink" : "text-ink-soft")} title={r.host}>
+                <span className={cn("mono truncate text-[13px]", i === 0 ? "text-fg" : "text-fg-soft")} title={r.host}>
                   {r.host}
                 </span>
-                <span className="h-3 border-y border-ink/10">
-                  <span className={cn("block h-full", i === 0 ? "bg-ink" : "bg-ink/40")} style={{ width: `${(r.score / maxRisk) * 100}%` }} />
+                <span className="h-3 border-y border-camel/10">
+                  <span className={cn("block h-full", i === 0 ? "bg-kiwi" : "bg-camel/45")} style={{ width: `${(r.score / maxRisk) * 100}%` }} />
                 </span>
                 <span className="tabular text-right font-mono text-sm font-bold">{r.score}</span>
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-xs text-ink-soft">Critical 5 · high 4 · medium 3 · low 2 · info 1, summed per host.</p>
+          <p className="mt-3 text-xs text-fg-soft">Critical 5 · high 4 · medium 3 · low 2 · info 1, summed per host.</p>
         </section>
       </div>
 
-      <section className="border border-ink/25">
-        <dl className="mono grid grid-cols-[4.5rem_minmax(0,1fr)] gap-y-1 border-b-2 border-ink px-5 py-4 text-[13px] sm:px-7">
-          <dt className="text-ink-soft">TO:</dt>
+      <section className="border border-camel/25">
+        <dl className="mono grid grid-cols-[4.5rem_minmax(0,1fr)] gap-y-1 border-b-2 border-camel px-5 py-4 text-[13px] sm:px-7">
+          <dt className="text-camel">TO:</dt>
           <dd>Engineering, {project.data?.root_domain ?? "this project"}</dd>
-          <dt className="text-ink-soft">FROM:</dt>
+          <dt className="text-camel">FROM:</dt>
           <dd>AttackSurface analyst (Gemini)</dd>
-          <dt className="text-ink-soft">RE:</dt>
+          <dt className="text-camel">RE:</dt>
           <dd className="font-bold">Overall exposure</dd>
         </dl>
         <div className="px-5 py-5 sm:px-7">
@@ -176,12 +176,12 @@ export function DashboardPage() {
           ) : analysisMutation.isPending ? (
             <div className="space-y-2" aria-busy="true">
               {[100, 92, 96, 60].map((w) => (
-                <div key={w} className="h-3.5 animate-pulse bg-ink/10" style={{ width: `${w}%` }} />
+                <div key={w} className="h-3.5 animate-pulse bg-camel/10" style={{ width: `${w}%` }} />
               ))}
-              <p className="pt-1 text-xs text-ink-soft">Writing the memo…</p>
+              <p className="pt-1 text-xs text-fg-soft">Writing the memo…</p>
             </div>
           ) : (
-            <p className="text-sm text-ink-soft">The analyst memo isn’t available right now. The findings above are unaffected.</p>
+            <p className="text-sm text-fg-soft">The analyst memo isn’t available right now. The findings above are unaffected.</p>
           )}
         </div>
       </section>

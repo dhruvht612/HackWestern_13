@@ -35,8 +35,8 @@ export function DependenciesPage() {
   const columns: Column<Dependency>[] = [
     { key: "package", header: "Package", render: (d) => <span className="mono font-bold">{d.package_name}</span> },
     { key: "version", header: "Version", render: (d) => <span className="mono text-[13px]">{d.version}</span> },
-    { key: "ecosystem", header: "Ecosystem", render: (d) => <span className="text-ink-soft">{d.ecosystem}</span> },
-    { key: "direct", header: "Direct", render: (d) => (d.direct ? "Yes" : <span className="text-ink-soft">Transitive</span>) },
+    { key: "ecosystem", header: "Ecosystem", render: (d) => <span className="text-fg-soft">{d.ecosystem}</span> },
+    { key: "direct", header: "Direct", render: (d) => (d.direct ? "Yes" : <span className="text-fg-soft">Transitive</span>) },
     {
       key: "advisories",
       header: "Advisories",
@@ -45,7 +45,7 @@ export function DependenciesPage() {
           {d.advisories.map((a) => (
             <span key={a.id} className="inline-flex items-center gap-1.5">
               <SeverityBadge severity={a.severity} className="text-[11px]" />
-              <span className="mono text-[13px] text-ink-soft">{a.id}</span>
+              <span className="mono text-[13px] text-fg-soft">{a.id}</span>
             </span>
           ))}
         </div>
@@ -62,13 +62,13 @@ export function DependenciesPage() {
         {...getRootProps()}
         className={cn(
           "flex cursor-pointer flex-col items-center justify-center border-2 border-dashed p-8 text-center transition-colors",
-          isDragActive ? "border-ink bg-manila/20" : "border-ink/35 hover:border-ink hover:bg-manila/10",
+          isDragActive ? "border-camel bg-camel/20" : "border-camel/35 hover:border-camel hover:bg-camel/10",
         )}
       >
         <input {...getInputProps()} />
         <Upload size={22} aria-hidden="true" />
         <div className="mt-3 font-semibold">Drop package.json or package-lock.json here</div>
-        <p className="mt-1 text-sm text-ink-soft">Or click to choose a file. In demo mode the upload is simulated.</p>
+        <p className="mt-1 text-sm text-fg-soft">Or click to choose a file. In demo mode the upload is simulated.</p>
         {upload.isPending ? <p className="mt-3 text-[13px] font-semibold">Reading manifest…</p> : null}
         {upload.isSuccess ? <p className="mt-3 text-[13px] font-semibold">Manifest loaded. The table below is up to date.</p> : null}
         {upload.isError ? (

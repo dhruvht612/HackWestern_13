@@ -15,10 +15,10 @@ export function DetailPanel({
 }) {
   if (!open) return null;
   return (
-    <aside className="sheet sticky top-4 h-fit max-h-[calc(100vh-7rem)] overflow-auto border border-ink/25 p-5" aria-label={title}>
-      <div className="mb-4 flex items-start justify-between gap-3 border-b-2 border-ink pb-3">
+    <aside className="sheet sticky top-4 h-fit max-h-[calc(100vh-7rem)] overflow-auto border border-camel/25 p-5" aria-label={title}>
+      <div className="mb-4 flex items-start justify-between gap-3 border-b-2 border-camel pb-3">
         <h3 className="text-lg font-semibold leading-snug">{title}</h3>
-        <button onClick={onClose} className="-m-1 shrink-0 p-1 text-ink-soft transition-colors hover:text-ink" aria-label="Close details">
+        <button onClick={onClose} className="-m-1 shrink-0 p-1 text-fg-soft transition-colors hover:text-fg" aria-label="Close details">
           <X size={16} />
         </button>
       </div>

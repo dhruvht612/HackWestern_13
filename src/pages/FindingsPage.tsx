@@ -56,7 +56,7 @@ export function FindingsPage() {
               disabled={count === 0}
               className={cn(
                 "border-[1.5px] px-3 py-1.5 text-[13px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40",
-                active ? "border-ink bg-ink text-bond" : "border-ink/30 text-ink hover:border-ink",
+                active ? "border-kiwi bg-kiwi text-navy" : "border-camel/35 text-fg hover:border-camel",
               )}
             >
               {s === "all" ? "All" : severityLabels[s]} <span className="tabular ml-1 font-mono">{count}</span>
@@ -67,27 +67,27 @@ export function FindingsPage() {
 
       <div className={cn("grid gap-6", selected && "xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]")}>
         {filtered.length ? (
-          <ul className="border-y border-ink/25">
+          <ul className="border-y border-camel/25">
             {filtered.map((f) => {
               const active = selected?.id === f.id;
               const urgent = f.severity === "critical";
               return (
-                <li key={f.id} className={cn("border-t first:border-t-0", active ? "border-ink" : "border-ink/15", active && "[&+li]:border-ink")}>
+                <li key={f.id} className={cn("border-t first:border-t-0", active ? "border-kiwi" : "border-camel/15", active && "[&+li]:border-kiwi")}>
                   <button
                     onClick={() => setSelected(f)}
                     aria-current={active || undefined}
                     className={cn(
                       "grid w-full grid-cols-[6rem_minmax(0,1fr)] gap-x-4 px-3 py-4 text-left transition-colors",
-                      !active && "hover:bg-manila/10",
+                      !active && "hover:bg-camel/10",
                     )}
                   >
                     <SeverityBadge severity={f.severity} className="h-fit justify-self-start" />
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-baseline justify-between gap-x-3">
                         <span className={active || urgent ? "font-bold" : "font-semibold"}>{f.title}</span>
-                        <span className="mono text-[13px] text-ink-soft">{assetMap.get(f.asset_id)?.hostname || f.asset_id}</span>
+                        <span className="mono text-[13px] text-fg-soft">{assetMap.get(f.asset_id)?.hostname || f.asset_id}</span>
                       </div>
-                      <p className={cn("mt-1 text-sm", active || urgent ? "text-ink" : "text-ink-faint")}>{f.remediation}</p>
+                      <p className={cn("mt-1 text-sm", active || urgent ? "text-fg" : "text-fg-faint")}>{f.remediation}</p>
                     </div>
                   </button>
                 </li>
@@ -103,7 +103,7 @@ export function FindingsPage() {
             <div className="space-y-5">
               <div className="flex flex-wrap items-center gap-2">
                 <SeverityBadge severity={selected.severity} />
-                <span className="mono text-[13px] text-ink-soft">
+                <span className="mono text-[13px] text-fg-soft">
                   {assetMap.get(selected.asset_id)?.hostname} · {selected.source === "osv" ? "OSV advisory" : "rule"}
                 </span>
               </div>
