@@ -1,7 +1,7 @@
 [project]
 name = "attacksurface"
 version = "0.1.0"
-description = "Add your description here"
+description = "Backend API for Attacksurface"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
