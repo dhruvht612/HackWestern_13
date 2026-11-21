@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from app.fixture_loader import load_fixture
-from app.schemas import Analysis, Graph
+from attacksurface.fixture_loader import load_fixture
+from attacksurface.schemas import Analysis, Graph
 
 router = APIRouter(tags=["analysis"])
 

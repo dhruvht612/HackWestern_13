@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from fastapi.responses import PlainTextResponse
 
-from app.fixture_loader import load_report
+from attacksurface.fixture_loader import load_report
 
 router = APIRouter(tags=["reports"])
 

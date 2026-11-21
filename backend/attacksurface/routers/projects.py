@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 
-from app.fixture_loader import load_fixture
-from app.schemas import Project, ProjectCreate
-from app.validation import is_valid_root_domain
+from attacksurface.fixture_loader import load_fixture
+from attacksurface.schemas import Project, ProjectCreate
+from attacksurface.validation import is_valid_root_domain
 
 router = APIRouter(prefix="/projects", tags=["projects"])
 
