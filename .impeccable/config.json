@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font-size",
+        "value": "15px",
+        "createdAt": "2026-11-21T18:18:11.273Z",
+        "reason": "agent decision: DESIGN.md Body role documents 15px for memos; token list omits it"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "2.4rem",
+        "createdAt": "2026-11-21T18:20:03.906Z",
+        "reason": "agent decision: DESIGN.md Title role documents 2rem to 2.4rem"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "1.35rem",
+        "createdAt": "2026-11-21T18:26:47.439Z",
+        "reason": "agent decision: AttackSurface wordmark size, a brand mark not a type role"
+      }
+    ]
+  }
+}
