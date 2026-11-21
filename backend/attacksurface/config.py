@@ -1,3 +1,5 @@
+import os
+
 from pydantic import BaseModel
 
 
@@ -12,3 +14,13 @@ class Settings(BaseModel):
 
 
 settings = Settings()
+
+try:
+    settings.supabase_url = os.environ["SUPABASE_URL"]
+except KeyError:
+    raise KeyError("SUPABASE_URL not defined in environment.")
+
+try:
+    settings.supabase_service_key = os.environ["SUPABASE_SERVICE_KEY"]
+except KeyError:
+    raise KeyError("SUPABASE_SERVICE_KEY not defined in environment.")

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
+from attacksurface.database import supabase
 from attacksurface.fixture_loader import load_fixture
 from attacksurface.schemas import Project, ProjectCreate
 from attacksurface.validation import is_valid_root_domain
@@ -8,7 +9,7 @@ router = APIRouter(prefix="/projects", tags=["projects"])
 
 
 @router.post("", response_model=Project, status_code=201)
-def create_project(payload: ProjectCreate) -> dict:
+def create_project(payload: ProjectCreate) -> Project:
     if not payload.authorization_confirmed:
         raise HTTPException(
             status_code=400,
@@ -19,21 +20,33 @@ def create_project(payload: ProjectCreate) -> dict:
             status_code=400,
             detail="root_domain must be a registrable domain (no IPs, wildcards, schemes, or paths)",
         )
-    project = load_fixture("project.json")
-    return {
-        **project,
-        "name": payload.name,
-        "root_domain": payload.root_domain.strip().lower(),
-        "authorization_confirmed": payload.authorization_confirmed,
-    }
+
+    resp = (
+        supabase.table("projects")
+        .insert(
+            {
+                "name": payload.name,
+                "root_domain": payload.root_domain,
+                "authorization_confirmed": payload.authorization_confirmed,
+            }
+        )
+        .execute()
+    )
+
+    project_data = resp.data[0]
+
+    return Project.model_validate(project_data)
 
 
 @router.get("", response_model=list[Project])
-def list_projects() -> list[dict]:
-    return load_fixture("projects.json")
+def list_projects() -> list[Project]:
+    resp = supabase.table("projects").select("*").execute()
+
+    return [Project.model_validate(p) for p in resp.data]
 
 
 @router.get("/{project_id}", response_model=Project)
-def get_project(project_id: str) -> dict:
-    project = load_fixture("project.json")
-    return {**project, "id": project_id}
+def get_project(project_id: str) -> Project:
+    resp = supabase.table("projects").select("*").eq("id", project_id).execute()
+
+    return Project.model_validate(resp.data[0])
