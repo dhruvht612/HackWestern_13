@@ -10,7 +10,6 @@ dependencies = [
     "pydantic>=2.14.4",
     "pytest>=9.2.0",
     "python-multipart>=0.0.34",
-    "ruff>=0.17.6",
     "uvicorn[standard]>=0.54.0",
 ]
 
@@ -24,3 +23,46 @@ module-name = "attacksurface"
 
 [tool.fastapi]
 entrypoint = "attacksurface:app"
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+    # pep8-naming
+    "N",
+    # flake8-builtins
+    "A",
+    # flake8-type-checking
+    "TC",
+    # flake8-bandit
+    "S",
+    # flake8-errmsg
+    "EM",
+    # flake8-no-pep420
+    "INP",
+    # flake8-tidy-imports
+    "TID",
+    # perflint
+    "PERF",
+    # pydoclint
+    # "DOC",
+    # pydocstyle
+    "D",
+]
+ignore = ["D1", "D203", "D213", "SIM108"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.17.6",
+    "ty>=0.0.107",
+]
