@@ -11,6 +11,7 @@ class Settings(BaseModel):
     gemini_api_key: str = ""
     gemini_model: str = "gemini-2.0-flash"
     scan_rate_limit_per_min: int = 30
+    jwt_secret: str = ""
 
 
 settings = Settings()
@@ -24,3 +25,8 @@ try:
     settings.supabase_service_key = os.environ["SUPABASE_SERVICE_KEY"]
 except KeyError:
     raise KeyError("SUPABASE_SERVICE_KEY not defined in environment.")
+
+try:
+    settings.jwt_secret = os.environ["JWT_SECRET"]
+except KeyError:
+    raise KeyError("JWT_SECRET not defined in environment.")

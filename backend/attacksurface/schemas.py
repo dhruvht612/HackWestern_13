@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal
 
+import pydantic
 from pydantic import BaseModel, Field
 
 Severity = Literal["critical", "high", "medium", "low", "info"]
@@ -123,3 +124,13 @@ class Graph(BaseModel):
 
 class Health(BaseModel):
     status: Literal["ok"]
+
+
+class SignUpModel(BaseModel):
+    email: str
+    password: str
+
+
+class SignInModel(BaseModel):
+    email: str
+    password: str
