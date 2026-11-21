@@ -10,10 +10,10 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="panel flex flex-col items-center justify-center px-6 py-12 text-center">
-      <div className="text-lg font-semibold text-slate-100">{title}</div>
-      <p className="mt-2 max-w-xl text-sm text-slate-400">{description}</p>
-      {action ? <div className="mt-4">{action}</div> : null}
+    <div className="flex flex-col items-center justify-center border border-dashed border-ink/40 px-6 py-12 text-center">
+      <div className="display text-2xl font-extrabold uppercase text-ink">{title}</div>
+      <p className="mt-2 max-w-xl text-sm text-ink-soft">{description}</p>
+      {action ? <div className="mt-5">{action}</div> : null}
     </div>
   );
 }

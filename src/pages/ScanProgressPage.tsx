@@ -2,41 +2,49 @@ import { useParams } from "react-router-dom";
 import { useScan } from "@/hooks/useScan";
 import { ScanTimeline } from "@/components/ScanTimeline";
 import { PageSkeleton } from "@/components/LoadingSkeleton";
+import { PageHeader } from "@/components/PageHeader";
 
 export function ScanProgressPage() {
   const { scanId } = useParams();
   const { data: scan, isLoading, error } = useScan(scanId);
 
   if (isLoading) return <PageSkeleton />;
-  if (error || !scan) return <div className="panel p-6 text-severity-critical">Failed to load scan.</div>;
+  if (error || !scan)
+    return (
+      <div className="border-2 border-severity-critical p-6 text-sm">
+        <div className="font-semibold">Couldn’t load this scan.</div>
+        <p className="mt-1 text-ink-soft">It may have been removed. Start a new scan from the header.</p>
+      </div>
+    );
+
+  const done = scan.status === "completed";
+  const pct = done ? 100 : Math.min(90, scan.events.length * 15);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
+      <PageHeader
+        title="Live scan"
+        description={`Passive collection for scan ${scan.id.slice(0, 8)}: certificate logs, DNS, then HTTP and TLS metadata.`}
+      />
       <div>
-        <h1 className="text-2xl font-semibold">Live scan</h1>
-        <p className="mt-1 text-sm text-slate-400">
-          Passive discovery in progress for scan <span className="mono text-slate-300">{scan.id}</span>
-        </p>
-      </div>
-      <div className="grid gap-4 md:grid-cols-3">
-        <div className="panel p-5 md:col-span-2">
-          <div className="text-sm text-slate-400">Status</div>
-          <div className="mt-2 text-xl font-semibold capitalize text-slate-100">{scan.status}</div>
-          <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-800">
-            <div
-              className="h-full bg-accent transition-all"
-              style={{ width: scan.status === "completed" ? "100%" : `${Math.min(90, scan.events.length * 15)}%` }}
-            />
-          </div>
-          <p className="mt-3 text-xs text-slate-500">
-            This view polls every 2 seconds until the scan completes.
-          </p>
+        <div className="mono flex flex-wrap items-baseline justify-between gap-2 text-[13.5px]">
+          <span>
+            <span className="text-ink-soft">STATUS </span>
+            <span className="font-bold uppercase">{scan.status}</span>
+          </span>
+          <span className="tabular text-ink-soft">{scan.events.length} log entries</span>
         </div>
-        <div className="panel p-5">
-          <div className="text-sm text-slate-400">Events</div>
-          <div className="mt-2 text-3xl font-semibold">{scan.events.length}</div>
-          <div className="mt-2 text-xs text-slate-500">CT logs, DNS, HTTP/TLS metadata collection.</div>
+        <div
+          className="mt-2 h-3 border border-ink/40"
+          role="progressbar"
+          aria-valuenow={pct}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Scan progress"
+        >
+          <div className="h-full bg-ink transition-[width] duration-500 ease-out" style={{ width: `${pct}%` }} />
         </div>
+        <p className="mt-2 text-xs text-ink-soft">{done ? "Collection finished." : "This view refreshes every 2 seconds until the scan completes."}</p>
       </div>
       <ScanTimeline events={scan.events} status={scan.status} />
     </div>

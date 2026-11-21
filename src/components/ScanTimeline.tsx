@@ -1,45 +1,40 @@
-import { CheckCircle2, Circle, Clock, AlertTriangle } from "lucide-react";
 import type { ScanEvent } from "@/lib/types";
-import { formatDate } from "@/lib/utils";
 
+function clock(value: string) {
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? value : d.toISOString().slice(11, 19);
+}
+
+/** The collection log: typed, timestamped, one line per entry. */
 export function ScanTimeline({ events, status }: { events: ScanEvent[]; status: string }) {
   return (
-    <div className="panel p-5">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-slate-100">Scan timeline</h3>
-        <span className="text-xs uppercase tracking-wide text-slate-400">{status}</span>
+    <section className="panel">
+      <div className="flex items-center justify-between border-b border-ink/20 px-5 py-3">
+        <h3 className="field-label !text-ink">Collection log</h3>
+        <span className="field-label">{status}</span>
       </div>
-      <div className="space-y-4">
-        {events.map((event, i) => {
-          const done = status === "completed" || i < events.length - 1;
-          const Icon = event.level === "warn" ? AlertTriangle : done ? CheckCircle2 : Circle;
-          const color =
-            event.level === "warn"
-              ? "text-severity-medium"
-              : done
-                ? "text-accent"
-                : "text-slate-500";
-          return (
-            <div key={`${event.timestamp}-${i}`} className="flex gap-3">
-              <div className={`mt-0.5 ${color}`}>
-                <Icon size={16} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-sm text-slate-200">{event.message}</div>
-                <div className="mt-1 flex items-center gap-1 text-xs text-slate-500">
-                  <Clock size={12} /> {formatDate(event.timestamp)}
-                </div>
-              </div>
-            </div>
-          );
-        })}
+      <ol className="divide-y divide-ink/10">
+        {events.map((event, i) => (
+          <li key={`${event.timestamp}-${i}`} className="grid grid-cols-[5.5rem_1fr] gap-3 px-5 py-3 text-sm sm:grid-cols-[6.5rem_4rem_1fr]">
+            <span className="mono tabular text-ink-soft">{clock(event.timestamp)}Z</span>
+            <span
+              className={`mono hidden text-[13px] font-bold uppercase sm:block ${
+                event.level === "warn" ? "text-severity-high" : event.level === "error" ? "text-severity-critical" : "text-ink-faint"
+              }`}
+            >
+              {event.level}
+            </span>
+            <span className={event.level === "warn" ? "font-semibold text-ink" : "text-ink"}>{event.message}</span>
+          </li>
+        ))}
         {status !== "completed" ? (
-          <div className="flex gap-3 text-slate-500">
-            <Circle size={16} className="mt-0.5 animate-pulse" />
-            <div className="text-sm">Scan in progress...</div>
-          </div>
+          <li className="grid grid-cols-[5.5rem_1fr] gap-3 px-5 py-3 text-sm sm:grid-cols-[6.5rem_4rem_1fr]">
+            <span className="h-3.5 w-16 animate-pulse self-center bg-ink/15" />
+            <span className="hidden sm:block" />
+            <span className="text-ink-soft">Collecting…</span>
+          </li>
         ) : null}
-      </div>
-    </div>
+      </ol>
+    </section>
   );
 }

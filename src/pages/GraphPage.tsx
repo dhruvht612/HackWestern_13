@@ -2,8 +2,8 @@ import { useCallback, useMemo, useState } from "react";
 import {
   ReactFlow,
   Background,
+  BackgroundVariant,
   Controls,
-  MiniMap,
   Handle,
   Position,
   type Node,
@@ -16,42 +16,53 @@ import { DEMO_SCAN_ID } from "@/lib/constants";
 import { PageSkeleton } from "@/components/LoadingSkeleton";
 import { DetailPanel } from "@/components/DetailPanel";
 import { SeverityBadge } from "@/components/SeverityBadge";
-import { severityColors } from "@/lib/severity";
+import { PageHeader } from "@/components/PageHeader";
+import { severityColors, severityOrder } from "@/lib/severity";
 import type { GraphNode as GNode, Severity } from "@/lib/types";
 
 type NodeData = { label: string; nodeType: GNode["type"]; severity?: Severity; dimmed?: boolean };
 
+const INK = "#141414";
+const kindLabel: Record<GNode["type"], string> = { root: "Root domain", asset: "Host", finding: "Finding", fix: "Fix" };
+
 function tone(severity?: Severity) {
-  if (!severity) return "#22D3EE";
-  return severityColors[severity];
+  return severity ? severityColors[severity] : INK;
 }
 
-function BaseNode({ data, selected }: NodeProps<Node<NodeData>>) {
+/** Each node is an index card: kind on the top rule, value typed below, severity on the edge band. */
+function CardNode({ data, selected }: NodeProps<Node<NodeData>>) {
   const color = tone(data.severity);
+  const root = data.nodeType === "root";
   return (
     <div
-      className={`min-w-[180px] rounded-lg border bg-panel px-3 py-2 text-xs shadow-panel transition ${data.dimmed ? "opacity-25" : "opacity-100"}`}
-      style={{ borderColor: selected ? "#22D3EE" : color, boxShadow: selected ? `0 0 0 1px ${color}` : undefined }}
+      className={`min-w-[210px] border-[1.5px] px-3 py-2.5 text-sm transition-opacity duration-200 ${root ? "bg-ink text-bond" : "bg-bond text-ink"} ${data.dimmed ? "opacity-20" : "opacity-100"}`}
+      style={{
+        borderColor: selected ? INK : data.severity ? color : INK,
+        borderTopWidth: data.severity ? 5 : 1.5,
+        boxShadow: selected ? "0 0 0 2px #1F3A93" : "0 1px 2px rgba(74,52,16,0.25)",
+      }}
     >
-      <Handle type="target" position={Position.Left} className="!bg-slate-500" />
-      <div className="mb-1 text-[10px] uppercase tracking-wide text-slate-500">{data.nodeType}</div>
-      <div className="font-medium text-slate-100">{data.label}</div>
-      {data.severity ? <div className="mt-1" style={{ color }}>{data.severity}</div> : null}
-      <Handle type="source" position={Position.Right} className="!bg-slate-500" />
+      <Handle type="target" position={Position.Left} className="!h-2 !w-2 !rounded-none !border-0 !bg-ink" />
+      <div className={`mb-0.5 text-[11px] font-semibold uppercase tracking-[0.09em] ${root ? "text-bond/70" : "text-ink-soft"}`}>
+        {kindLabel[data.nodeType]}
+      </div>
+      <div className="font-mono text-[14px] font-bold">{data.label}</div>
+      {data.severity ? <div className="mt-1 text-[11px] font-bold uppercase tracking-[0.08em]">{data.severity}</div> : null}
+      <Handle type="source" position={Position.Right} className="!h-2 !w-2 !rounded-none !border-0 !bg-ink" />
     </div>
   );
 }
 
-const nodeTypes = { custom: BaseNode };
+const nodeTypes = { custom: CardNode };
 
 function layout(nodes: GNode[]): Node<NodeData>[] {
   const columns: Record<GNode["type"], GNode[]> = { root: [], asset: [], finding: [], fix: [] };
   nodes.forEach((n) => columns[n.type].push(n));
-  const x: Record<GNode["type"], number> = { root: 0, asset: 320, finding: 660, fix: 1000 };
+  const x: Record<GNode["type"], number> = { root: 0, asset: 300, finding: 620, fix: 960 };
   return nodes.map((n) => {
     const col = columns[n.type];
     const idx = col.indexOf(n);
-    const y = idx * 110 - ((col.length - 1) * 110) / 2 + 220;
+    const y = idx * 96 - ((col.length - 1) * 96) / 2 + 220;
     return {
       id: n.id,
       type: "custom",
@@ -74,7 +85,10 @@ function connectedSet(nodeId: string, edges: Edge[]) {
     while (q.length) {
       const cur = q.shift()!;
       for (const next of map.get(cur) || []) {
-        if (!visited.has(next)) { visited.add(next); q.push(next); }
+        if (!visited.has(next)) {
+          visited.add(next);
+          q.push(next);
+        }
       }
     }
   };
@@ -89,6 +103,11 @@ export function GraphPage() {
   const [highlight, setHighlight] = useState<Set<string> | null>(null);
 
   const initialNodes = useMemo(() => (data ? layout(data.nodes) : []), [data]);
+  // Size the board to the whole graph at a legible zoom so nothing opens clipped; the page scrolls, not the board.
+  const boardHeight = useMemo(() => {
+    const tallest = Math.max(1, ...["root", "asset", "finding", "fix"].map((t) => (data?.nodes ?? []).filter((n) => n.type === t).length));
+    return Math.max(520, Math.round(((tallest - 1) * 96 + 90) * 0.86 + 60));
+  }, [data]);
   const initialEdges: Edge[] = useMemo(
     () =>
       (data?.edges || []).map((e) => ({
@@ -96,7 +115,7 @@ export function GraphPage() {
         source: e.source,
         target: e.target,
         type: "smoothstep",
-        style: { stroke: "#334155", strokeWidth: 1.5 },
+        style: { stroke: "rgba(20,20,20,0.45)", strokeWidth: 1.5 },
       })),
     [data],
   );
@@ -110,74 +129,94 @@ export function GraphPage() {
     if (!highlight) return initialEdges;
     return initialEdges.map((e) => {
       const onPath = highlight.has(e.source) && highlight.has(e.target);
-      return { ...e, style: { stroke: onPath ? "#22D3EE" : "#1F2A37", strokeWidth: onPath ? 2 : 1 } };
+      return { ...e, style: { stroke: onPath ? INK : "rgba(20,20,20,0.1)", strokeWidth: onPath ? 2.5 : 1 } };
     });
   }, [initialEdges, highlight]);
 
-  const onNodeClick = useCallback((_: unknown, node: Node<NodeData>) => {
-    const raw = data?.nodes.find((n) => n.id === node.id) || null;
-    setSelected(raw);
-    setHighlight(connectedSet(node.id, initialEdges));
-  }, [data, initialEdges]);
+  const onNodeClick = useCallback(
+    (_: unknown, node: Node<NodeData>) => {
+      setSelected(data?.nodes.find((n) => n.id === node.id) || null);
+      setHighlight(connectedSet(node.id, initialEdges));
+    },
+    [data, initialEdges],
+  );
 
-  const onPaneClick = useCallback(() => { setSelected(null); setHighlight(null); }, []);
+  const clear = useCallback(() => {
+    setSelected(null);
+    setHighlight(null);
+  }, []);
 
   if (isLoading) return <PageSkeleton />;
-  if (error || !data) return <div className="panel p-6 text-severity-critical">Failed to load graph.</div>;
+  if (error || !data)
+    return (
+      <div className="border-2 border-severity-critical p-6 text-sm">
+        <div className="font-semibold text-severity-critical">Couldn’t load the attack path graph.</div>
+        <p className="mt-1 text-ink-soft">Reload the page. Findings and assets are still available in their own tabs.</p>
+      </div>
+    );
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-semibold">Attack Paths</h1>
-        <p className="mt-1 text-sm text-slate-400">Potential exposure relationships between assets, findings, and fixes.</p>
-      </div>
+    <div className="space-y-5">
+      <PageHeader
+        title="Attack paths"
+        description="How each host connects to its findings and their fixes. Select a card to trace its path; select the background to clear."
+      />
 
-      <div className="rounded-lg border border-severity-medium/30 bg-severity-medium/10 px-4 py-3 text-sm text-severity-medium">
+      <p className="inline-flex border-[1.5px] border-ink px-3 py-1.5 text-[13px] font-semibold">
         Potential exposure paths, not confirmed attack chains.
-      </div>
+      </p>
 
-      <div className="grid gap-4 xl:grid-cols-[1fr_320px]">
-        <div className="panel h-[70vh] min-h-[520px] overflow-hidden">
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_300px]">
+        <div className="overflow-hidden border border-ink/30 bg-bond" style={{ height: boardHeight }}>
           <ReactFlow
+            zoomOnScroll={false}
+            preventScrolling={false}
             nodes={nodes}
             edges={edges}
             nodeTypes={nodeTypes}
             onNodeClick={onNodeClick}
-            onPaneClick={onPaneClick}
+            onPaneClick={clear}
             fitView
-            fitViewOptions={{ padding: 0.2 }}
+            fitViewOptions={{ padding: 0.04, maxZoom: 1 }}
             minZoom={0.2}
           >
-            <Background color="#1F2A37" gap={20} />
-            <MiniMap
-              nodeColor={(n) => tone((n.data as NodeData).severity)}
-              maskColor="rgba(11,15,20,0.75)"
-            />
-            <Controls />
+            <Background variant={BackgroundVariant.Lines} color="rgba(31,58,147,0.08)" gap={24} />
+            <Controls showInteractive={false} />
           </ReactFlow>
         </div>
 
-        <div className="space-y-4">
-          <div className="panel p-4">
-            <div className="text-sm font-semibold text-slate-200">Legend</div>
-            <div className="mt-3 space-y-2 text-xs text-slate-300">
-              {(["critical", "high", "medium", "low", "info"] as Severity[]).map((s) => (
-                <div key={s} className="flex items-center gap-2">
-                  <span className="h-2.5 w-2.5 rounded-full" style={{ background: severityColors[s] }} />
+        <div className="space-y-5">
+          <section className="border border-ink/25 p-4">
+            <h2 className="field-label border-b border-ink/20 pb-2 !text-ink">Legend</h2>
+            <ul className="mt-3 space-y-2 text-[13px]">
+              {severityOrder.map((s) => (
+                <li key={s} className="flex items-center gap-2.5">
+                  <span className="h-1.5 w-6" style={{ background: severityColors[s] }} aria-hidden="true" />
                   <span className="capitalize">{s}</span>
-                </div>
+                </li>
               ))}
-              <div className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-accent" /> root/fix</div>
-            </div>
-          </div>
-          <DetailPanel title="Node detail" open={Boolean(selected)} onClose={() => { setSelected(null); setHighlight(null); }}>
+              <li className="flex items-center gap-2.5">
+                <span className="h-1.5 w-6 bg-ink" aria-hidden="true" />
+                Root domain, host, or fix
+              </li>
+            </ul>
+          </section>
+          <DetailPanel title={selected?.label ?? ""} open={Boolean(selected)} onClose={clear}>
             {selected ? (
-              <div className="space-y-3 text-sm">
-                <div><div className="text-slate-400">Type</div><div className="capitalize text-slate-200">{selected.type}</div></div>
-                <div><div className="text-slate-400">Label</div><div className="mono text-slate-200">{selected.label}</div></div>
-                {selected.severity ? <div><div className="mb-1 text-slate-400">Severity</div><SeverityBadge severity={selected.severity} /></div> : null}
-                <p className="text-xs text-slate-500">Click a node to highlight its connected exposure path. Click the canvas to clear.</p>
-              </div>
+              <dl className="space-y-3 text-sm">
+                <div>
+                  <dt className="field-label">Kind</dt>
+                  <dd className="mt-0.5">{kindLabel[selected.type]}</dd>
+                </div>
+                {selected.severity ? (
+                  <div>
+                    <dt className="field-label mb-1">Severity</dt>
+                    <dd>
+                      <SeverityBadge severity={selected.severity} />
+                    </dd>
+                  </div>
+                ) : null}
+              </dl>
             ) : null}
           </DetailPanel>
         </div>

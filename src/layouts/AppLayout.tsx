@@ -1,16 +1,9 @@
-import { NavLink, Outlet, useNavigate, useParams } from "react-router-dom";
-import {
-  LayoutDashboard,
-  Server,
-  AlertTriangle,
-  Package,
-  Network,
-  FileText,
-  Plus,
-  Shield,
-} from "lucide-react";
+import { Link, NavLink, Outlet, useNavigate, useParams } from "react-router-dom";
+import { LayoutDashboard, Server, AlertTriangle, Package, Network, FileText, Plus } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { useCreateScan } from "@/hooks/useCreateScan";
+import { ClassificationBand } from "@/components/ClassificationBand";
+import { DEMO_PROJECT_ID } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -18,13 +11,13 @@ const navItems = [
   { label: "Assets", icon: Server, path: "/assets" },
   { label: "Findings", icon: AlertTriangle, path: "/findings" },
   { label: "Dependencies", icon: Package, path: "/dependencies" },
-  { label: "Attack Paths", icon: Network, path: "/graph" },
+  { label: "Attack paths", icon: Network, path: "/graph" },
   { label: "Report", icon: FileText, path: "/report" },
 ];
 
 export function AppLayout() {
   const { id } = useParams();
-  const projectId = id || "11111111-1111-4111-8111-111111111111";
+  const projectId = id || DEMO_PROJECT_ID;
   const navigate = useNavigate();
   const { data: projects } = useProjects();
   const createScan = useCreateScan(projectId);
@@ -35,95 +28,63 @@ export function AppLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-slate-100">
-      <div className="flex min-h-screen">
-        <aside className="no-print hidden w-64 shrink-0 border-r border-border bg-[#0E141C] p-4 lg:block">
-          <div className="mb-8 flex items-center gap-2 px-2">
-            <div className="rounded-lg border border-accent/30 bg-accent/10 p-2 text-accent">
-              <Shield size={18} />
-            </div>
-            <div>
-              <div className="text-sm font-semibold tracking-wide">AttackSurface</div>
-              <div className="text-xs text-slate-500">External intelligence</div>
-            </div>
-          </div>
-          <nav className="space-y-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const to = `/projects/${projectId}${item.path}`;
-              return (
-                <NavLink
-                  key={item.label}
-                  to={to}
-                  end={item.path === ""}
-                  className={({ isActive }) =>
-                    cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition",
-                      isActive
-                        ? "bg-accent/10 text-accent border border-accent/20"
-                        : "text-slate-300 hover:bg-white/5 hover:text-slate-100 border border-transparent",
-                    )
-                  }
-                >
-                  <Icon size={16} />
-                  {item.label}
-                </NavLink>
-              );
-            })}
-          </nav>
-        </aside>
+    <div className="grain min-h-screen text-ink">
+      <ClassificationBand className="no-print">Passive recon only // Potential exposure, validate before action</ClassificationBand>
 
-        <div className="min-w-0 flex-1">
-          <header className="no-print sticky top-0 z-20 border-b border-border bg-background/90 px-4 py-3 backdrop-blur md:px-6">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="lg:hidden flex items-center gap-2 text-sm font-semibold"><Shield size={16} className="text-accent"/>AttackSurface</div>
-                <select
-                  className="rounded-lg border border-border bg-panel px-3 py-2 text-sm text-slate-200"
-                  value={projectId}
-                  onChange={(e) => navigate(`/projects/${e.target.value}`)}
-                >
-                  {(projects || []).map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} ({p.root_domain})
-                    </option>
-                  ))}
-                  {!projects?.length ? <option value={projectId}>Acme Demo</option> : null}
-                </select>
-              </div>
-              <button
-                onClick={onNewScan}
-                disabled={createScan.isPending}
-                className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-slate-950 hover:bg-cyan-300 disabled:opacity-60"
+      <div className="mx-auto max-w-[1440px] px-3 pb-10 md:px-6">
+        <header className="no-print flex flex-wrap items-center justify-between gap-3 py-4">
+          <Link to="/" className="flex items-center gap-2.5" aria-label="AttackSurface home">
+            <svg viewBox="0 0 32 32" className="h-7 w-7" aria-hidden="true">
+              <path fill="#141414" d="M2 8.5h10l2.5-3H30v22H2z" />
+              <path fill="#D9A13B" d="M6 14h20v3H6zm0 6h13v3H6z" />
+            </svg>
+            <span className="display text-[1.35rem] font-extrabold uppercase tracking-[0.02em]">AttackSurface</span>
+          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <label htmlFor="project-select" className="sr-only">
+              Project
+            </label>
+            <select
+              id="project-select"
+              className="field w-auto max-w-[16rem] cursor-pointer py-2 font-mono text-[13px]"
+              value={projectId}
+              onChange={(e) => navigate(`/projects/${e.target.value}`)}
+            >
+              {(projects || []).map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.root_domain}
+                </option>
+              ))}
+              {!projects?.length ? <option value={projectId}>acme-demo.com</option> : null}
+            </select>
+            <button onClick={onNewScan} disabled={createScan.isPending} className="btn-primary py-2">
+              <Plus size={16} aria-hidden="true" /> {createScan.isPending ? "Starting…" : "New scan"}
+            </button>
+          </div>
+        </header>
+
+        <nav aria-label="Project sections" className="no-print -mb-px flex gap-0.5 overflow-x-auto px-1 pr-14 pt-1 [mask-image:linear-gradient(to_right,black_80%,transparent)] md:pr-1 md:[mask-image:none]">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <NavLink
+                key={item.label}
+                to={`/projects/${projectId}${item.path}`}
+                end={item.path === ""}
+                className={({ isActive }) =>
+                  cn("tab", isActive ? "bg-bond text-ink" : "bg-manila-deep text-manila-dark hover:bg-manila hover:text-ink")
+                }
               >
-                <Plus size={16} /> {createScan.isPending ? "Starting..." : "New scan"}
-              </button>
-            </div>
-            <div className="mt-3 flex gap-2 overflow-x-auto lg:hidden">
-              {navItems.map((item) => {
-                const to = `/projects/${projectId}${item.path}`;
-                return (
-                  <NavLink
-                    key={item.label}
-                    to={to}
-                    end={item.path === ""}
-                    className={({ isActive }) =>
-                      cn(
-                        "whitespace-nowrap rounded-full border px-3 py-1.5 text-xs",
-                        isActive ? "border-accent/30 bg-accent/10 text-accent" : "border-border text-slate-300",
-                      )
-                    }
-                  >
-                    {item.label}
-                  </NavLink>
-                );
-              })}
-            </div>
-          </header>
-          <main className="p-4 md:p-6">
-            <Outlet />
-          </main>
-        </div>
+                <Icon size={15} aria-hidden="true" />
+                {item.label}
+              </NavLink>
+            );
+          })}
+        </nav>
+
+        <main className="sheet relative min-h-[70vh] p-4 sm:p-6 lg:p-8">
+          <Outlet />
+        </main>
       </div>
     </div>
   );
