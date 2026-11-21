@@ -20,6 +20,15 @@
         "value": "1.35rem",
         "createdAt": "2026-11-21T18:26:47.439Z",
         "reason": "agent decision: AttackSurface wordmark size, a brand mark not a type role"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "*",
+        "files": [
+          "src/styles/print.css"
+        ],
+        "createdAt": "2026-11-21T20:05:20.024Z",
+        "reason": "agent decision: DESIGN.md Exceptions documents print as black ink on white"
       }
     ]
   }

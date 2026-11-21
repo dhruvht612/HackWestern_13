@@ -1,21 +1,22 @@
 ---
 name: AttackSurface
-description: The file an attacker keeps on you, printed on folder stock and bond paper.
+description: The file an attacker keeps on you, kept as a dark intelligence dossier.
 colors:
-  manila: "#D9A13B"
-  manila-deep: "#C38D2E"
-  manila-dark: "#4A3410"
-  bond: "#F8F7F3"
-  ink: "#141414"
-  ink-soft: "#4A4A46"
-  ink-faint: "#6E6C64"
-  stamp: "#C8102E"
-  carbon: "#1F3A93"
-  severity-critical: "#7A1530"
-  severity-high: "#D9480F"
-  severity-medium: "#A87C00"
-  severity-low: "#2E6E62"
-  severity-info: "#6B6B66"
+  abyss-navy: "#1A2236"
+  navy-deep: "#121929"
+  navy-raised: "#212A40"
+  navy-high: "#29334C"
+  camel-suede: "#C19A6B"
+  electric-kiwi: "#C4FF1F"
+  kiwi-hover: "#D3FF5C"
+  text-primary: "#F8F7F3"
+  text-secondary: "#D1D5DB"
+  text-muted: "#9AA0AC"
+  severity-critical: "#FF5D5D"
+  severity-high: "#FF8C42"
+  severity-medium: "#F2C14E"
+  severity-low: "#7FB7A4"
+  severity-info: "#9AA0AC"
 typography:
   display:
     fontFamily: "Archivo, Public Sans, ui-sans-serif, sans-serif"
@@ -77,51 +78,48 @@ spacing:
   section-lg: "112px"
 components:
   button-primary:
-    backgroundColor: "{colors.ink}"
-    textColor: "{colors.bond}"
+    backgroundColor: "{colors.electric-kiwi}"
+    textColor: "{colors.abyss-navy}"
     rounded: "{rounded.none}"
     padding: "10px 16px"
   button-primary-hover:
-    backgroundColor: "#000000"
-    textColor: "{colors.bond}"
+    backgroundColor: "{colors.kiwi-hover}"
+    textColor: "{colors.abyss-navy}"
   button-secondary:
     backgroundColor: "transparent"
-    textColor: "{colors.ink}"
+    textColor: "{colors.text-primary}"
     rounded: "{rounded.none}"
     padding: "10px 16px"
-  button-secondary-hover:
-    backgroundColor: "{colors.ink}"
-    textColor: "{colors.bond}"
   field:
-    backgroundColor: "{colors.bond}"
-    textColor: "{colors.ink}"
+    backgroundColor: "{colors.navy-raised}"
+    textColor: "{colors.text-primary}"
     rounded: "{rounded.none}"
     padding: "8px 12px"
   tab-active:
-    backgroundColor: "{colors.bond}"
-    textColor: "{colors.ink}"
+    backgroundColor: "{colors.navy-raised}"
+    textColor: "{colors.text-primary}"
     padding: "10px 20px 8px"
   tab-inactive:
-    backgroundColor: "{colors.manila-deep}"
-    textColor: "{colors.manila-dark}"
+    backgroundColor: "{colors.camel-suede}"
+    textColor: "{colors.abyss-navy}"
     padding: "10px 20px 8px"
   classification-band:
-    backgroundColor: "{colors.ink}"
-    textColor: "{colors.bond}"
+    backgroundColor: "{colors.camel-suede}"
+    textColor: "{colors.abyss-navy}"
     typography: "{typography.band}"
     padding: "6px 16px"
   severity-badge:
     backgroundColor: "transparent"
-    textColor: "{colors.ink}"
+    textColor: "{colors.text-primary}"
     rounded: "{rounded.none}"
     padding: "2px 8px"
   priority-p0:
-    backgroundColor: "{colors.stamp}"
-    textColor: "{colors.bond}"
+    backgroundColor: "{colors.electric-kiwi}"
+    textColor: "{colors.abyss-navy}"
     padding: "2px 6px"
   sheet:
-    backgroundColor: "{colors.bond}"
-    textColor: "{colors.ink}"
+    backgroundColor: "{colors.navy-raised}"
+    textColor: "{colors.text-primary}"
     rounded: "{rounded.none}"
     padding: "32px"
 ---
@@ -130,58 +128,63 @@ components:
 
 ## Overview
 
-**Creative North Star: "The Attacker's Dossier"**
+**Creative North Star: "The Attacker's Dossier"**, kept as a dark intelligence file.
 
-Every surface is a page from the file an outsider would keep on you. The field is manila folder stock with paper fiber; content sits on bond sheets that lie on the folder and cast a soft paper shadow; everything printed on them is carbon ink. Typed exhibits are set in Courier Prime, the body in Public Sans (the U.S. government face), and headings in condensed Archivo, the way a stamp or a form title would be. Classification bands run across the top (and on the landing page, the bottom) of every surface.
+Every surface is a page from the file an outsider would keep on you. The field is Abyss Navy with a faint camel fiber; content sits on raised navy sheets with a camel hairline edge and a soft drop shadow; text is off-white. Camel Suede is the file's structure: folder tabs, classification bands, rules, labels, redaction tape, and the lines of the infrastructure. Electric Kiwi is the one live wire: the primary action, focus, the active tab, and the single thing to fix first. Typed exhibits are set in Courier Prime, the body in Public Sans (the U.S. government face), and headings in condensed Archivo, the way a stamp or a form title would be. Classification bands run across the top (and on the landing page, the bottom) of every surface.
 
-Structure comes from rules, not fills. Panels are ruled boxes; tables are ledgers with a heavy ink head rule; summaries are typed ledgers (SUBJECT / SCAN / SOURCES / ON FILE), never hero-metric tiles. Color is almost entirely absent: one stamp red marks the single thing to fix first, carbon blue marks focus and nothing else, and severity hues ride on edges and bands while the words stay in ink. Evidence is shown in place and annotated where it sits (a header line, a dotted leader, a note), never summarized into a tinted card.
+Structure comes from rules, not fills. Panels are ruled boxes; tables are ledgers with a heavy camel head rule; summaries are typed ledgers (SUBJECT / SCAN / SOURCES / ON FILE), never hero-metric tiles. Evidence is shown in place and annotated where it sits (a header line, a dotted leader, a note), never summarized into a tinted card.
 
-Density is that of a working document: compact 13 to 14px text in the app, generous 80 to 112px section passes on the landing page. The Persuade surface may tilt and stack sheets; the Operate surfaces lie flat on one sheet under die-cut folder tabs.
+Density is that of a working document: compact 13 to 14px text in the app, generous 80 to 112px section passes on the landing page. The Persuade surface may tilt and stack sheets inside a camel folder; the Operate surfaces lie flat on one sheet under die-cut folder tabs.
 
 **Key Characteristics:**
-- Manila field, bond sheets, carbon ink; square corners everywhere.
-- Rules and line style carry structure and category; fills are reserved.
-- Stamp red appears once per surface, on the P0.
+- A strict 60 / 30 / 10: Abyss Navy surfaces, Camel Suede structure, Electric Kiwi action.
+- Square corners everywhere; the die-cut tab and the drawn stamp are the only other silhouettes.
+- Rules and line style carry structure and category; fills are reserved for the bands, tabs, and the folder.
+- Kiwi appears on the primary action, focus, the active tab, and once per surface on the P0.
 - Condensed Archivo for titles and stamps, Public Sans for prose, Courier Prime for anything collected.
-- Folder tabs are navigation; classification bands frame the page.
 
 ## Colors
 
-A near-achromatic document palette (folder, paper, ink) with one reserved red and one functional blue.
+Every color is a CSS custom property in `src/styles/globals.css` (`--color-primary`, `--color-secondary`, `--color-accent`, text and severity tokens, plus `--rgb-*` channel triplets). `tailwind.config.js` reads only those variables, so components never carry a literal color.
 
-### Primary
-- **Stamp Red** (`stamp`): the rubber-stamp ink for the single P0 item: the red `Stamp` and the filled P0 priority chip in memos. It is never a severity hue.
+### 60%: Abyss Navy (`--color-primary`, Tailwind `navy`)
+- **Abyss Navy** `#1A2236`: the page field under everything (with the `.grain` fiber), every dominant surface, the browser theme color, and text on kiwi or camel fills.
+- **Navy Deep** `#121929` (`navy-deep`): quiet passages (the rules-of-engagement section) and the graph board.
+- **Navy Raised** `#212A40` (`navy-raised`): sheets, fields, detail panels, the active folder tab, chain nodes.
+- **Navy High** `#29334C` (`navy-high`): pressed and hovered control surfaces.
 
-### Secondary
-- **Carbon Blue** (`carbon`): the focus ring on every interactive element (2px outline, 2px offset), and link hover. Nothing else is blue.
+### 30%: Camel Suede (`--color-secondary`, Tailwind `camel`)
+Structure and warmth: classification bands (filled), inactive folder tabs (filled), the landing case-file folder (filled), head rules and section breaks (solid), hairline dividers and ruled boxes (15 to 45% alpha), field borders, secondary-button borders, ledger heads, field labels and dossier metadata keys (SUBJECT, TO, FROM), redaction tape, icons in the wordmark, graph cards and edges, and the faded (non-P0) exposure chains. Never used for paragraphs.
 
-### Neutral
-- **Manila Folder** (`manila`): the page field under everything, always with the `.grain` fiber texture. Also the browser theme color.
-- **Folder Shadow** (`manila-deep`): inactive folder tabs and the scrollbar thumb.
-- **Folder Ink** (`manila-dark`): text set directly on the manila field (landing ledes, nav links, footer, inactive tab labels). Never used on bond.
-- **Bond Paper** (`bond`): every sheet, field, and active tab; also text on ink.
-- **Carbon Ink** (`ink`): all primary text, heavy rules, primary buttons, classification bands, redaction tape, the prod environment tag, and the one full-bleed black passage (rules of engagement).
-- **Soft Ink** (`ink-soft`): secondary text, field labels, ledger heads, the info severity label.
-- **Faint Ink** (`ink-faint`): placeholders, list numerals, evidence-ref footers, inactive log levels.
-- **Hairline**: ink at 16 to 30% alpha (`rgba(20,20,20,0.16)` is the global default border) for dividers and ruled boxes; 40% for fields, 100% for head rules.
+### 10%: Electric Kiwi (`--color-accent`, Tailwind `kiwi`)
+Action and focus only: primary buttons (navy text), the focus ring, the active folder tab's top edge, the active severity filter, a selected ledger row's rules, the traced path in the attack graph, the live P0 exposure chain, the active scan progress bar, the highest-exposure bar, the P0 chip, and the P0 stamp. Never a background for more than a button-sized area.
 
-### Severity
-Severity keeps its own inks so it never borrows the stamp or the focus color: Critical oxblood (`severity-critical`), High orange (`severity-high`), Medium ochre (`severity-medium`), Low pine (`severity-low`), Info gray (`severity-info`). Severity hue appears on the badge border, a small square swatch inside the badge, chart bars, and graph card top bands. Badge text stays ink (soft ink for Info); Critical earns a 2px border, never a fill.
+### Text
+- **Primary** `#F8F7F3` (`fg`): all headings and body text.
+- **Secondary** `#D1D5DB` (`fg-soft`): ledes, secondary lines, metadata values.
+- **Muted** `#9AA0AC` (`fg-faint`): placeholders, list numerals, de-emphasized remediation, disabled text (6.2:1 on Abyss Navy).
+
+### Severity (sanctioned exception)
+Severity is semantic, not palette, and is always paired with a text label so it never depends on hue: Critical `#FF5D5D`, High `#FF8C42`, Medium `#F2C14E`, Low `#7FB7A4`, Info `#9AA0AC`. Severity hue appears on the badge border, a square swatch inside the badge, chart bars, and graph card top bands. Badge text stays off-white; Critical earns a 2px border, never a fill. Kiwi is never a severity color.
 
 ### Named Rules
-**The One Stamp Rule.** Stamp red marks the P0 and nothing else. A surface carries one red stamp, on the one item to fix first; the same item may repeat its red in a P0 chip, but no severity badge, second item, heading, button, or decoration ever takes red.
+**The 60/30/10 Rule.** Navy owns the surface, camel owns the structure, kiwi owns the action. If a new element is neither a surface, a structure, nor an action, it is text.
 
-**The Edge-Not-Ink Rule.** Severity color rides edges, swatches, bars, and lines; the words are ink. Never set severity labels or body text in a severity hue.
+**The One Kiwi Mark Rule.** A surface carries one kiwi stamp, on the one item to fix first. The same item may repeat kiwi in its P0 chip; no second item, heading, or decoration takes the kiwi stamp.
 
-**The Untinted Panel Rule.** Panels, cards, memos, and tiles are bond or transparent with ink rules. No tinted fills to group or signal; hover tints on ledger rows (`manila` at 10 to 15%) are state, not structure.
+**The Edge-Not-Hue Rule.** Severity color rides edges, swatches, bars, and lines; the words are neutral and the label is always present.
 
-**The Line-Not-Hue Rule.** Categories that are not severity (environment, priority above P0, inactive paths) are told by line style: solid fill for prod, solid outline for staging, dashed for dev, dotted for unknown.
+**The Untinted Panel Rule.** Panels, cards, and memos are raised navy or transparent with camel rules. Hover tints on ledger rows (`camel` at 10 to 15%) are state, not structure.
+
+**The Line-Not-Hue Rule.** Categories that are not severity (environment, priority above P0, inactive paths) are told by line style: solid camel fill for prod, solid outline for staging, dashed for dev, dotted for unknown.
 
 ## Typography
 
 **Display Font:** Archivo, variable width, set condensed (`font-stretch: 78%`), with Public Sans fallback
 **Body Font:** Public Sans (with ui-sans-serif, system-ui)
 **Label/Mono Font:** Courier Prime (with ui-monospace)
+
+All three are self-hosted from `public/fonts/`.
 
 **Character:** A government form set by a typewriter. Archivo condensed at weight 800 reads as stamped titling; Public Sans is the plain civil-service voice; Courier Prime marks everything that was collected rather than written: hostnames, headers, timestamps, IDs, memo routing lines.
 
@@ -191,7 +194,7 @@ Severity keeps its own inks so it never borrows the stamp or the focus color: Cr
 - **Title** (800, 2rem to 2.4rem, 1): app page titles (`PageHeader`), document titles ("Case file", "Memorandum", report title), which may be uppercase.
 - **Body** (400, 14px app / 15px memos / 1.05rem landing ledes, 1.625): prose, capped at 34 to 70ch.
 - **Exhibit** (Courier Prime 400, 13 to 13.5px, 1.625): collected data, evidence blocks, memo headers, hostnames in tables.
-- **Label** (600, 11px, 0.09em, uppercase): field labels, ledger heads, and in-sheet section labels ("Findings by severity", "Evidence"). Numbered only when they title a form box in an intake form ("1. Project name"). Never an eyebrow above a heading.
+- **Label** (600, 11px, 0.09em, uppercase, camel): field labels, ledger heads, and in-sheet section labels ("Findings by severity", "Evidence"). Numbered only when they title a form box in an intake form ("1. Project name"). Never an eyebrow above a heading.
 - **Band** (Archivo 700, 11px, 0.22em, uppercase, width 90%): classification bands only.
 
 ### Named Rules
@@ -199,92 +202,105 @@ Severity keeps its own inks so it never borrows the stamp or the focus color: Cr
 
 **The Condensed Title Rule.** Display, headline, title, and stamp text are Archivo at weight 800, condensed (78% for titles, 70 to 85% inside stamps and sheet headings). Never set a title in the body face.
 
+**The Neutral Prose Rule.** Paragraphs are off-white or secondary text. Camel and kiwi never color running text.
+
 ## Layout
 
-Two compositions share one material system. The landing page is a 1320px column with `px-16/32px` gutters, two-column asymmetric grids at `lg` (1fr / 1.08fr hero; 0.78fr / 1.22fr and 1.2fr / 0.8fr exhibits), and section passes of 80px (`py-20`), 112px at `lg`, separated by 2px ink rules at 80% opacity. The app is a 1440px column: header, a row of folder tabs that overlap the sheet by 1px, then one bond sheet (`p-16/24/32px` by breakpoint) holding the page.
+Two compositions share one material system. The landing page is a 1320px column with `px-16/32px` gutters, two-column asymmetric grids at `lg` (1fr / 1.08fr hero; 0.78fr / 1.22fr and 1.2fr / 0.8fr exhibits), and section passes of 80px (`py-20`), 112px at `lg`, separated by solid 2px camel rules. The app is a 1440px column: header, a row of folder tabs that overlap the sheet by 1px, then one raised navy sheet (`p-16/24/32px` by breakpoint) holding the page.
 
-Inside the sheet, pages stack in 32px rhythm (`space-y-8`), open with a title over a 2px ink rule, and lay sections in two-column grids at `xl`. Stat boxes sit in a gap-px grid whose 25% ink background shows through as shared hairlines. Detail panels are sticky sheets beside the ledger. Tabs scroll horizontally on narrow screens; the landing nav collapses to the wordmark and one CTA below `md`. Breakpoints are Tailwind defaults.
+Inside the sheet, pages stack in 32px rhythm (`space-y-8`), open with a title over a 2px camel rule, and lay sections in two-column grids at `xl`. Detail panels are sticky sheets beside the ledger. Tabs scroll horizontally on narrow screens behind a right-edge fade; the landing nav collapses to the wordmark and one CTA below `md`. Breakpoints are Tailwind defaults.
 
 ## Elevation & Depth
 
-Depth is physical paper, not interface layering. The manila field is the ground; bond sheets lie on it with one soft, warm paper shadow tinted by the folder (`sheet`). Nothing inside a sheet is elevated: structure there is rules only. The only other shadow is a small ink lift under the primary button on hover, released on press. On the landing page, a second sheet sits rotated beneath the case file and sheets may tilt under a degree; the app's sheet is flat and untilted. Print strips every shadow, texture, and field to white.
+Depth comes from navy lightness steps, not new hues: deep for quiet passages and the graph board, the base field, raised for sheets and fields, high for pressed controls. Sheets carry a 1px camel hairline (inset, 16%) and one soft black drop (`sheet`). Nothing inside a sheet is elevated: structure there is rules only. The only other shadow is a small kiwi-tinted lift under the primary button on hover, released on press. On the landing page the case sheet is filed in a camel folder rotated beneath it, with the subject on the folder tab; the app's sheet is flat and untilted. No glow, no glass.
 
 ### Shadow Vocabulary
-- **Sheet** (`box-shadow: 0 1px 1px rgba(74,52,16,0.18), 0 18px 36px -14px rgba(74,52,16,0.55)`): every bond sheet on the manila field. Always paired with the paper-fiber texture.
-- **Lift** (`box-shadow: 0 2px 4px rgba(20,20,20,0.18), 0 10px 18px -8px rgba(20,20,20,0.4)`): primary button hover only, with a 1px rise.
+- **Sheet** (`box-shadow: inset 0 0 0 1px rgb(193 154 107 / 0.16), 0 18px 40px -16px rgb(0 0 0 / 0.65)`): every sheet on the navy field and the landing folder.
+- **Lift** (`box-shadow: 0 8px 18px -8px rgb(196 255 31 / 0.35)`): primary button hover only, with a 1px rise.
 
 ### Named Rules
-**The Paper-On-Folder Rule.** A shadow means "a sheet of paper is lying on the folder." Nothing on a sheet casts a shadow.
+**The Sheet-On-Folder Rule.** A shadow means "a sheet is lying in the file." Nothing on a sheet casts a shadow.
 
 ## Shapes
 
-Square corners throughout (0 radius): buttons, fields, badges, tabs, sheets, tiles. The only silhouette is the die-cut folder tab, a trapezoid clipped 10px in at each top corner. Borders carry meaning by weight and style: 1px hairline for dividers, 1.5px for badges, tags, and chain nodes, 2px for head rules, secondary buttons, and section breaks; dashed for absent or undeclared things (a missing header slot, the "Internet" origin, an empty state, a dev host), dotted for unknown and for annotation leaders. Stamps are the one rounded form, drawn as SVG double rectangles with roughened ink.
+Square corners throughout (0 radius): buttons, fields, badges, tabs, sheets, folders. The only silhouette is the die-cut folder tab, a trapezoid clipped 10px in at each top corner (app navigation and the landing folder's label tab). Borders carry meaning by weight and style: 1px hairline for dividers, 1.5px for badges, tags, and chain nodes, 2px for head rules, secondary buttons, and section breaks; dashed for absent or undeclared things (a missing header slot, the "Internet" origin, an empty state, a dev host), dotted for unknown and for annotation leaders. Stamps are the one rounded form, drawn as SVG double rectangles with roughened ink.
 
 ## Components
 
 ### Buttons
 Blunt, typed, square.
-- **Shape:** square corners (0).
-- **Primary:** ink fill, bond text, bold uppercase 14px with 0.06em tracking, 10px by 16px (landing hero CTAs step to 14px by 24px at 15px text).
-- **Hover / Focus:** rises 1px to pure black with the Lift shadow; press returns flat; 150ms ease-out. Focus is the global 2px carbon outline at 2px offset. Disabled at 50% opacity.
-- **Secondary:** transparent with a 2px ink border and ink text; hover inverts to ink fill and bond text.
-- **Text link action:** underlined at 0.2em offset, 1px thickness, hover to carbon.
+- **Primary:** Electric Kiwi fill, Abyss Navy text (13:1), bold uppercase 14px with 0.06em tracking, 10px by 16px (landing hero CTAs step to 14px by 24px at 15px text).
+- **Hover / Focus:** rises 1px to `kiwi-hover` with the Lift shadow; press returns flat; 150ms ease-out. Focus is the global 2px kiwi outline at 2px offset. Disabled at 50% opacity with no lift.
+- **Secondary:** transparent with a 2px camel border and off-white text; hover adds a 10% camel wash.
+- **Text link action:** underlined at 0.2em offset, 1px thickness, hover to kiwi.
 
 ### Chips
-- **Severity badge:** 1.5px border in the severity hue, a 8px square swatch in the hue, bold uppercase 11px ink label at 0.08em. Critical takes a 2px border in oxblood; no badge is ever filled.
-- **Environment tag:** Courier Prime 11px bold uppercase in a 1.5px ink box; prod is filled ink, staging outlined, dev dashed, unknown dotted faint.
-- **Priority chip:** Courier Prime bold 13px; P0 is filled stamp red, every other priority is a 1.5px ink outline.
-- **Evidence ref:** Courier Prime 12px soft ink in a hairline box.
+- **Severity badge:** 1.5px border in the severity hue, an 8px square swatch in the hue, bold uppercase 11px off-white label at 0.08em. Critical takes a 2px border; no badge is ever filled.
+- **Environment tag:** Courier Prime 11px bold uppercase in a 1.5px camel box; prod is filled camel with navy text, staging outlined, dev dashed, unknown dotted muted.
+- **Priority chip:** Courier Prime bold; P0 is filled kiwi with navy text, every other priority is a 1.5px camel outline.
+- **Evidence ref:** Courier Prime 13px secondary text in a camel hairline box.
 
 ### Cards / Containers
-- **Corner Style:** square (0).
-- **Background:** bond (sheets, tiles, detail panels) or transparent (ruled panels, memos inside a sheet).
-- **Shadow Strategy:** Sheet shadow on top-level sheets only; see Elevation & Depth.
-- **Border:** ink at 20 to 25%; dashed 35 to 40% for empty states and absent memos.
-- **Internal Padding:** 20px for panels and tiles, 32px to 40px for landing sheets.
+- **Background:** raised navy (sheets, detail panels) or transparent (ruled panels, memos inside a sheet).
+- **Shadow Strategy:** Sheet shadow on top-level sheets only.
+- **Border:** camel at 20 to 25%; dashed 35 to 40% for empty states and absent memos.
+- **Internal Padding:** 20px for panels, 32px to 40px for landing sheets.
 
 ### Inputs / Fields
-- **Style:** bond fill, 1px ink border at 40%, square, 8px by 12px, 14px text, faint-ink placeholder.
-- **Focus:** border goes to full ink plus the carbon focus outline; hover raises the border to 70%.
+- **Style:** raised navy fill, 1px camel border at 45%, square, 8px by 12px, 14px off-white text, muted placeholder, kiwi caret.
+- **Focus:** border to full camel plus the kiwi focus outline; hover raises the border to full camel. In boxed intake forms the box takes the kiwi outline and the bare input inside drops its own.
+- **Error:** 2px `severity-critical` border around the message, with "Not created." and the recovery in text.
 - **Labels:** the Label style above the field.
 
 ### Navigation
-- **Folder tabs (app):** die-cut trapezoids, 14px semibold with a 15px line icon. Active tab is bond and joins the sheet beneath it; inactive tabs are `manila-deep` with folder-ink text, lightening toward manila on hover. 150ms color transition.
-- **Landing nav:** 14px semibold folder-ink text links on the field, ink and underlined on hover; hidden below `md`.
-- **Wordmark:** an ink folder glyph with two manila lines beside condensed uppercase "AttackSurface" at 800.
+- **Folder tabs (app):** die-cut trapezoids, 14px semibold with a 15px line icon. Active tab is raised navy, joins the sheet beneath it, and carries a 3px kiwi top edge. Inactive tabs are filled camel with navy text, easing to 80% camel on hover. 150ms color transition.
+- **Landing nav:** 14px semibold secondary-text links on the field, kiwi on hover; hidden below `md`.
+- **Wordmark:** a camel folder glyph with navy lines beside condensed uppercase "AttackSurface" at 800.
 
 ### Ledger (signature)
-Tables are ledgers: a 2px ink head rule over 11px uppercase soft-ink headers, hairline row dividers at 15%, tabular numerals, Courier Prime for hostnames and IDs. Clickable rows tint manila at 15% on hover.
+Tables are ledgers: a 2px camel head rule over 11px uppercase camel headers, camel hairline row dividers at 15%, tabular numerals, Courier Prime for hostnames and IDs. Clickable rows wash camel at 10 to 15% on hover; a selected row is ruled in kiwi above and below.
 
 ### Stamp (signature)
-An SVG rubber stamp: double rectangle, Archivo 800 condensed caps, roughened and speckled ink, multiply blend, rotated -8 to +6 degrees. Tones: red (the P0 only) and ink ("Collected passively", "Filed", "No record"). On the landing case sheet it lands with a 460ms expo-out scale (keyframed press, no bounce easing) into a reserved slot so nothing shifts or is covered.
+An SVG rubber stamp: double rectangle, Archivo 800 condensed caps, roughened and speckled ink, normal blend (multiply would vanish on navy), rotated -8 to +6 degrees. Tones: `accent` (kiwi, the P0 only) and `camel` ("Collected passively", "Filed", "No record"). On the landing case sheet the kiwi stamp lands with a 460ms expo-out scale into a reserved slot so nothing shifts or is covered.
 
 ### Classification Band
-A full-width ink strip of Band type stating scope ("Passive recon only // ..."). Top of every surface; also the bottom of the landing page. Hidden in print.
+A full-width camel strip of navy Band type stating scope ("Passive recon only // ..."). Top of every surface; also the bottom of the landing page. Hidden in print.
 
 ### Redaction
-Ink tape over values. Inline values peel right-to-left per wrapped line over 560ms on `cubic-bezier(0.16, 1, 0.3, 1)`; whole rows scale out from the right. Text stays in the DOM for screen readers. Selected text also reads as redaction (ink background, bond text). Reduced motion arrives fully declassified.
+Camel tape over values. Inline values peel right-to-left per wrapped line over 560ms on `cubic-bezier(0.16, 1, 0.3, 1)`; whole rows scale out from the right. Text stays in the DOM for screen readers. Selected text also reads as redaction (camel background, navy text). Reduced motion arrives fully declassified.
 
 ### Annotated Exhibit
-Raw collected output in Courier Prime with notes pinned to the line they describe: a dotted ink leader runs from the code to a fixed-width note column holding a severity badge and one plain sentence. Absent values are drawn as a dashed empty slot, not described.
+Raw collected output in Courier Prime with notes pinned to the line they describe: a dotted camel leader runs from the code to a fixed-width note column holding a severity badge and one plain sentence. Absent values are drawn as a dashed camel empty slot, not described.
+
+### Infrastructure lines (exposure chains and the attack graph)
+Hosts, manifests, packages, and advisories are camel-bordered raised-navy nodes joined by camel lines. The live connection is kiwi: the P0 chain on the landing page, and the path traced from a selected card in the attack graph (others fade to 12% camel). The root domain node is filled camel with navy text. Scan progress fills kiwi while a scan is running and camel once it is complete; the collection log states each event's level (info, warn, error) in text.
+
+## Exceptions
+
+- **Print.** Reports print as black ink on white paper (`src/styles/print.css`): every color inside `.print-surface` drops to near-black with gray rules; bands and controls are hidden.
+- **Severity.** The five severity hues are semantic, not palette, and always ship with their text label.
+- **Focus.** The focus ring is kiwi everywhere, including on camel and navy fills, for a consistent 2px indicator.
+- **Favicon.** `public/favicon.svg` is a static asset and carries literal navy, camel, and kiwi.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** put every content surface on a bond sheet over the grained manila field, with the Sheet shadow.
-- **Do** build structure from ink rules: 2px for heads and page titles, 1px hairlines at 15 to 30% for dividers.
-- **Do** set collected data in Courier Prime and written prose in Public Sans.
-- **Do** carry severity on borders, swatches, bars, and edges, with ink labels.
+- **Do** keep the balance: navy surfaces, camel structure, kiwi only where the user acts or must act first.
+- **Do** put every content surface on a raised navy sheet over the grained navy field, with the Sheet shadow.
+- **Do** build structure from camel rules: 2px for heads and page titles, 1px hairlines at 15 to 30% for dividers.
+- **Do** set collected data in Courier Prime and written prose in Public Sans, in off-white or secondary text.
+- **Do** carry severity on borders, swatches, bars, and edges, with a text label every time.
 - **Do** tell non-severity categories by line style (filled, solid, dashed, dotted).
-- **Do** print the most urgent path in full ink and fade the rest to 30% ink until hovered.
-- **Do** annotate evidence in place with leaders and badges rather than summarizing it elsewhere.
+- **Do** draw the live path in kiwi and fade the rest to camel at 30% until hovered.
 - **Do** frame every surface with a classification band stating the passive, authorized scope.
 - **Do** give every motion a reduced-motion state that shows the finished result.
 
 ### Don't:
-- **Don't** use stamp red for anything but the P0: no red buttons, headings, links, or second stamps.
+- **Don't** use kiwi for large backgrounds, every icon or border, a second stamp, or decoration.
+- **Don't** set paragraphs in camel or kiwi.
+- **Don't** introduce purple, pink, cyan, or blue accents, SaaS gradients, glow, or glassmorphism.
+- **Don't** hardcode a color in a component; add or reuse a token in `globals.css`.
 - **Don't** fill a panel, card, or callout with a tint to group or flag it.
 - **Don't** round corners; the only non-rectangular forms are the die-cut tab and the drawn stamp.
-- **Don't** cast shadows inside a sheet or use hard offset shadows; the only shadows are Sheet and the button Lift.
-- **Don't** set severity labels or body copy in a severity hue.
+- **Don't** cast shadows inside a sheet or use hard offset shadows.
 - **Don't** set titles in Public Sans or uncondensed Archivo.

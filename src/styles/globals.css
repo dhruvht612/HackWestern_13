@@ -33,12 +33,49 @@
   src: url("/fonts/CourierPrime-700.woff2") format("woff2");
 }
 
+/*
+ * The one place colors live. 60 / 30 / 10:
+ *   60  Abyss Navy    #1A2236  surfaces
+ *   30  Camel Suede   #C19A6B  structure: rules, tabs, labels, infrastructure lines
+ *   10  Electric Kiwi #C4FF1F  action, focus, the single top-priority mark
+ * Channels (--rgb-*) are the source of truth so Tailwind opacity modifiers work (bg-camel/15).
+ */
 :root {
-  color-scheme: light;
-  --manila: #d9a13b;
-  --bond: #f8f7f3;
-  --ink: #141414;
-  --carbon: #1f3a93;
+  color-scheme: dark;
+
+  --rgb-primary: 26 34 54; /* #1A2236 */
+  --rgb-primary-deep: 18 25 41; /* #121929 bands, quiet passages */
+  --rgb-primary-raised: 33 42 64; /* #212A40 sheets, fields, active tab */
+  --rgb-primary-high: 41 51 76; /* #29334C pressed / emphasis surface */
+  --rgb-secondary: 193 154 107; /* #C19A6B */
+  --rgb-accent: 196 255 31; /* #C4FF1F */
+  --rgb-accent-hover: 211 255 92; /* #D3FF5C */
+  --rgb-text-primary: 248 247 243; /* #F8F7F3 */
+  --rgb-text-secondary: 209 213 219; /* #D1D5DB */
+  --rgb-text-muted: 154 160 172; /* #9AA0AC tertiary + disabled */
+
+  /* Severity is semantic, not palette: always paired with a text label. */
+  --rgb-sev-critical: 255 93 93; /* #FF5D5D */
+  --rgb-sev-high: 255 140 66; /* #FF8C42 */
+  --rgb-sev-medium: 242 193 78; /* #F2C14E */
+  --rgb-sev-low: 127 183 164; /* #7FB7A4 */
+  --rgb-sev-info: 154 160 172; /* #9AA0AC */
+
+  --color-primary: rgb(var(--rgb-primary));
+  --color-secondary: rgb(var(--rgb-secondary));
+  --color-accent: rgb(var(--rgb-accent));
+  --color-text-primary: rgb(var(--rgb-text-primary));
+  --color-text-secondary: rgb(var(--rgb-text-secondary));
+  --color-text-muted: rgb(var(--rgb-text-muted));
+
+  --color-background: var(--color-primary);
+  --color-surface: rgb(var(--rgb-primary-raised));
+  --color-border: var(--color-secondary);
+  --color-button-primary: var(--color-accent);
+  --color-button-primary-hover: rgb(var(--rgb-accent-hover));
+  --color-button-text: var(--color-primary);
+  --color-focus: var(--color-accent);
+  --color-error: rgb(var(--rgb-sev-critical));
 }
 
 html,
@@ -59,32 +96,37 @@ html {
 
 body {
   margin: 0;
-  background: var(--manila);
-  color: var(--ink);
+  background: var(--color-background);
+  color: var(--color-text-primary);
   font-family: "Public Sans", ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
 * {
-  border-color: rgba(20, 20, 20, 0.16);
+  border-color: rgb(var(--rgb-secondary) / 0.2);
 }
 
-/* Selected text reads as a redaction strip. */
+/* Selected text reads as a strip of redaction tape. */
 ::selection {
-  background: var(--ink);
-  color: var(--bond);
+  background: var(--color-secondary);
+  color: var(--color-primary);
 }
 
 :focus-visible {
-  outline: 2px solid var(--carbon);
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }
 
 input,
 select,
 textarea {
-  caret-color: var(--ink);
+  caret-color: var(--color-accent);
+}
+
+select option {
+  background: rgb(var(--rgb-primary-raised));
+  color: var(--color-text-primary);
 }
 
 a {
@@ -97,7 +139,7 @@ a {
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #c38d2e;
+  background: rgb(var(--rgb-secondary) / 0.45);
   border: 2px solid transparent;
   background-clip: padding-box;
 }
@@ -106,21 +148,21 @@ a {
 }
 
 @layer components {
-  /* Folder stock: ochre field with paper fiber. */
+  /* The folder: navy field with a faint camel fiber. */
   .grain {
-    background-color: var(--manila);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .29 0 0 0 0 .2 0 0 0 0 .06 .7 0 0 0 -.24'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-color: var(--color-background);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .76 0 0 0 0 .6 0 0 0 0 .42 .26 0 0 0 -.11'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  /* Bond paper sheet lying on the folder. */
+  /* A sheet in the file: raised navy, camel hairline edge, soft drop. */
   .sheet {
-    @apply bg-bond shadow-sheet;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .28 0 0 0 0 .22 .35 0 0 0 -.14'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
+    @apply bg-navy-raised shadow-sheet;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .97 0 0 0 0 .97 0 0 0 0 .95 .16 0 0 0 -.07'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
   }
 
   /* Ruled box: structure from rules, never tinted fills. */
   .panel {
-    @apply border border-ink/20;
+    @apply border border-camel/25;
   }
 
   .mono {
@@ -138,42 +180,50 @@ a {
   }
 
   .field-label {
-    @apply text-[11px] font-semibold uppercase tracking-[0.09em] text-ink-soft;
+    @apply text-[11px] font-semibold uppercase tracking-[0.09em] text-camel;
   }
 
   .field {
-    @apply w-full border border-ink/40 bg-bond px-3 py-2 text-sm text-ink placeholder:text-ink-faint transition-colors;
-    @apply hover:border-ink/70 focus:border-ink focus:outline-none focus-visible:outline-2 focus-visible:outline-carbon;
+    @apply w-full border border-camel/45 bg-navy-raised px-3 py-2 text-sm text-fg placeholder:text-fg-faint transition-colors;
+    @apply hover:border-camel focus:border-camel focus:outline-none focus-visible:outline-2 focus-visible:outline-kiwi;
   }
 
   .btn {
     @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold uppercase tracking-[0.06em] transition duration-150 ease-out;
-    @apply disabled:cursor-not-allowed disabled:opacity-50;
+    @apply disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none;
   }
   .btn-primary {
-    @apply btn bg-ink text-bond hover:-translate-y-px hover:bg-black hover:shadow-lift active:translate-y-0 active:shadow-none;
+    @apply btn bg-kiwi text-navy hover:-translate-y-px hover:bg-kiwi-hover hover:shadow-lift active:translate-y-0 active:shadow-none;
   }
   .btn-secondary {
-    @apply btn border-2 border-ink text-ink hover:bg-ink hover:text-bond;
+    @apply btn border-2 border-camel text-fg hover:bg-camel/10 hover:text-fg;
   }
 
-  /* Folder tab, die-cut. */
+  /* Folder tab, die-cut. Active tabs carry a kiwi indicator on their top edge. */
   .tab {
     clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 100%, 0 100%);
     @apply inline-flex shrink-0 items-center gap-2 whitespace-nowrap px-5 pb-2 pt-2.5 text-sm font-semibold transition-colors duration-150;
   }
+  .tab-active {
+    @apply bg-navy-raised text-fg;
+    box-shadow: inset 0 3px 0 var(--color-accent);
+  }
+  .tab-inactive {
+    @apply bg-camel text-navy hover:bg-camel/80;
+  }
 
+  /* Redaction tape is camel: structure laid over the evidence until it's declassified. */
   .redaction {
-    @apply bg-ink;
+    @apply bg-camel;
   }
 
   .ledger-head {
-    @apply border-b-2 border-ink text-left text-[11px] font-semibold uppercase tracking-[0.09em] text-ink-soft;
+    @apply border-b-2 border-camel text-left text-[11px] font-semibold uppercase tracking-[0.09em] text-camel;
   }
 
   /* Inline redaction: one bar per wrapped line, peeled left to right when data-open flips. */
   .redact {
-    background-image: linear-gradient(var(--ink), var(--ink));
+    background-image: linear-gradient(var(--color-secondary), var(--color-secondary));
     background-repeat: no-repeat;
     background-position: right center;
     background-size: 100% 100%;
@@ -218,23 +268,23 @@ a {
   }
 }
 
-/* React Flow, re-inked for the evidence board. */
+/* React Flow, re-inked for the dark evidence board. */
 .react-flow__controls {
   box-shadow: none !important;
-  border: 1px solid rgba(20, 20, 20, 0.4);
+  border: 1px solid rgb(var(--rgb-secondary) / 0.4);
 }
 .react-flow__controls-button {
-  background: var(--bond) !important;
-  border-bottom: 1px solid rgba(20, 20, 20, 0.2) !important;
-  fill: var(--ink) !important;
+  background: rgb(var(--rgb-primary-raised)) !important;
+  border-bottom: 1px solid rgb(var(--rgb-secondary) / 0.25) !important;
+  fill: var(--color-text-primary) !important;
 }
 .react-flow__controls-button:hover {
-  background: color-mix(in srgb, var(--manila) 18%, var(--bond)) !important;
-}
-.react-flow__minimap {
-  background: var(--bond) !important;
-  border: 1px solid rgba(20, 20, 20, 0.3);
+  background: rgb(var(--rgb-primary-high)) !important;
+  fill: var(--color-accent) !important;
 }
 .react-flow__attribution {
   background: transparent !important;
+}
+.react-flow__attribution a {
+  color: var(--color-text-muted) !important;
 }

@@ -10,21 +10,23 @@ export const severityLabels: Record<Severity, string> = {
   info: "Info",
 };
 
-// Color rides the edge (cover-sheet band); text stays ink. Stamp red is not a severity: it marks the P0 alone.
+// Color rides the edge (badge border + swatch); the label text stays neutral so severity never depends on hue alone.
+// Severity hues are semantic, not palette: Electric Kiwi is never a severity, it marks the single top action.
 export const severityClasses: Record<Severity, string> = {
-  critical: "border-severity-critical text-ink",
-  high: "border-severity-high text-ink",
-  medium: "border-severity-medium text-ink",
-  low: "border-severity-low text-ink",
-  info: "border-severity-info text-ink-soft",
+  critical: "border-severity-critical text-fg",
+  high: "border-severity-high text-fg",
+  medium: "border-severity-medium text-fg",
+  low: "border-severity-low text-fg",
+  info: "border-severity-info text-fg-soft",
 };
 
+// For inline styles (bars, swatches, graph cards); values live in globals.css.
 export const severityColors: Record<Severity, string> = {
-  critical: "#7A1530",
-  high: "#D9480F",
-  medium: "#A87C00",
-  low: "#2E6E62",
-  info: "#6B6B66",
+  critical: "rgb(var(--rgb-sev-critical))",
+  high: "rgb(var(--rgb-sev-high))",
+  medium: "rgb(var(--rgb-sev-medium))",
+  low: "rgb(var(--rgb-sev-low))",
+  info: "rgb(var(--rgb-sev-info))",
 };
 
 export const severityWeight: Record<Severity, number> = { critical: 5, high: 4, medium: 3, low: 2, info: 1 };

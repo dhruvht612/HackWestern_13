@@ -5,7 +5,7 @@ export function ClassificationBand({ children, className }: { children: string; 
   return (
     <div
       className={cn(
-        "bg-ink px-4 py-1.5 text-center font-display text-[11px] font-bold uppercase tracking-[0.22em] text-bond",
+        "bg-camel px-4 py-1.5 text-center font-display text-[11px] font-bold uppercase tracking-[0.22em] text-navy",
         className,
       )}
       style={{ fontStretch: "90%" }}

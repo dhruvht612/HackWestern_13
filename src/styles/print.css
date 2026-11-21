@@ -1,4 +1,11 @@
+/*
+ * Print is the one sanctioned departure from the 60/30/10 palette: reports print as black ink on white
+ * paper so they stay legible and cheap to print. Severity swatches and stamps keep their hue as edges only.
+ */
 @media print {
+  :root {
+    color-scheme: light;
+  }
   body,
   .grain {
     background: white !important;
@@ -8,18 +15,21 @@
     display: none !important;
   }
   .sheet,
-  .print-surface {
+  .print-surface,
+  .panel {
     background: white !important;
-    color: #141414 !important;
     box-shadow: none !important;
+  }
+  .print-surface {
     border: 0 !important;
+  }
+  .print-surface,
+  .print-surface * {
+    color: #141414 !important;
+    border-color: #8a8a8a !important;
   }
   a {
     color: #141414 !important;
     text-decoration: underline;
-  }
-  .panel {
-    background: white !important;
-    color: #141414 !important;
   }
 }

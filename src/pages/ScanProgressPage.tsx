@@ -13,7 +13,7 @@ export function ScanProgressPage() {
     return (
       <div className="border-2 border-severity-critical p-6 text-sm">
         <div className="font-semibold">Couldn’t load this scan.</div>
-        <p className="mt-1 text-ink-soft">It may have been removed. Start a new scan from the header.</p>
+        <p className="mt-1 text-fg-soft">It may have been removed. Start a new scan from the header.</p>
       </div>
     );
 
@@ -29,22 +29,22 @@ export function ScanProgressPage() {
       <div>
         <div className="mono flex flex-wrap items-baseline justify-between gap-2 text-[13.5px]">
           <span>
-            <span className="text-ink-soft">STATUS </span>
+            <span className="text-fg-soft">STATUS </span>
             <span className="font-bold uppercase">{scan.status}</span>
           </span>
-          <span className="tabular text-ink-soft">{scan.events.length} log entries</span>
+          <span className="tabular text-fg-soft">{scan.events.length} log entries</span>
         </div>
         <div
-          className="mt-2 h-3 border border-ink/40"
+          className="mt-2 h-3 border border-camel/40"
           role="progressbar"
           aria-valuenow={pct}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-label="Scan progress"
         >
-          <div className="h-full bg-ink transition-[width] duration-500 ease-out" style={{ width: `${pct}%` }} />
+          <div className={`h-full transition-[width] duration-500 ease-out ${done ? "bg-camel" : "bg-kiwi"}`} style={{ width: `${pct}%` }} />
         </div>
-        <p className="mt-2 text-xs text-ink-soft">{done ? "Collection finished." : "This view refreshes every 2 seconds until the scan completes."}</p>
+        <p className="mt-2 text-xs text-fg-soft">{done ? "Collection finished." : "This view refreshes every 2 seconds until the scan completes."}</p>
       </div>
       <ScanTimeline events={scan.events} status={scan.status} />
     </div>
