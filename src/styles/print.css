@@ -1,0 +1,24 @@
+@media print {
+  body {
+    background: white !important;
+    color: #111827 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-surface {
+    background: white !important;
+    color: #111827 !important;
+    border: 1px solid #d1d5db !important;
+    box-shadow: none !important;
+  }
+  a {
+    color: #111827 !important;
+    text-decoration: underline;
+  }
+  .panel {
+    background: white !important;
+    color: #111827 !important;
+    box-shadow: none !important;
+  }
+}

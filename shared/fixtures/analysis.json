@@ -1,0 +1,35 @@
+{
+  "executive_summary": "The acme-demo.com external surface shows moderate exposure concentrated in non-production systems and one production API dependency chain. The most urgent risks are a critical prototype pollution advisory in minimist and publicly reachable staging/dev hosts with weak transport or missing browser protections. Prioritize dependency upgrades on the API, enforce HTTPS and access controls on non-production hosts, and remediate missing security headers before the next release.",
+  "findings": [
+    {
+      "finding_id": "fddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "summary": "A critical prototype pollution vulnerability exists in minimist 1.2.5.",
+      "why_it_matters": "Prototype pollution can alter application behavior and, depending on usage, lead to data integrity issues or code execution paths.",
+      "business_impact": "A compromised API dependency could affect customer data handling and service reliability.",
+      "remediation": "Upgrade minimist to 1.2.6 or later and regenerate lockfiles to ensure transitive resolution.",
+      "suggested_priority": "P0",
+      "confidence": "high",
+      "evidence_refs": ["package-lock.json", "GHSA-xvch-5gv4-984h"]
+    },
+    {
+      "finding_id": "f4444444-4444-4444-8444-444444444444",
+      "summary": "The dev host accepts plaintext HTTP without redirecting to HTTPS.",
+      "why_it_matters": "Traffic over HTTP can be intercepted or modified by an on-path attacker.",
+      "business_impact": "Exposed development workflows or credentials could leak and create a foothold into production systems.",
+      "remediation": "Redirect HTTP to HTTPS, disable plaintext listeners where possible, and restrict dev access.",
+      "suggested_priority": "P1",
+      "confidence": "high",
+      "evidence_refs": ["GET http://dev.acme-demo.com/"]
+    },
+    {
+      "finding_id": "f2222222-2222-4222-8222-222222222222",
+      "summary": "The staging site is missing an HSTS header.",
+      "why_it_matters": "Without HSTS, browsers may be downgraded to insecure connections in certain scenarios.",
+      "business_impact": "Staging often mirrors production behavior; weak controls increase the chance of credential or session exposure.",
+      "remediation": "Add Strict-Transport-Security with an appropriate max-age after confirming HTTPS stability.",
+      "suggested_priority": "P1",
+      "confidence": "high",
+      "evidence_refs": ["GET https://staging.acme-demo.com/"]
+    }
+  ]
+}
