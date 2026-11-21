@@ -1,0 +1,62 @@
+{
+  "nodes": [
+    { "id": "root", "type": "root", "label": "acme-demo.com" },
+
+    { "id": "asset-www", "type": "asset", "label": "www.acme-demo.com" },
+    { "id": "asset-api", "type": "asset", "label": "api.acme-demo.com" },
+    { "id": "asset-staging", "type": "asset", "label": "staging.acme-demo.com", "severity": "high" },
+    { "id": "asset-dev", "type": "asset", "label": "dev.acme-demo.com", "severity": "high" },
+    { "id": "asset-mail", "type": "asset", "label": "mail.acme-demo.com", "severity": "medium" },
+
+    { "id": "finding-f2222222", "type": "finding", "label": "Missing HSTS (staging)", "severity": "high" },
+    { "id": "finding-f1111111", "type": "finding", "label": "Missing CSP (staging)", "severity": "medium" },
+    { "id": "finding-f3333333", "type": "finding", "label": "Missing X-Frame-Options (staging)", "severity": "medium" },
+    { "id": "finding-f7777777", "type": "finding", "label": "TLS cert expiring in 21 days", "severity": "medium" },
+    { "id": "finding-f8888888", "type": "finding", "label": "Staging publicly reachable", "severity": "info" },
+    { "id": "finding-f4444444", "type": "finding", "label": "HTTP without redirect (dev)", "severity": "high" },
+    { "id": "finding-f5555555", "type": "finding", "label": "nginx/1.18.0 version disclosure", "severity": "low" },
+    { "id": "finding-fddddddd", "type": "finding", "label": "minimist prototype pollution", "severity": "critical" },
+    { "id": "finding-fccccccc", "type": "finding", "label": "lodash command injection", "severity": "high" },
+    { "id": "finding-feeeeeee", "type": "finding", "label": "node-fetch header leak", "severity": "high" },
+
+    { "id": "fix-hsts", "type": "fix", "label": "Enable HSTS" },
+    { "id": "fix-csp", "type": "fix", "label": "Add CSP policy" },
+    { "id": "fix-xfo", "type": "fix", "label": "Set X-Frame-Options" },
+    { "id": "fix-tls", "type": "fix", "label": "Renew TLS certificate" },
+    { "id": "fix-access", "type": "fix", "label": "Restrict non-prod access" },
+    { "id": "fix-https", "type": "fix", "label": "Enforce HTTPS redirect" },
+    { "id": "fix-server", "type": "fix", "label": "Suppress server version" },
+    { "id": "fix-minimist", "type": "fix", "label": "Upgrade minimist >= 1.2.6" },
+    { "id": "fix-lodash", "type": "fix", "label": "Upgrade lodash >= 4.17.21" },
+    { "id": "fix-node-fetch", "type": "fix", "label": "Upgrade node-fetch >= 2.6.7" }
+  ],
+  "edges": [
+    { "id": "e-root-www", "source": "root", "target": "asset-www" },
+    { "id": "e-root-api", "source": "root", "target": "asset-api" },
+    { "id": "e-root-staging", "source": "root", "target": "asset-staging" },
+    { "id": "e-root-dev", "source": "root", "target": "asset-dev" },
+    { "id": "e-root-mail", "source": "root", "target": "asset-mail" },
+
+    { "id": "e-staging-f2222222", "source": "asset-staging", "target": "finding-f2222222" },
+    { "id": "e-staging-f1111111", "source": "asset-staging", "target": "finding-f1111111" },
+    { "id": "e-staging-f3333333", "source": "asset-staging", "target": "finding-f3333333" },
+    { "id": "e-staging-f7777777", "source": "asset-staging", "target": "finding-f7777777" },
+    { "id": "e-staging-f8888888", "source": "asset-staging", "target": "finding-f8888888" },
+    { "id": "e-dev-f4444444", "source": "asset-dev", "target": "finding-f4444444" },
+    { "id": "e-staging-f5555555", "source": "asset-staging", "target": "finding-f5555555" },
+    { "id": "e-api-fddddddd", "source": "asset-api", "target": "finding-fddddddd" },
+    { "id": "e-api-fccccccc", "source": "asset-api", "target": "finding-fccccccc" },
+    { "id": "e-api-feeeeeee", "source": "asset-api", "target": "finding-feeeeeee" },
+
+    { "id": "e-f2222222-fix-hsts", "source": "finding-f2222222", "target": "fix-hsts" },
+    { "id": "e-f1111111-fix-csp", "source": "finding-f1111111", "target": "fix-csp" },
+    { "id": "e-f3333333-fix-xfo", "source": "finding-f3333333", "target": "fix-xfo" },
+    { "id": "e-f7777777-fix-tls", "source": "finding-f7777777", "target": "fix-tls" },
+    { "id": "e-f8888888-fix-access", "source": "finding-f8888888", "target": "fix-access" },
+    { "id": "e-f4444444-fix-https", "source": "finding-f4444444", "target": "fix-https" },
+    { "id": "e-f5555555-fix-server", "source": "finding-f5555555", "target": "fix-server" },
+    { "id": "e-fddddddd-fix-minimist", "source": "finding-fddddddd", "target": "fix-minimist" },
+    { "id": "e-fccccccc-fix-lodash", "source": "finding-fccccccc", "target": "fix-lodash" },
+    { "id": "e-feeeeeee-fix-node-fetch", "source": "finding-feeeeeee", "target": "fix-node-fetch" }
+  ]
+}

@@ -1,0 +1,156 @@
+[
+  {
+    "id": "f1111111-1111-4111-8111-111111111111",
+    "asset_id": "a3333333-3333-4333-8333-333333333333",
+    "type": "missing_header",
+    "title": "Missing Content-Security-Policy header",
+    "severity": "medium",
+    "evidence": "GET https://staging.acme-demo.com/ -> response missing Content-Security-Policy header",
+    "remediation": "Define and deploy a strict Content-Security-Policy header appropriate for the application.",
+    "source": "rules",
+    "references": ["https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP"]
+  },
+  {
+    "id": "f2222222-2222-4222-8222-222222222222",
+    "asset_id": "a3333333-3333-4333-8333-333333333333",
+    "type": "missing_header",
+    "title": "Missing Strict-Transport-Security header",
+    "severity": "high",
+    "evidence": "GET https://staging.acme-demo.com/ -> response missing Strict-Transport-Security header",
+    "remediation": "Add HSTS with a long max-age, includeSubDomains, and preload after validation.",
+    "source": "rules",
+    "references": ["https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security"]
+  },
+  {
+    "id": "f3333333-3333-4333-8333-333333333333",
+    "asset_id": "a3333333-3333-4333-8333-333333333333",
+    "type": "missing_header",
+    "title": "Missing X-Frame-Options header",
+    "severity": "medium",
+    "evidence": "GET https://staging.acme-demo.com/ -> response missing X-Frame-Options header",
+    "remediation": "Set X-Frame-Options to DENY or SAMEORIGIN, or use CSP frame-ancestors.",
+    "source": "rules",
+    "references": ["https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options"]
+  },
+  {
+    "id": "f4444444-4444-4444-8444-444444444444",
+    "asset_id": "a4444444-4444-4444-8444-444444444444",
+    "type": "insecure_transport",
+    "title": "HTTP does not redirect to HTTPS",
+    "severity": "high",
+    "evidence": "GET http://dev.acme-demo.com/ -> 200 OK over plaintext HTTP; no redirect to HTTPS observed",
+    "remediation": "Redirect all HTTP requests to HTTPS and enforce HSTS on the HTTPS endpoint.",
+    "source": "rules",
+    "references": ["https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security"]
+  },
+  {
+    "id": "f5555555-5555-4555-8555-555555555555",
+    "asset_id": "a3333333-3333-4333-8333-333333333333",
+    "type": "version_disclosure",
+    "title": "Server version disclosure",
+    "severity": "low",
+    "evidence": "GET https://staging.acme-demo.com/ -> Server: nginx/1.18.0",
+    "remediation": "Configure the web server to suppress detailed version information in response headers.",
+    "source": "rules",
+    "references": ["https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/01-Information_Gathering/02-Fingerprint_Web_Server"]
+  },
+  {
+    "id": "f6666666-6666-4666-8666-666666666666",
+    "asset_id": "a4444444-4444-4444-8444-444444444444",
+    "type": "version_disclosure",
+    "title": "Server version disclosure",
+    "severity": "low",
+    "evidence": "GET http://dev.acme-demo.com/ -> Server: nginx/1.18.0",
+    "remediation": "Configure the web server to suppress detailed version information in response headers.",
+    "source": "rules",
+    "references": ["https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/01-Information_Gathering/02-Fingerprint_Web_Server"]
+  },
+  {
+    "id": "f7777777-7777-4777-8777-777777777777",
+    "asset_id": "a3333333-3333-4333-8333-333333333333",
+    "type": "tls_expiry",
+    "title": "TLS certificate expiring soon",
+    "severity": "medium",
+    "evidence": "TLS certificate for staging.acme-demo.com expires in 21 days (2026-05-31T23:59:59Z)",
+    "remediation": "Renew the TLS certificate before expiry and automate renewal with ACME or managed certificates.",
+    "source": "rules",
+    "references": ["https://letsencrypt.org/docs/"]
+  },
+  {
+    "id": "f8888888-8888-4888-8888-888888888888",
+    "asset_id": "a3333333-3333-4333-8333-333333333333",
+    "type": "exposed_non_prod",
+    "title": "Non-production host publicly reachable",
+    "severity": "info",
+    "evidence": "staging.acme-demo.com resolves to public IP 203.0.113.30 and responds over HTTPS",
+    "remediation": "Restrict staging access to trusted networks, VPN, or identity-aware proxy controls.",
+    "source": "rules",
+    "references": ["https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/"]
+  },
+  {
+    "id": "f9999999-9999-4999-8999-999999999999",
+    "asset_id": "a4444444-4444-4444-8444-444444444444",
+    "type": "exposed_non_prod",
+    "title": "Non-production host publicly reachable",
+    "severity": "info",
+    "evidence": "dev.acme-demo.com resolves to public IP 203.0.113.40 and responds over HTTP",
+    "remediation": "Restrict development environment access to trusted networks or VPN and require authentication.",
+    "source": "rules",
+    "references": ["https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/"]
+  },
+  {
+    "id": "faaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+    "asset_id": "a1111111-1111-4111-8111-111111111111",
+    "type": "missing_header",
+    "title": "Missing Permissions-Policy header",
+    "severity": "low",
+    "evidence": "GET https://www.acme-demo.com/ -> response missing Permissions-Policy header",
+    "remediation": "Add a Permissions-Policy header to disable unused browser features.",
+    "source": "rules",
+    "references": ["https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy"]
+  },
+  {
+    "id": "fbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+    "asset_id": "a5555555-5555-4555-8555-555555555555",
+    "type": "missing_header",
+    "title": "Missing Strict-Transport-Security header",
+    "severity": "medium",
+    "evidence": "GET https://mail.acme-demo.com/ -> response missing Strict-Transport-Security header",
+    "remediation": "Add HSTS to reduce downgrade risk for HTTPS services.",
+    "source": "rules",
+    "references": ["https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security"]
+  },
+  {
+    "id": "fccccccc-cccc-4ccc-8ccc-cccccccccccc",
+    "asset_id": "a2222222-2222-4222-8222-222222222222",
+    "type": "dependency_vulnerability",
+    "title": "Command Injection in lodash",
+    "severity": "high",
+    "evidence": "package-lock.json reports lodash@4.17.15; advisory GHSA-35jh-r3h4-6jhm affects versions < 4.17.21",
+    "remediation": "Upgrade lodash to 4.17.21 or later.",
+    "source": "osv",
+    "references": ["https://github.com/advisories/GHSA-35jh-r3h4-6jhm"]
+  },
+  {
+    "id": "fddddddd-dddd-4ddd-8ddd-dddddddddddd",
+    "asset_id": "a2222222-2222-4222-8222-222222222222",
+    "type": "dependency_vulnerability",
+    "title": "Prototype Pollution in minimist",
+    "severity": "critical",
+    "evidence": "package-lock.json reports minimist@1.2.5; advisory GHSA-xvch-5gv4-984h affects versions < 1.2.6",
+    "remediation": "Upgrade minimist to 1.2.6 or later and verify transitive dependency resolution.",
+    "source": "osv",
+    "references": ["https://github.com/advisories/GHSA-xvch-5gv4-984h"]
+  },
+  {
+    "id": "feeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+    "asset_id": "a2222222-2222-4222-8222-222222222222",
+    "type": "dependency_vulnerability",
+    "title": "node-fetch forwards secure headers to untrusted sites",
+    "severity": "high",
+    "evidence": "package-lock.json reports node-fetch@2.6.6; advisory GHSA-r683-j2x4-v87g affects versions < 2.6.7",
+    "remediation": "Upgrade node-fetch to 2.6.7 or later.",
+    "source": "osv",
+    "references": ["https://github.com/advisories/GHSA-r683-j2x4-v87g"]
+  }
+]

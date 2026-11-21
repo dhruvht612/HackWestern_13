@@ -1,0 +1,14 @@
+{
+  "id": "22222222-2222-4222-8222-222222222222",
+  "status": "completed",
+  "started_at": "2026-05-10T14:05:00Z",
+  "completed_at": "2026-05-10T14:06:12Z",
+  "events": [
+    { "timestamp": "2026-05-10T14:05:00Z", "level": "info", "message": "Scan queued for acme-demo.com" },
+    { "timestamp": "2026-05-10T14:05:08Z", "level": "info", "message": "Queried certificate transparency logs" },
+    { "timestamp": "2026-05-10T14:05:24Z", "level": "info", "message": "Resolved 5 hostnames via DNS" },
+    { "timestamp": "2026-05-10T14:05:41Z", "level": "info", "message": "Collected HTTP headers and TLS metadata" },
+    { "timestamp": "2026-05-10T14:05:58Z", "level": "warn", "message": "Staging host publicly reachable: staging.acme-demo.com" },
+    { "timestamp": "2026-05-10T14:06:12Z", "level": "info", "message": "Scan completed with 14 findings" }
+  ]
+}

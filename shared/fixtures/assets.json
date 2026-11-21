@@ -1,0 +1,52 @@
+[
+  {
+    "id": "a1111111-1111-4111-8111-111111111111",
+    "hostname": "www.acme-demo.com",
+    "ip_addresses": ["203.0.113.10"],
+    "technology": "Cloudflare, nginx/1.24.0",
+    "https": true,
+    "environment": "prod",
+    "status": "resolved",
+    "last_seen": "2026-05-10T14:05:24Z"
+  },
+  {
+    "id": "a2222222-2222-4222-8222-222222222222",
+    "hostname": "api.acme-demo.com",
+    "ip_addresses": ["203.0.113.20"],
+    "technology": "Node.js, Express",
+    "https": true,
+    "environment": "prod",
+    "status": "resolved",
+    "last_seen": "2026-05-10T14:05:24Z"
+  },
+  {
+    "id": "a3333333-3333-4333-8333-333333333333",
+    "hostname": "staging.acme-demo.com",
+    "ip_addresses": ["203.0.113.30"],
+    "technology": "nginx/1.18.0, React",
+    "https": true,
+    "environment": "staging",
+    "status": "resolved",
+    "last_seen": "2026-05-10T14:05:24Z"
+  },
+  {
+    "id": "a4444444-4444-4444-8444-444444444444",
+    "hostname": "dev.acme-demo.com",
+    "ip_addresses": ["203.0.113.40"],
+    "technology": "nginx/1.18.0, PHP/8.1",
+    "https": false,
+    "environment": "dev",
+    "status": "resolved",
+    "last_seen": "2026-05-10T14:05:24Z"
+  },
+  {
+    "id": "a5555555-5555-4555-8555-555555555555",
+    "hostname": "mail.acme-demo.com",
+    "ip_addresses": ["203.0.113.50"],
+    "technology": "Postfix",
+    "https": true,
+    "environment": "prod",
+    "status": "resolved",
+    "last_seen": "2026-05-10T14:05:24Z"
+  }
+]
