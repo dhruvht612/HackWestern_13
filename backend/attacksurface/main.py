@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
-from .routers import analysis, dependencies, projects, reports, scans
+from .routers import analysis, auth, dependencies, projects, reports, scans
 from .schemas import Health
 
 app = FastAPI(title=settings.app_name)
@@ -20,6 +20,7 @@ app.include_router(scans.router)
 app.include_router(dependencies.router)
 app.include_router(analysis.router)
 app.include_router(reports.router)
+app.include_router(auth.router)
 
 
 @app.get("/health", response_model=Health)
