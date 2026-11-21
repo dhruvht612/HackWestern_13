@@ -2,8 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Self-hosted so a flaky venue network can't knock out the display voice mid-demo. */
+@font-face {
+  font-family: "Archivo";
+  font-style: normal;
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+  src: url("/fonts/Archivo-100-900.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Public Sans";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/PublicSans-100-900.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Courier Prime";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/CourierPrime-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Courier Prime";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/CourierPrime-700.woff2") format("woff2");
+}
+
 :root {
-  color-scheme: dark;
+  color-scheme: light;
+  --manila: #d9a13b;
+  --bond: #f8f7f3;
+  --ink: #141414;
+  --carbon: #1f3a93;
 }
 
 html,
@@ -12,15 +47,49 @@ body,
   min-height: 100%;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
   margin: 0;
-  background: #0b0f14;
-  color: #e5edf5;
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  background: var(--manila);
+  color: var(--ink);
+  font-family: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 * {
-  border-color: #1f2a37;
+  border-color: rgba(20, 20, 20, 0.16);
+}
+
+/* Selected text reads as a redaction strip. */
+::selection {
+  background: var(--ink);
+  color: var(--bond);
+}
+
+:focus-visible {
+  outline: 2px solid var(--carbon);
+  outline-offset: 2px;
+}
+
+input,
+select,
+textarea {
+  caret-color: var(--ink);
+}
+
+a {
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
 }
 
 ::-webkit-scrollbar {
@@ -28,18 +97,144 @@ body {
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1f2a37;
-  border-radius: 999px;
+  background: #c38d2e;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 ::-webkit-scrollbar-track {
-  background: #0b0f14;
+  background: transparent;
 }
 
 @layer components {
-  .panel {
-    @apply rounded-xl border border-border bg-panel shadow-panel;
+  /* Folder stock: ochre field with paper fiber. */
+  .grain {
+    background-color: var(--manila);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .29 0 0 0 0 .2 0 0 0 0 .06 .7 0 0 0 -.24'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
+
+  /* Bond paper sheet lying on the folder. */
+  .sheet {
+    @apply bg-bond shadow-sheet;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .28 0 0 0 0 .22 .35 0 0 0 -.14'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
+  }
+
+  /* Ruled box: structure from rules, never tinted fills. */
+  .panel {
+    @apply border border-ink/20;
+  }
+
   .mono {
     @apply font-mono;
   }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .display {
+    @apply font-display;
+    font-stretch: 78%;
+    letter-spacing: -0.015em;
+  }
+
+  .field-label {
+    @apply text-[11px] font-semibold uppercase tracking-[0.09em] text-ink-soft;
+  }
+
+  .field {
+    @apply w-full border border-ink/40 bg-bond px-3 py-2 text-sm text-ink placeholder:text-ink-faint transition-colors;
+    @apply hover:border-ink/70 focus:border-ink focus:outline-none focus-visible:outline-2 focus-visible:outline-carbon;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold uppercase tracking-[0.06em] transition duration-150 ease-out;
+    @apply disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-ink text-bond hover:-translate-y-px hover:bg-black hover:shadow-lift active:translate-y-0 active:shadow-none;
+  }
+  .btn-secondary {
+    @apply btn border-2 border-ink text-ink hover:bg-ink hover:text-bond;
+  }
+
+  /* Folder tab, die-cut. */
+  .tab {
+    clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 100%, 0 100%);
+    @apply inline-flex shrink-0 items-center gap-2 whitespace-nowrap px-5 pb-2 pt-2.5 text-sm font-semibold transition-colors duration-150;
+  }
+
+  .redaction {
+    @apply bg-ink;
+  }
+
+  .ledger-head {
+    @apply border-b-2 border-ink text-left text-[11px] font-semibold uppercase tracking-[0.09em] text-ink-soft;
+  }
+
+  /* Inline redaction: one bar per wrapped line, peeled left to right when data-open flips. */
+  .redact {
+    background-image: linear-gradient(var(--ink), var(--ink));
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: 100% 100%;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    color: transparent;
+    transition:
+      background-size 560ms cubic-bezier(0.16, 1, 0.3, 1),
+      color 0ms linear 180ms;
+  }
+  .redact[data-open="true"] {
+    background-size: 0% 100%;
+    color: inherit;
+  }
+
+  .stamp-in {
+    animation: stamp-in 460ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@keyframes stamp-in {
+  0% {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .redact {
+    transition: none;
+  }
+  .stamp-in {
+    animation: none;
+  }
+}
+
+/* React Flow, re-inked for the evidence board. */
+.react-flow__controls {
+  box-shadow: none !important;
+  border: 1px solid rgba(20, 20, 20, 0.4);
+}
+.react-flow__controls-button {
+  background: var(--bond) !important;
+  border-bottom: 1px solid rgba(20, 20, 20, 0.2) !important;
+  fill: var(--ink) !important;
+}
+.react-flow__controls-button:hover {
+  background: color-mix(in srgb, var(--manila) 18%, var(--bond)) !important;
+}
+.react-flow__minimap {
+  background: var(--bond) !important;
+  border: 1px solid rgba(20, 20, 20, 0.3);
+}
+.react-flow__attribution {
+  background: transparent !important;
 }

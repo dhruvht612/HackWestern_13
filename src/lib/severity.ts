@@ -10,18 +10,24 @@ export const severityLabels: Record<Severity, string> = {
   info: "Info",
 };
 
+// Color rides the edge (cover-sheet band); text stays ink. Stamp red is not a severity: it marks the P0 alone.
 export const severityClasses: Record<Severity, string> = {
-  critical: "bg-severity-critical/15 text-severity-critical border-severity-critical/40",
-  high: "bg-severity-high/15 text-severity-high border-severity-high/40",
-  medium: "bg-severity-medium/15 text-severity-medium border-severity-medium/40",
-  low: "bg-severity-low/15 text-severity-low border-severity-low/40",
-  info: "bg-severity-info/15 text-severity-info border-severity-info/40",
+  critical: "border-severity-critical text-ink",
+  high: "border-severity-high text-ink",
+  medium: "border-severity-medium text-ink",
+  low: "border-severity-low text-ink",
+  info: "border-severity-info text-ink-soft",
 };
 
 export const severityColors: Record<Severity, string> = {
-  critical: "#EF4444",
-  high: "#F97316",
-  medium: "#EAB308",
-  low: "#3B82F6",
-  info: "#64748B",
+  critical: "#7A1530",
+  high: "#D9480F",
+  medium: "#A87C00",
+  low: "#2E6E62",
+  info: "#6B6B66",
 };
+
+export const severityWeight: Record<Severity, number> = { critical: 5, high: 4, medium: 3, low: 2, info: 1 };
+
+export const bySeverity = <T extends { severity: Severity }>(a: T, b: T) =>
+  severityOrder.indexOf(a.severity) - severityOrder.indexOf(b.severity);

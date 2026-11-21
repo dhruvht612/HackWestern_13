@@ -1,53 +1,45 @@
-import { Bot, ShieldCheck } from "lucide-react";
 import type { AnalysisFinding } from "@/lib/types";
 
+/** The analyst's memo on one finding, in the form a memo actually takes. */
 export function AIAnalystCard({ analysis }: { analysis?: AnalysisFinding | null }) {
   if (!analysis) {
     return (
-      <div className="panel p-5">
-        <div className="flex items-center gap-2 text-sm font-medium text-slate-200">
-          <Bot size={16} className="text-accent" /> AI Analyst
-        </div>
-        <p className="mt-3 text-sm text-slate-400">
-          Select a finding to view AI-generated context, business impact, and remediation guidance.
-        </p>
+      <div className="border border-dashed border-ink/35 p-5 text-sm text-ink-soft">
+        No analyst memo on file for this finding. Memos are written for the highest-priority findings first.
       </div>
     );
   }
 
+  const memo: [string, string][] = [
+    ["Summary", analysis.summary],
+    ["Why it matters", analysis.why_it_matters],
+    ["Business impact", analysis.business_impact],
+    ["Remediation", analysis.remediation],
+  ];
+
   return (
-    <div className="panel p-5">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-sm font-medium text-slate-200">
-          <Bot size={16} className="text-accent" /> AI Analyst
-        </div>
-        <div className="flex items-center gap-1 text-xs text-slate-400">
-          <ShieldCheck size={14} /> Confidence: {analysis.confidence}
-        </div>
-      </div>
-      <div className="mt-4 space-y-3 text-sm">
-        <div>
-          <div className="text-slate-400">Summary</div>
-          <p className="mt-1 text-slate-200">{analysis.summary}</p>
-        </div>
-        <div>
-          <div className="text-slate-400">Why it matters</div>
-          <p className="mt-1 text-slate-200">{analysis.why_it_matters}</p>
-        </div>
-        <div>
-          <div className="text-slate-400">Business impact</div>
-          <p className="mt-1 text-slate-200">{analysis.business_impact}</p>
-        </div>
-        <div>
-          <div className="text-slate-400">Remediation</div>
-          <p className="mt-1 text-slate-200">{analysis.remediation}</p>
-        </div>
-        <div className="flex flex-wrap gap-2 pt-1 text-xs">
-          <span className="rounded-full border border-accent/30 bg-accent/10 px-2 py-1 text-accent">
-            Priority: {analysis.suggested_priority}
+    <div className="border border-ink/25">
+      <dl className="mono grid grid-cols-[4.5rem_1fr] gap-x-3 gap-y-1 border-b border-ink/20 px-5 py-3 text-[13px]">
+        <dt className="text-ink-soft">FROM:</dt>
+        <dd>AI analyst (Gemini)</dd>
+        <dt className="text-ink-soft">RE:</dt>
+        <dd className="flex flex-wrap items-center gap-2">
+          <span className={analysis.suggested_priority === "P0" ? "bg-stamp px-1.5 font-bold text-bond" : "border border-ink px-1.5 font-bold"}>
+            {analysis.suggested_priority}
           </span>
+          <span>confidence {analysis.confidence}</span>
+        </dd>
+      </dl>
+      <div className="space-y-3 px-5 py-4 text-sm">
+        {memo.map(([label, body]) => (
+          <div key={label}>
+            <div className="field-label">{label}</div>
+            <p className="mt-1 leading-relaxed text-ink">{body}</p>
+          </div>
+        ))}
+        <div className="flex flex-wrap gap-1.5 pt-1">
           {analysis.evidence_refs.map((ref) => (
-            <span key={ref} className="mono rounded-full border border-border bg-background/60 px-2 py-1 text-slate-300">
+            <span key={ref} className="mono border border-ink/25 px-1.5 py-0.5 text-[13px] text-ink-soft">
               {ref}
             </span>
           ))}

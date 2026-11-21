@@ -1,0 +1,408 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-21T17:51:20.232Z",
+  "title": "Design System: AttackSurface",
+  "extensions": {
+    "colorMeta": {
+      "manila": {
+        "role": "neutral",
+        "displayName": "Manila Folder",
+        "canonical": "oklch(74.4% 0.133 78.7)",
+        "tonalRamp": [
+          "oklch(15% 0.133 78.7)",
+          "oklch(25% 0.133 78.7)",
+          "oklch(35% 0.133 78.7)",
+          "oklch(45% 0.133 78.7)",
+          "oklch(55% 0.133 78.7)",
+          "oklch(65% 0.133 78.7)",
+          "oklch(80% 0.133 78.7)",
+          "oklch(95% 0.033 78.7)"
+        ]
+      },
+      "manila-deep": {
+        "role": "neutral",
+        "displayName": "Folder Shadow",
+        "canonical": "oklch(68.0% 0.125 77.2)",
+        "tonalRamp": [
+          "oklch(15% 0.125 77.2)",
+          "oklch(25% 0.125 77.2)",
+          "oklch(35% 0.125 77.2)",
+          "oklch(45% 0.125 77.2)",
+          "oklch(55% 0.125 77.2)",
+          "oklch(65% 0.125 77.2)",
+          "oklch(80% 0.125 77.2)",
+          "oklch(95% 0.031 77.2)"
+        ]
+      },
+      "manila-dark": {
+        "role": "neutral",
+        "displayName": "Folder Ink",
+        "canonical": "oklch(34.3% 0.059 76.4)",
+        "tonalRamp": [
+          "oklch(15% 0.059 76.4)",
+          "oklch(25% 0.059 76.4)",
+          "oklch(35% 0.059 76.4)",
+          "oklch(45% 0.059 76.4)",
+          "oklch(55% 0.059 76.4)",
+          "oklch(65% 0.059 76.4)",
+          "oklch(80% 0.059 76.4)",
+          "oklch(95% 0.015 76.4)"
+        ]
+      },
+      "bond": {
+        "role": "neutral",
+        "displayName": "Bond Paper",
+        "canonical": "oklch(97.6% 0.005 95.1)",
+        "tonalRamp": [
+          "oklch(15% 0.005 95.1)",
+          "oklch(25% 0.005 95.1)",
+          "oklch(35% 0.005 95.1)",
+          "oklch(45% 0.005 95.1)",
+          "oklch(55% 0.005 95.1)",
+          "oklch(65% 0.005 95.1)",
+          "oklch(80% 0.005 95.1)",
+          "oklch(95% 0.001 95.1)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Carbon Ink",
+        "canonical": "oklch(19.1% 0.000 89.9)",
+        "tonalRamp": [
+          "oklch(15% 0.000 89.9)",
+          "oklch(25% 0.000 89.9)",
+          "oklch(35% 0.000 89.9)",
+          "oklch(45% 0.000 89.9)",
+          "oklch(55% 0.000 89.9)",
+          "oklch(65% 0.000 89.9)",
+          "oklch(80% 0.000 89.9)",
+          "oklch(95% 0.000 89.9)"
+        ]
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Soft Ink",
+        "canonical": "oklch(40.8% 0.007 106.7)",
+        "tonalRamp": [
+          "oklch(15% 0.007 106.7)",
+          "oklch(25% 0.007 106.7)",
+          "oklch(35% 0.007 106.7)",
+          "oklch(45% 0.007 106.7)",
+          "oklch(55% 0.007 106.7)",
+          "oklch(65% 0.007 106.7)",
+          "oklch(80% 0.007 106.7)",
+          "oklch(95% 0.002 106.7)"
+        ]
+      },
+      "ink-faint": {
+        "role": "neutral",
+        "displayName": "Faint Ink",
+        "canonical": "oklch(53.1% 0.012 95.3)",
+        "tonalRamp": [
+          "oklch(15% 0.012 95.3)",
+          "oklch(25% 0.012 95.3)",
+          "oklch(35% 0.012 95.3)",
+          "oklch(45% 0.012 95.3)",
+          "oklch(55% 0.012 95.3)",
+          "oklch(65% 0.012 95.3)",
+          "oklch(80% 0.012 95.3)",
+          "oklch(95% 0.003 95.3)"
+        ]
+      },
+      "stamp": {
+        "role": "primary",
+        "displayName": "Stamp Red",
+        "canonical": "oklch(53.0% 0.207 22.3)",
+        "tonalRamp": [
+          "oklch(15% 0.200 22.3)",
+          "oklch(25% 0.200 22.3)",
+          "oklch(35% 0.200 22.3)",
+          "oklch(45% 0.200 22.3)",
+          "oklch(55% 0.200 22.3)",
+          "oklch(65% 0.200 22.3)",
+          "oklch(80% 0.200 22.3)",
+          "oklch(95% 0.050 22.3)"
+        ]
+      },
+      "carbon": {
+        "role": "secondary",
+        "displayName": "Carbon Blue",
+        "canonical": "oklch(38.7% 0.150 266.4)",
+        "tonalRamp": [
+          "oklch(15% 0.150 266.4)",
+          "oklch(25% 0.150 266.4)",
+          "oklch(35% 0.150 266.4)",
+          "oklch(45% 0.150 266.4)",
+          "oklch(55% 0.150 266.4)",
+          "oklch(65% 0.150 266.4)",
+          "oklch(80% 0.150 266.4)",
+          "oklch(95% 0.038 266.4)"
+        ]
+      },
+      "severity-high": {
+        "role": "severity",
+        "displayName": "Severity High",
+        "canonical": "oklch(60.0% 0.190 37.9)",
+        "tonalRamp": [
+          "oklch(15% 0.190 37.9)",
+          "oklch(25% 0.190 37.9)",
+          "oklch(35% 0.190 37.9)",
+          "oklch(45% 0.190 37.9)",
+          "oklch(55% 0.190 37.9)",
+          "oklch(65% 0.190 37.9)",
+          "oklch(80% 0.190 37.9)",
+          "oklch(95% 0.048 37.9)"
+        ]
+      },
+      "severity-medium": {
+        "role": "severity",
+        "displayName": "Severity Medium",
+        "canonical": "oklch(61.3% 0.126 83.6)",
+        "tonalRamp": [
+          "oklch(15% 0.126 83.6)",
+          "oklch(25% 0.126 83.6)",
+          "oklch(35% 0.126 83.6)",
+          "oklch(45% 0.126 83.6)",
+          "oklch(55% 0.126 83.6)",
+          "oklch(65% 0.126 83.6)",
+          "oklch(80% 0.126 83.6)",
+          "oklch(95% 0.031 83.6)"
+        ]
+      },
+      "severity-info": {
+        "role": "severity",
+        "displayName": "Severity Info",
+        "canonical": "oklch(52.6% 0.008 106.7)",
+        "tonalRamp": [
+          "oklch(15% 0.008 106.7)",
+          "oklch(25% 0.008 106.7)",
+          "oklch(35% 0.008 106.7)",
+          "oklch(45% 0.008 106.7)",
+          "oklch(55% 0.008 106.7)",
+          "oklch(65% 0.008 106.7)",
+          "oklch(80% 0.008 106.7)",
+          "oklch(95% 0.002 106.7)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Landing hero headline only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Landing section headings."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "App page titles and document titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "App prose at 14px."
+      },
+      "body-lead": {
+        "displayName": "Body Lead",
+        "purpose": "Landing ledes on the manila field."
+      },
+      "exhibit": {
+        "displayName": "Exhibit",
+        "purpose": "Collected data: hostnames, headers, IDs, timestamps."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Field labels, ledger heads, form-box labels."
+      },
+      "band": {
+        "displayName": "Band",
+        "purpose": "Classification bands only."
+      }
+    },
+    "shadows": [
+      {
+        "name": "sheet",
+        "value": "0 1px 1px rgba(74,52,16,0.18), 0 18px 36px -14px rgba(74,52,16,0.55)",
+        "purpose": "A bond sheet lying on the manila folder."
+      },
+      {
+        "name": "lift",
+        "value": "0 2px 4px rgba(20,20,20,0.18), 0 10px 18px -8px rgba(20,20,20,0.4)",
+        "purpose": "Primary button hover only, with a 1px rise."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ui",
+        "value": "150ms ease-out",
+        "purpose": "Buttons, tabs, fields, row hover."
+      },
+      {
+        "name": "ease-peel",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Shared curve for the redaction peel and stamp landing."
+      },
+      {
+        "name": "redact",
+        "value": "560ms",
+        "purpose": "Inline redaction tape peeling right to left."
+      },
+      {
+        "name": "stamp-in",
+        "value": "460ms",
+        "purpose": "Stamp lands at 1.7x, overshoots to 0.94x, settles."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ink-filled square action; the main call to act on a surface.",
+      "html": "<button class=\"ds-btn-primary\">Open the demo file</button>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:#141414;color:#F8F7F3;border:0;border-radius:0;font:700 14px/1.25 'Public Sans',sans-serif;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;transition:all 150ms ease-out}.ds-btn-primary:hover{background:#000;transform:translateY(-1px);box-shadow:0 2px 4px rgba(20,20,20,.18),0 10px 18px -8px rgba(20,20,20,.4)}.ds-btn-primary:active{transform:none;box-shadow:none}.ds-btn-primary:focus-visible{outline:2px solid var(--carbon,#1F3A93);outline-offset:2px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "2px ink outline that inverts to ink on hover.",
+      "html": "<button class=\"ds-btn-secondary\">Start on your domain</button>",
+      "css": ".ds-btn-secondary{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:transparent;color:#141414;border:2px solid #141414;border-radius:0;font:700 14px/1.25 'Public Sans',sans-serif;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;transition:all 150ms ease-out}.ds-btn-secondary:hover{background:#141414;color:#F8F7F3}.ds-btn-secondary:focus-visible{outline:2px solid var(--carbon,#1F3A93);outline-offset:2px}"
+    },
+    {
+      "name": "Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Square bond input under a form-box label.",
+      "html": "<label class=\"ds-field-label\" for=\"ds-f\">Root domain</label><input id=\"ds-f\" class=\"ds-field\" placeholder=\"acme-demo.com\">",
+      "css": ".ds-field-label{display:block;margin-bottom:6px;font:600 11px 'Public Sans',sans-serif;text-transform:uppercase;letter-spacing:.09em;color:#4A4A46}.ds-field{width:100%;padding:8px 12px;background:#F8F7F3;color:#141414;border:1px solid rgba(20,20,20,.4);border-radius:0;font:400 14px 'Public Sans',sans-serif;transition:border-color 150ms}.ds-field::placeholder{color:#6E6C64}.ds-field:hover{border-color:rgba(20,20,20,.7)}.ds-field:focus{border-color:#141414;outline:none}.ds-field:focus-visible{outline:2px solid var(--carbon,#1F3A93);outline-offset:2px}"
+    },
+    {
+      "name": "Folder Tabs",
+      "kind": "nav",
+      "refersTo": "tab-active",
+      "description": "Die-cut folder tabs; the active tab joins the bond sheet below.",
+      "html": "<nav class=\"ds-tabs\"><a class=\"ds-tab ds-tab-on\" href=\"#\">Dashboard</a><a class=\"ds-tab\" href=\"#\">Findings</a><a class=\"ds-tab\" href=\"#\">Attack paths</a></nav><div class=\"ds-tab-sheet\"></div>",
+      "css": ".ds-tabs{display:flex;gap:2px;padding:4px 4px 0;background:#D9A13B}.ds-tab{clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 100%,0 100%);padding:10px 20px 8px;background:#C38D2E;color:#4A3410;font:600 14px 'Public Sans',sans-serif;text-decoration:none;transition:background 150ms,color 150ms}.ds-tab:hover{background:#D9A13B;color:#141414}.ds-tab-on,.ds-tab-on:hover{background:#F8F7F3;color:#141414}.ds-tab:focus-visible{outline:2px solid var(--carbon,#1F3A93);outline-offset:2px}.ds-tab-sheet{height:24px;background:#F8F7F3}"
+    },
+    {
+      "name": "Severity Badges",
+      "kind": "chip",
+      "refersTo": "severity-badge",
+      "description": "Hue on the edge and swatch, ink label; only Critical is filled.",
+      "html": "<span class=\"ds-sev ds-sev-crit\"><i style=\"background:#7A1530\"></i>Critical</span> <span class=\"ds-sev\" style=\"border-color:#D9480F\"><i style=\"background:#D9480F\"></i>High</span> <span class=\"ds-sev\" style=\"border-color:#A87C00\"><i style=\"background:#A87C00\"></i>Medium</span> <span class=\"ds-sev\" style=\"border-color:#2E6E62\"><i style=\"background:#2E6E62\"></i>Low</span> <span class=\"ds-sev\" style=\"border-color:#6B6B66;color:#4A4A46\"><i style=\"background:#6B6B66\"></i>Info</span>",
+      "css": ".ds-sev{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border:1.5px solid;color:#141414;font:700 11px 'Public Sans',sans-serif;text-transform:uppercase;letter-spacing:.08em}.ds-sev i{width:8px;height:8px;display:inline-block}.ds-sev-crit{border-width:2px;border-color:#7A1530}"
+    },
+    {
+      "name": "Environment Tags",
+      "kind": "chip",
+      "refersTo": "severity-badge",
+      "description": "Environment told by line style, never hue.",
+      "html": "<span class=\"ds-env ds-env-prod\">prod</span> <span class=\"ds-env\">staging</span> <span class=\"ds-env ds-env-dev\">dev</span> <span class=\"ds-env ds-env-unk\">unknown</span>",
+      "css": ".ds-env{display:inline-flex;padding:1px 6px;border:1.5px solid #141414;color:#141414;font:700 11px 'Courier Prime',monospace;text-transform:uppercase;letter-spacing:.06em}.ds-env-prod{background:#141414;color:#F8F7F3}.ds-env-dev{border-style:dashed}.ds-env-unk{border-style:dotted;border-color:#6E6C64;color:#4A4A46}"
+    },
+    {
+      "name": "Classification Band",
+      "kind": "custom",
+      "refersTo": "classification-band",
+      "description": "Ink strip stating scope at the top of every surface.",
+      "html": "<div class=\"ds-band\">Passive recon only // Potential exposure, validate before action</div>",
+      "css": ".ds-band{background:#141414;color:#F8F7F3;padding:6px 16px;text-align:center;font:700 11px 'Archivo',sans-serif;font-stretch:90%;text-transform:uppercase;letter-spacing:.22em}"
+    },
+    {
+      "name": "Sheet with Ledger",
+      "kind": "card",
+      "refersTo": "sheet",
+      "description": "Bond sheet on the folder holding a ruled ledger.",
+      "html": "<div class=\"ds-folder\"><div class=\"ds-sheet\"><table class=\"ds-ledger\"><thead><tr><th>Host</th><th>Env</th><th>Findings</th></tr></thead><tbody><tr><td class=\"m\">api.acme-demo.com</td><td>prod</td><td>4</td></tr><tr><td class=\"m\">staging.acme-demo.com</td><td>staging</td><td>6</td></tr></tbody></table></div></div>",
+      "css": ".ds-folder{background:#D9A13B;padding:24px}.ds-sheet{background:#F8F7F3;padding:32px;box-shadow:0 1px 1px rgba(74,52,16,.18),0 18px 36px -14px rgba(74,52,16,.55)}.ds-ledger{width:100%;border-collapse:collapse;font:400 14px 'Public Sans',sans-serif;font-variant-numeric:tabular-nums;color:#141414}.ds-ledger th{text-align:left;padding:10px 12px;border-bottom:2px solid #141414;font:600 11px 'Public Sans',sans-serif;text-transform:uppercase;letter-spacing:.09em;color:#4A4A46}.ds-ledger td{padding:12px;border-bottom:1px solid rgba(20,20,20,.15)}.ds-ledger td.m{font-family:'Courier Prime',monospace;font-size:13px}.ds-ledger tbody tr{transition:background 150ms}.ds-ledger tbody tr:hover{background:rgba(217,161,59,.15)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Attacker's Dossier",
+    "overview": "Every surface is a page from the file an outsider would keep on you. The field is manila folder stock with paper fiber; content sits on bond sheets that lie on the folder and cast a soft paper shadow; everything printed on them is carbon ink. Typed exhibits are set in Courier Prime, the body in Public Sans (the U.S. government face), and headings in condensed Archivo, the way a stamp or a form title would be. Classification bands run across the top (and on the landing page, the bottom) of every surface.\n\nStructure comes from rules, not fills. Panels are ruled boxes; tables are ledgers with a heavy ink head rule; summaries are typed ledgers, never hero-metric tiles. Color is almost entirely absent: one stamp red marks the single thing to fix first, carbon blue marks focus and nothing else, and severity hues ride on edges and bands while the words stay in ink. Evidence is shown in place and annotated where it sits (a header line, a dotted leader, a note), never summarized into a tinted card.\n\nDensity is that of a working document: compact 13 to 14px text in the app, generous 80 to 112px section passes on the landing page. The Persuade surface may tilt and stack sheets; the Operate surfaces lie flat on one sheet under die-cut folder tabs.",
+    "keyCharacteristics": [
+      "Manila field, bond sheets, carbon ink; square corners everywhere.",
+      "Rules and line style carry structure and category; fills are reserved.",
+      "Stamp red appears once per surface, on the P0.",
+      "Condensed Archivo for titles and stamps, Public Sans for prose, Courier Prime for anything collected.",
+      "Folder tabs are navigation; classification bands frame the page."
+    ],
+    "rules": [
+      {
+        "name": "The One Stamp Rule",
+        "body": "Stamp red marks the P0 and nothing else. A surface carries one red stamp, on the one item to fix first; the same item may repeat its red in a P0 chip or Critical badge, but no second item, heading, button, or decoration ever takes red.",
+        "section": "colors"
+      },
+      {
+        "name": "The Edge-Not-Ink Rule",
+        "body": "Severity color rides edges, swatches, bars, and lines; the words are ink. Never set severity labels or body text in a severity hue.",
+        "section": "colors"
+      },
+      {
+        "name": "The Untinted Panel Rule",
+        "body": "Panels, cards, and memos are bond or transparent with ink rules. No tinted fills to group or signal; hover tints on ledger rows (`manila` at 10 to 15%) are state, not structure.",
+        "section": "colors"
+      },
+      {
+        "name": "The Line-Not-Hue Rule",
+        "body": "Categories that are not severity (environment, priority above P0, inactive paths) are told by line style: solid fill for prod, solid outline for staging, dashed for dev, dotted for unknown.",
+        "section": "colors"
+      },
+      {
+        "name": "The Typed-Evidence Rule",
+        "body": "If it was collected (a hostname, header, timestamp, advisory ID, package version), it is set in Courier Prime. If it was written (a summary, a remediation, a description), it is Public Sans.",
+        "section": "typography"
+      },
+      {
+        "name": "The Condensed Title Rule",
+        "body": "Display, headline, title, and stamp text are Archivo at weight 800, condensed (78% for titles, 70 to 85% inside stamps and sheet headings). Never set a title in the body face.",
+        "section": "typography"
+      },
+      {
+        "name": "The Paper-On-Folder Rule",
+        "body": "A shadow means \"a sheet of paper is lying on the folder.\" Nothing on a sheet casts a shadow.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do put every content surface on a bond sheet over the grained manila field, with the Sheet shadow.",
+      "Do build structure from ink rules: 2px for heads and page titles, 1px hairlines at 15 to 30% for dividers.",
+      "Do set collected data in Courier Prime and written prose in Public Sans.",
+      "Do carry severity on borders, swatches, bars, and edges, with ink labels.",
+      "Do tell non-severity categories by line style (filled, solid, dashed, dotted).",
+      "Do print the most urgent path in full ink and fade the rest to 30% ink until hovered.",
+      "Do annotate evidence in place with leaders and badges rather than summarizing it elsewhere.",
+      "Do frame every surface with a classification band stating the passive, authorized scope.",
+      "Do give every motion a reduced-motion state that shows the finished result."
+    ],
+    "donts": [
+      "Don't use stamp red for anything but the P0: no red buttons, headings, links, or second stamps.",
+      "Don't fill a panel, card, or callout with a tint to group or flag it.",
+      "Don't round corners; the only non-rectangular forms are the die-cut tab and the drawn stamp.",
+      "Don't cast shadows inside a sheet or use hard offset shadows; the only shadows are Sheet and the button Lift.",
+      "Don't set severity labels or body copy in a severity hue.",
+      "Don't set titles in Public Sans or uncondensed Archivo."
+    ]
+  }
+}

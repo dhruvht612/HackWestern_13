@@ -1,15 +1,21 @@
 import { cn } from "@/lib/utils";
 
+// Environment is told by line, not hue, so it never competes with severity color.
 const styles: Record<string, string> = {
-  prod: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
-  staging: "bg-amber-500/15 text-amber-300 border-amber-500/30",
-  dev: "bg-sky-500/15 text-sky-300 border-sky-500/30",
-  unknown: "bg-slate-500/15 text-slate-300 border-slate-500/30",
+  prod: "border-ink bg-ink text-bond",
+  staging: "border-ink text-ink",
+  dev: "border-dashed border-ink text-ink",
+  unknown: "border-dotted border-ink-faint text-ink-soft",
 };
 
-export function EnvironmentTag({ env }: { env: "prod" | "staging" | "dev" | "unknown" }) {
+export function EnvironmentTag({ env }: { env: "prod" | "staging" | "dev" | "unknown" | string }) {
   return (
-    <span className={cn("inline-flex rounded-full border px-2 py-0.5 text-xs font-medium", styles[env])}>
+    <span
+      className={cn(
+        "inline-flex border-[1.5px] px-1.5 py-px font-mono text-[11px] font-bold uppercase tracking-[0.06em]",
+        styles[env] ?? styles.unknown,
+      )}
+    >
       {env}
     </span>
   );

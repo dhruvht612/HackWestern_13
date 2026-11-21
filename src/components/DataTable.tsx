@@ -19,26 +19,26 @@ export function DataTable<T>({
   onRowClick?: (row: T) => void;
 }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-border">
-      <table className="min-w-full divide-y divide-border text-sm">
-        <thead className="bg-background/60 text-left text-slate-400">
-          <tr>
+    <div className="overflow-x-auto">
+      <table className="tabular min-w-full text-sm">
+        <thead>
+          <tr className="ledger-head">
             {columns.map((col) => (
-              <th key={col.key} className={`px-4 py-3 font-medium ${col.className || ""}`}>
+              <th key={col.key} scope="col" className={`whitespace-nowrap px-3 py-2.5 ${col.className || ""}`}>
                 {col.header}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-border bg-panel/40">
+        <tbody className="divide-y divide-ink/15">
           {rows.map((row) => (
             <tr
               key={rowKey(row)}
-              className={onRowClick ? "cursor-pointer hover:bg-white/5" : ""}
+              className={onRowClick ? "cursor-pointer transition-colors hover:bg-manila/15" : "transition-colors hover:bg-manila/10"}
               onClick={() => onRowClick?.(row)}
             >
               {columns.map((col) => (
-                <td key={col.key} className={`px-4 py-3 text-slate-200 ${col.className || ""}`}>
+                <td key={col.key} className={`px-3 py-3 align-middle text-ink ${col.className || ""}`}>
                   {col.render(row)}
                 </td>
               ))}

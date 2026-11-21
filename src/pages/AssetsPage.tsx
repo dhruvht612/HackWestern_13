@@ -6,44 +6,48 @@ import { DataTable, type Column } from "@/components/DataTable";
 import { EnvironmentTag } from "@/components/EnvironmentTag";
 import { SeverityBadge } from "@/components/SeverityBadge";
 import { PageSkeleton } from "@/components/LoadingSkeleton";
+import { PageHeader } from "@/components/PageHeader";
 import type { Asset, Severity } from "@/lib/types";
-import { severityOrder } from "@/lib/severity";
+import { bySeverity } from "@/lib/severity";
+
+type Row = Asset & { findingCount: number; topSeverity?: Severity };
 
 export function AssetsPage() {
   const assets = useAssets(DEMO_SCAN_ID);
   const findings = useFindings(DEMO_SCAN_ID);
 
-  const rows = useMemo(() => {
-    const list = assets.data || [];
+  const rows = useMemo<Row[]>(() => {
     const f = findings.data || [];
-    return list.map((a) => {
+    return (assets.data || []).map((a) => {
       const af = f.filter((x) => x.asset_id === a.id);
-      const top = [...af].sort((x, y) => severityOrder.indexOf(x.severity) - severityOrder.indexOf(y.severity))[0]?.severity as Severity | undefined;
-      return { ...a, findingCount: af.length, topSeverity: top };
+      return { ...a, findingCount: af.length, topSeverity: [...af].sort(bySeverity)[0]?.severity };
     });
   }, [assets.data, findings.data]);
 
   if (assets.isLoading || findings.isLoading) return <PageSkeleton />;
 
-  const columns: Column<(Asset & { findingCount: number; topSeverity?: Severity })>[] = [
-    { key: "hostname", header: "Hostname", render: (r) => <span className="mono text-cyan-100">{r.hostname}</span> },
+  const columns: Column<Row>[] = [
+    { key: "hostname", header: "Hostname", render: (r) => <span className="mono font-bold">{r.hostname}</span> },
     { key: "env", header: "Environment", render: (r) => <EnvironmentTag env={r.environment} /> },
-    { key: "ips", header: "IP addresses", render: (r) => <span className="mono text-xs text-slate-300">{r.ip_addresses.join(", ")}</span> },
-    { key: "tech", header: "Technology", render: (r) => <span className="text-slate-300">{r.technology}</span> },
-    { key: "https", header: "HTTPS", render: (r) => <span>{r.https ? "Yes" : "No"}</span> },
-    { key: "findings", header: "Findings", render: (r) => <span>{r.findingCount}</span> },
-    { key: "severity", header: "Top severity", render: (r) => r.topSeverity ? <SeverityBadge severity={r.topSeverity} /> : <span className="text-slate-500">—</span> },
+    { key: "ips", header: "IP addresses", render: (r) => <span className="mono text-[13px] text-ink-soft">{r.ip_addresses.join(", ")}</span> },
+    { key: "tech", header: "Technology", render: (r) => <span className="text-ink-soft">{r.technology}</span> },
+    {
+      key: "https",
+      header: "HTTPS",
+      render: (r) => (r.https ? <span>Yes</span> : <span className="font-semibold text-severity-high">No</span>),
+    },
+    { key: "findings", header: "Findings", className: "text-right", render: (r) => <span className="font-mono font-bold">{r.findingCount}</span> },
+    {
+      key: "severity",
+      header: "Worst",
+      render: (r) => (r.topSeverity ? <SeverityBadge severity={r.topSeverity} /> : <span className="text-ink-faint">None</span>),
+    },
   ];
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Assets</h1>
-        <p className="mt-1 text-sm text-slate-400">Discovered externally exposed hosts and their risk posture.</p>
-      </div>
-      <div className="panel p-4">
-        <DataTable columns={columns} rows={rows} rowKey={(r) => r.id} />
-      </div>
+      <PageHeader title="Assets" description="Hosts reachable from the internet, found through CT logs and DNS, with their worst finding." />
+      <DataTable columns={columns} rows={rows} rowKey={(r) => r.id} />
     </div>
   );
 }

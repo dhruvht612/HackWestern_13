@@ -1,8 +1,9 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ShieldAlert } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useCreateProject } from "@/hooks/useCreateProject";
+import { ClassificationBand } from "@/components/ClassificationBand";
 
 export function NewProjectPage() {
   const navigate = useNavigate();
@@ -23,74 +24,95 @@ export function NewProjectPage() {
       });
       navigate(`/projects/${project.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create project");
+      setError(err instanceof Error ? err.message : "The project couldn’t be created. Check the domain and try again.");
     }
   };
 
   return (
-    <div className="min-h-screen bg-background px-4 py-12 text-slate-100">
-      <div className="mx-auto max-w-2xl">
-        <Link to="/" className="text-sm text-slate-400 hover:text-accent">← Back</Link>
-        <div className="panel mt-4 p-6 md:p-8">
-          <h1 className="text-2xl font-semibold">Create project</h1>
-          <p className="mt-2 text-sm text-slate-400">
-            Add an authorized root domain for passive external attack surface discovery.
-          </p>
+    <div className="grain min-h-screen text-ink">
+      <ClassificationBand>Passive recon only // Authorized targets</ClassificationBand>
+      <div className="mx-auto max-w-2xl px-4 py-10 md:py-14">
+        <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-manila-dark hover:text-ink hover:underline">
+          <ArrowLeft size={15} aria-hidden="true" /> Back
+        </Link>
 
-          <form onSubmit={onSubmit} className="mt-6 space-y-5">
-            <div>
-              <label className="mb-2 block text-sm text-slate-300">Project name</label>
-              <input
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-accent"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Acme Demo"
-                required
-              />
-            </div>
-            <div>
-              <label className="mb-2 block text-sm text-slate-300">Root domain</label>
-              <input
-                className="mono w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-accent"
-                value={rootDomain}
-                onChange={(e) => setRootDomain(e.target.value)}
-                placeholder="acme-demo.com"
-                required
-              />
-              <p className="mt-2 text-xs text-slate-500">Registrable domain only. No IPs, wildcards, schemes, or paths.</p>
-            </div>
+        <div className="sheet mt-4 px-5 py-7 sm:px-10 sm:py-10">
+          <div className="border-b-2 border-ink pb-4">
+            <h1 className="display text-[2.4rem] font-extrabold leading-none">Open a new file</h1>
+            <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+              Add a root domain you’re authorized to assess. AttackSurface maps what’s exposed using passive signals only.
+            </p>
+          </div>
 
-            <div className="rounded-lg border border-severity-medium/30 bg-severity-medium/5 p-4">
-              <div className="flex gap-2 text-sm text-severity-medium">
-                <ShieldAlert size={16} className="mt-0.5 shrink-0" />
-                <div>
-                  <div className="font-medium">Passive discovery only</div>
-                  <p className="mt-1 text-slate-300">
-                    Discovery uses CT logs, DNS, and HTTP headers/TLS metadata only. No brute-forcing, port scanning, or exploitation.
-                  </p>
-                </div>
+          <form onSubmit={onSubmit} className="mt-6">
+            <div className="grid border border-ink/40 sm:grid-cols-2">
+              <div className="border-b border-ink/40 p-3 focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-carbon sm:border-b-0 sm:border-r">
+                <label htmlFor="project-name" className="field-label">
+                  1. Project name
+                </label>
+                <input
+                  id="project-name"
+                  className="mt-1 w-full bg-transparent text-[15px] outline-none placeholder:text-ink-faint"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Acme Demo"
+                  autoComplete="off"
+                  required
+                />
+              </div>
+              <div className="p-3 focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-carbon">
+                <label htmlFor="root-domain" className="field-label">
+                  2. Root domain
+                </label>
+                <input
+                  id="root-domain"
+                  className="mono mt-1 w-full bg-transparent text-[15px] outline-none placeholder:text-ink-faint"
+                  value={rootDomain}
+                  onChange={(e) => setRootDomain(e.target.value)}
+                  placeholder="acme-demo.com"
+                  autoComplete="off"
+                  spellCheck={false}
+                  aria-describedby="root-domain-hint"
+                  required
+                />
               </div>
             </div>
+            <p id="root-domain-hint" className="mt-2 text-xs text-ink-soft">
+              A registrable domain only: no IP addresses, wildcards, schemes, or paths.
+            </p>
 
-            <label className="flex items-start gap-3 text-sm text-slate-300">
+            <div className="mt-6 border-[1.5px] border-ink p-4">
+              <div className="field-label !text-ink">3. Scope of collection</div>
+              <p className="mt-1.5 text-sm leading-relaxed">
+                Certificate Transparency logs, DNS, and HTTP headers / TLS metadata. No brute-forcing, port scanning, or exploitation.
+              </p>
+            </div>
+
+            <label className="mt-4 flex cursor-pointer items-start gap-3 border-[1.5px] border-dashed border-ink/50 p-4 text-sm leading-relaxed transition-colors hover:border-ink">
               <input
                 type="checkbox"
-                className="mt-1 accent-[#22D3EE]"
+                className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-[#141414]"
                 checked={authorized}
                 onChange={(e) => setAuthorized(e.target.checked)}
               />
-              <span>I confirm I am authorized to assess this domain and its externally exposed assets.</span>
+              <span>
+                <span className="font-semibold">4. Attestation.</span> I confirm I’m authorized to assess this domain and its
+                externally exposed assets.
+              </span>
             </label>
 
-            {error ? <div className="rounded-lg border border-severity-critical/30 bg-severity-critical/10 p-3 text-sm text-severity-critical">{error}</div> : null}
+            {error ? (
+              <div role="alert" className="mt-4 border-2 border-severity-critical p-3 text-sm">
+                <span className="font-semibold text-severity-critical">Not created.</span> {error}
+              </div>
+            ) : null}
 
-            <button
-              type="submit"
-              disabled={createProject.isPending}
-              className="rounded-lg bg-accent px-4 py-2 font-medium text-slate-950 hover:bg-cyan-300 disabled:opacity-60"
-            >
-              {createProject.isPending ? "Creating..." : "Create project"}
-            </button>
+            <div className="mt-7 flex flex-wrap items-center gap-4">
+              <button type="submit" disabled={createProject.isPending || !authorized} className="btn-primary px-6 py-3">
+                {createProject.isPending ? "Creating…" : "Create project"}
+              </button>
+              {!authorized ? <span className="text-xs text-ink-soft">Confirm the attestation to continue.</span> : null}
+            </div>
           </form>
         </div>
       </div>
