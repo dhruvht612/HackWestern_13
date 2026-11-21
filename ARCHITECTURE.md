@@ -94,22 +94,25 @@ All colors are CSS variables in `src/styles/globals.css` (60/30/10: Abyss Navy, 
 
 ### API surface
 
-| Method | Path | Router | Backing today |
-|---|---|---|---|
-| GET | `/health` | main | live |
-| POST | `/projects` | projects | **Supabase** (validates authorization + domain) |
-| GET | `/projects` | projects | **Supabase** |
-| GET | `/projects/{id}` | projects | **Supabase** |
-| POST | `/projects/{id}/scans` | scans | fixture |
-| GET | `/scans/{id}` | scans | fixture (echoes id) |
-| GET | `/scans/{id}/assets` | scans | fixture |
-| GET | `/scans/{id}/findings` | scans | fixture |
-| POST | `/projects/{id}/dependencies` | dependencies | fixture (reads the upload, ignores it) |
-| GET | `/projects/{id}/dependencies` | dependencies | fixture |
-| GET | `/scans/{id}/graph` | analysis | fixture |
-| POST | `/scans/{id}/analysis` | analysis | fixture |
-| GET | `/scans/{id}/report.md` | reports | fixture (text/markdown) |
-| GET | `/sign_up`, `/sign_in`, `/sign_out` | auth | WIP placeholders |
+Everything except `/health` and `/auth/signup|signin|refresh` requires `Authorization: Bearer <Supabase access token>` and is scoped to the caller; another user's IDs return 404.
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/health` | Liveness |
+| POST | `/auth/signup`, `/auth/signin`, `/auth/refresh` | Supabase Auth (JSON body, rate-limited) |
+| POST / GET | `/auth/signout`, `/auth/me` | |
+| POST / GET | `/projects`, `/projects/{id}` | Owner-scoped |
+| POST | `/projects/{id}/verification` | Issue a DNS TXT challenge (value shown once, hash stored) |
+| POST | `/projects/{id}/verification/check` | Resolve the TXT record; marks verified for 90 days |
+| GET / POST | `/projects/{id}/scans` | List; queue a scan (needs verification; one active per project; rate-limited) |
+| GET | `/scans/{id}`, `/scans/{id}/events` | Status + collection log |
+| POST | `/scans/{id}/cancel` | |
+| GET | `/scans/{id}/assets`, `/findings`, `/evidence` | Database rows |
+| PATCH | `/assets/{id}` | Correct an inferred environment |
+| GET / POST | `/projects/{id}/dependencies` | Upload `package.json`/`package-lock.json` (+ optional `deployed_on` host); OSV matched at upload |
+| GET | `/scans/{id}/graph` | Built from stored rows |
+| POST / GET | `/scans/{id}/analyze`, `/scans/{id}/analysis` | Queue / read the analyst job |
+| GET | `/scans/{id}/report.md` | Markdown, regenerated after scan and analysis |
 
 ### Scan lifecycle (target design)
 
@@ -193,15 +196,16 @@ CORS allows `http://localhost:5173` only; add the deployed frontend origin for p
 - **Secrets:** the Supabase service key bypasses row-level security, so it lives only on the server. Nothing secret goes in `VITE_*`.
 - **Prompt safety:** collected data (headers, banners) is untrusted input to the AI analyst; see [AI-AGENT.md](AI-AGENT.md).
 
-## 10. Known issues
+## 10. Status and known limitations (backend v1)
 
-| Issue | Where | Impact |
-|---|---|---|
-| Config raises `KeyError` at import without Supabase/JWT env | `config.py` | Backend tests and CI fail without secrets; `.env.example` lacks `JWT_SECRET` |
-| `GET /projects/{id}` indexes `resp.data[0]` without a check | `routers/projects.py` | An unknown id returns 500 instead of 404 |
-| Auth routes are GET with hardcoded credentials; `SignInModel`/`SignUpModel` unused | `routers/auth.py` | Placeholder; credentials must move to a POST body |
-| `decode_jwt` uses a bare `except` | `jwt.py` | Hides errors; `JWTBearer` isn't applied to any route |
-| Scans, assets, findings, deps, analysis, graph and report are fixtures | routers | Live mode shows demo data for every project |
-| No manifest ↔ host link | schema + upload | The correlation claim isn't backed by data yet |
-| App pages use `DEMO_SCAN_ID` | frontend | Real projects show the demo scan |
-| `backend/README.md` and the root README reference `backend/app/` and pip | docs | Paths are actually `backend/attacksurface/` with uv |
+Implemented and tested with mocks: env loading without import-time secrets; Supabase token verification (HS256 secret or JWKS; `exp`, `aud`, `iss`, `sub`); POST auth endpoints; owner-scoped projects and child resources (404 for others' data); DNS TXT domain verification; rate limits; SSRF/scope guards; durable DB-queued scans and analyses with a worker; CT, DNS, HTTP/TLS collectors; rules engine; npm manifest parsing; OSV matching; host ↔ package mapping; database-built graph, analysis (Gemini + validated output + deterministic fallback), and Markdown reports.
+
+| Limitation | Notes |
+|---|---|
+| Not run against live services in CI | crt.sh, DNS, target hosts, OSV.dev, Supabase Auth, and Gemini are exercised through mocks; first live run needs real credentials |
+| Rate limiter is per process | Use one API instance or move it to Redis/Postgres |
+| Sign-out doesn't revoke tokens | Client discards them; access tokens expire on Supabase's schedule |
+| crt.sh is the only CT source | When it fails the scan continues on the root only and is marked `partial` |
+| Environment classification is a hostname heuristic | Shown with its confidence; owners can correct it (`PATCH /assets/{id}`) |
+| Only npm manifests | `package.json` ranges are stored as unresolved and not queried |
+| Frontend has no unit-test framework | Typecheck, lint, build, and a browser smoke test cover it |

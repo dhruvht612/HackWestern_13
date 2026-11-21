@@ -1,52 +1,135 @@
-from fastapi import APIRouter, HTTPException
+from __future__ import annotations
 
-from attacksurface.database import supabase
-from attacksurface.fixture_loader import load_fixture
-from attacksurface.schemas import Project, ProjectCreate
+import hashlib
+import hmac
+import secrets
+from typing import Any
+
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+
+from attacksurface.config import settings
+from attacksurface.database import get_db
+from attacksurface.discovery import dns as dns_lookup
+from attacksurface.jwt import CurrentUser, get_current_user
+from attacksurface.ratelimit import limiter
+from attacksurface.schemas import (
+    Project,
+    ProjectCreate,
+    Scan,
+    ScanCreated,
+    VerificationChallenge,
+)
+from attacksurface.store import (
+    CHALLENGE_TTL,
+    add_event,
+    get_owned_project,
+    now_utc,
+    parse_ts,
+    project_out,
+    verification_status,
+)
 from attacksurface.validation import is_valid_root_domain
 
 router = APIRouter(prefix="/projects", tags=["projects"])
+TXT_PREFIX = "attacksurface-verification="
+
+
+def _record_name(root: str) -> str:
+    return f"_attacksurface-challenge.{root}"
+
+
+def _hash(token: str) -> str:
+    return hashlib.sha256(token.encode()).hexdigest()
 
 
 @router.post("", response_model=Project, status_code=201)
-def create_project(payload: ProjectCreate) -> Project:
+def create_project(payload: ProjectCreate, user: CurrentUser = Depends(get_current_user), db: Any = Depends(get_db)) -> dict:  # noqa: B008
     if not payload.authorization_confirmed:
-        raise HTTPException(
-            status_code=400,
-            detail="authorization_confirmed must be true before creating a project",
-        )
-    if not is_valid_root_domain(payload.root_domain):
-        raise HTTPException(
-            status_code=400,
-            detail="root_domain must be a registrable domain (no IPs, wildcards, schemes, or paths)",
-        )
-
-    resp = (
-        supabase.table("projects")
-        .insert(
-            {
-                "name": payload.name,
-                "root_domain": payload.root_domain,
-                "authorization_confirmed": payload.authorization_confirmed,
-            }
-        )
-        .execute()
-    )
-
-    project_data = resp.data[0]
-
-    return Project.model_validate(project_data)
+        raise HTTPException(status_code=400, detail="authorization_confirmed must be true before creating a project")
+    root = payload.root_domain.strip().lower()
+    if not is_valid_root_domain(root):
+        raise HTTPException(status_code=400, detail="root_domain must be a registrable domain (no IPs, wildcards, schemes, or paths)")
+    row = db.table("projects").insert({
+        "name": payload.name.strip(), "root_domain": root, "authorization_confirmed": True, "owner_user_id": user.id,
+    }).execute().data[0]
+    return project_out(db, row)
 
 
 @router.get("", response_model=list[Project])
-def list_projects() -> list[Project]:
-    resp = supabase.table("projects").select("*").execute()
-
-    return [Project.model_validate(p) for p in resp.data]
+def list_projects(user: CurrentUser = Depends(get_current_user), db: Any = Depends(get_db)) -> list[dict]:  # noqa: B008
+    rows = db.table("projects").select("*").eq("owner_user_id", user.id).order("created_at", desc=True).execute().data
+    return [project_out(db, r) for r in rows]
 
 
 @router.get("/{project_id}", response_model=Project)
-def get_project(project_id: str) -> Project:
-    resp = supabase.table("projects").select("*").eq("id", project_id).execute()
+def get_project(project_id: str, user: CurrentUser = Depends(get_current_user), db: Any = Depends(get_db)) -> dict:  # noqa: B008
+    return project_out(db, get_owned_project(db, project_id, user))
 
-    return Project.model_validate(resp.data[0])
+
+@router.post("/{project_id}/verification", response_model=VerificationChallenge)
+def issue_verification(project_id: str, user: CurrentUser = Depends(get_current_user), db: Any = Depends(get_db)) -> VerificationChallenge:  # noqa: B008
+    """Issue a DNS TXT challenge. Only the hash is stored; the value is shown once."""
+    limiter.check(f"verify-issue:{user.id}", 10)
+    project = get_owned_project(db, project_id, user)
+    token = secrets.token_urlsafe(32)
+    expires = now_utc() + CHALLENGE_TTL
+    db.table("projects").update({
+        "verification_token_hash": _hash(token), "verification_expires_at": expires.isoformat(), "updated_at": now_utc().isoformat(),
+    }).eq("id", project["id"]).execute()
+    status = verification_status(project)
+    return VerificationChallenge(
+        status="verified" if status == "verified" else "pending",
+        record_name=_record_name(project["root_domain"]), record_value=f"{TXT_PREFIX}{token}", expires_at=expires,
+        verified_at=project.get("verified_at"),
+        message=f"Add a TXT record named {_record_name(project['root_domain'])} with this value, then check it. Values are shown once.",
+    )
+
+
+@router.post("/{project_id}/verification/check", response_model=VerificationChallenge)
+async def check_verification(project_id: str, user: CurrentUser = Depends(get_current_user), db: Any = Depends(get_db)) -> VerificationChallenge:  # noqa: B008
+    limiter.check(f"verify-check:{user.id}", 6)
+    project = get_owned_project(db, project_id, user)
+    name = _record_name(project["root_domain"])
+    status = verification_status(project)
+    expected = project.get("verification_token_hash")
+    if not expected:
+        if status == "verified":
+            return VerificationChallenge(status=status, record_name=name, verified_at=project.get("verified_at"), message="Already verified.")
+        raise HTTPException(status_code=409, detail="Issue a verification challenge first")
+    expires = parse_ts(project.get("verification_expires_at"))
+    if expires is None or expires <= now_utc():
+        raise HTTPException(status_code=409, detail="The challenge expired; issue a new one")
+    records = await dns_lookup.lookup_txt(name)
+    if any(r.startswith(TXT_PREFIX) and hmac.compare_digest(_hash(r[len(TXT_PREFIX):]), expected) for r in records):
+        now = now_utc()
+        db.table("projects").update({
+            "verified_at": now.isoformat(), "verification_method": "dns-txt", "verification_token_hash": None,
+            "verification_expires_at": None, "updated_at": now.isoformat(),
+        }).eq("id", project["id"]).execute()
+        return VerificationChallenge(status="verified", record_name=name, verified_at=now, message="Domain control verified. You can start a scan.")
+    return VerificationChallenge(status=status, record_name=name, expires_at=project.get("verification_expires_at"), verified_at=project.get("verified_at"),
+                                 message="The TXT record wasn't found yet. DNS changes can take a few minutes; check again shortly.")
+
+
+@router.get("/{project_id}/scans", response_model=list[Scan])
+def list_scans(project_id: str, user: CurrentUser = Depends(get_current_user), db: Any = Depends(get_db)) -> list[dict]:  # noqa: B008
+    project = get_owned_project(db, project_id, user)
+    return db.table("scans").select("*").eq("project_id", project["id"]).order("created_at", desc=True).limit(50).execute().data
+
+
+@router.post("/{project_id}/scans", response_model=ScanCreated, status_code=201)
+def create_scan(project_id: str, background: BackgroundTasks, user: CurrentUser = Depends(get_current_user), db: Any = Depends(get_db)) -> ScanCreated:  # noqa: B008
+    project = get_owned_project(db, project_id, user)
+    if verification_status(project) != "verified":
+        raise HTTPException(status_code=403, detail="Verify domain control before scanning this project")
+    active = db.table("scans").select("id").eq("project_id", project["id"]).in_("status", ["queued", "running"]).execute().data
+    if active:
+        raise HTTPException(status_code=409, detail=f"A scan is already in progress ({active[0]['id']})")
+    limiter.check(f"scan:{user.id}", settings.scan_rate_limit_per_min)
+    scan = db.table("scans").insert({"project_id": project["id"], "status": "queued", "created_by": user.id}).execute().data[0]
+    add_event(db, scan["id"], "Scan queued.")
+    if settings.run_jobs_inline:
+        from attacksurface.worker import process_scan
+
+        background.add_task(process_scan, scan["id"])
+    return ScanCreated(scan_id=scan["id"], status="queued", project_id=project["id"])

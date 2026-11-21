@@ -1,19 +1,30 @@
-# Attacksurface API
+# AttackSurface API
 
-This is the backend API for the Attacksurface project.
-
-# Development
-
-This project uses the Python "uv" project manager. Make sure it is installed!
-
-Install packages with:
+FastAPI backend in `backend/attacksurface/`, managed with [uv](https://docs.astral.sh/uv/). Python 3.12.
 
 ```sh
-uv sync
+uv sync --all-groups                 # install (add --system-certs behind a TLS-intercepting proxy)
+uv run fastapi dev                   # API on http://localhost:8000 (docs at /docs)
+uv run python -m attacksurface.worker   # job worker (production; dev runs jobs inline)
+uv run pytest -q                     # tests: no credentials, no network
+uv run ruff check .
 ```
 
-Run the project with:
+Configuration is read from the environment, then `backend/.env`, then the repo-root `.env`
+(see `../.env.example`). Nothing is required to import or test the app; endpoints that need
+Supabase return 503 until it is configured.
 
-```sh
-uv run fastapi dev
-```
+| Module | Role |
+|---|---|
+| `config.py` | Settings (env + `.env`, never raises at import) |
+| `jwt.py` | Verifies Supabase access tokens (HS256 secret or JWKS), `get_current_user` |
+| `store.py` | Ownership-scoped data access, verification status, scan events |
+| `netsafety.py` | Scope and SSRF guards (public IPs only, root + subdomains only) |
+| `ratelimit.py` | Per-instance sliding-window limiter |
+| `discovery/` | `ct.py` (crt.sh), `dns.py`, `http_meta.py` (GET / on 80/443, TLS cert), `rules.py` |
+| `intel/` | `deps.py` (package.json / package-lock.json), `osv.py` (OSV.dev) |
+| `scanner.py` | The scan job: CT → DNS → HTTP/TLS → rules → dependency correlation → report |
+| `ai/` | `policy.py` (priorities + fallback), `gemini.py`, `analyst.py` (validation) |
+| `graph.py`, `reports.py` | Graph and Markdown report built from stored rows |
+| `worker.py` | Polls queued scans/analyses from the database |
+| `routers/` | `auth`, `projects` (+ verification, scans), `scans`, `dependencies`, `analysis`, `reports` |

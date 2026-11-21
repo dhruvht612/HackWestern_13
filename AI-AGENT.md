@@ -1,6 +1,6 @@
 # AttackSurface — AI Analyst Agent
 
-**Status:** specified, not implemented. `backend/attacksurface/ai/` is empty and `POST /scans/{id}/analysis` returns `shared/fixtures/analysis.json`.
+**Status:** implemented in `backend/attacksurface/ai/` (`policy.py`, `gemini.py`, `analyst.py`); API `POST /scans/{id}/analyze` (queues a job, 202) and `GET /scans/{id}/analysis`. Tested with a fake model; not yet run against the live Gemini API.
 Related: [PRD.md](PRD.md) (FR-11) · [ARCHITECTURE.md](ARCHITECTURE.md) · `backend/attacksurface/schemas.py` (`Analysis`, `AnalysisFinding`)
 
 ## 1. Role

@@ -5,13 +5,17 @@ description = "Backend API for Attacksurface"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "cryptography>=44",
+    "dnspython>=2.7",
     "fastapi[standard]>=0.165.0",
+    "google-genai>=1.0",
     "httpx>=0.28.1",
     "pydantic>=2.14.4",
     "pyjwt>=2.15.1",
     "pytest>=9.2.0",
     "python-multipart>=0.0.34",
     "supabase>=2.34.1",
+    "truststore>=0.10",
     "uvicorn[standard]>=0.54.0",
 ]
 

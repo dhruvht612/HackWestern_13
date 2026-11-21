@@ -11,8 +11,8 @@ import {
   type NodeProps,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useGraph } from "@/hooks/useGraph";
-import { DEMO_SCAN_ID } from "@/lib/constants";
+import { useGraph } from "@/hooks/useScanData";
+import { ScanGate } from "@/components/ScanGate";
 import { PageSkeleton } from "@/components/LoadingSkeleton";
 import { DetailPanel } from "@/components/DetailPanel";
 import { SeverityBadge } from "@/components/SeverityBadge";
@@ -24,7 +24,7 @@ type NodeData = { label: string; nodeType: GNode["type"]; severity?: Severity; d
 
 const CAMEL = "var(--color-secondary)";
 const KIWI = "var(--color-accent)";
-const kindLabel: Record<GNode["type"], string> = { root: "Root domain", asset: "Host", finding: "Finding", fix: "Fix" };
+const kindLabel: Record<GNode["type"], string> = { root: "Root domain", asset: "Host", dependency: "Package", finding: "Finding", fix: "Fix" };
 
 function tone(severity?: Severity) {
   return severity ? severityColors[severity] : CAMEL;
@@ -57,9 +57,9 @@ function CardNode({ data, selected }: NodeProps<Node<NodeData>>) {
 const nodeTypes = { custom: CardNode };
 
 function layout(nodes: GNode[]): Node<NodeData>[] {
-  const columns: Record<GNode["type"], GNode[]> = { root: [], asset: [], finding: [], fix: [] };
+  const columns: Record<GNode["type"], GNode[]> = { root: [], asset: [], dependency: [], finding: [], fix: [] };
   nodes.forEach((n) => columns[n.type].push(n));
-  const x: Record<GNode["type"], number> = { root: 0, asset: 300, finding: 620, fix: 960 };
+  const x: Record<GNode["type"], number> = { root: 0, asset: 300, dependency: 600, finding: 900, fix: 1240 };
   return nodes.map((n) => {
     const col = columns[n.type];
     const idx = col.indexOf(n);
@@ -68,7 +68,7 @@ function layout(nodes: GNode[]): Node<NodeData>[] {
       id: n.id,
       type: "custom",
       position: { x: x[n.type], y },
-      data: { label: n.label, nodeType: n.type, severity: n.severity },
+      data: { label: n.label, nodeType: n.type, severity: n.severity ?? undefined },
     };
   });
 }
@@ -99,14 +99,18 @@ function connectedSet(nodeId: string, edges: Edge[]) {
 }
 
 export function GraphPage() {
-  const { data, isLoading, error } = useGraph(DEMO_SCAN_ID);
+  return <ScanGate>{(scanId) => <GraphView scanId={scanId} />}</ScanGate>;
+}
+
+function GraphView({ scanId }: { scanId: string }) {
+  const { data, isLoading, error } = useGraph(scanId);
   const [selected, setSelected] = useState<GNode | null>(null);
   const [highlight, setHighlight] = useState<Set<string> | null>(null);
 
   const initialNodes = useMemo(() => (data ? layout(data.nodes) : []), [data]);
   // Size the board to the whole graph at a legible zoom so nothing opens clipped; the page scrolls, not the board.
   const boardHeight = useMemo(() => {
-    const tallest = Math.max(1, ...["root", "asset", "finding", "fix"].map((t) => (data?.nodes ?? []).filter((n) => n.type === t).length));
+    const tallest = Math.max(1, ...["root", "asset", "dependency", "finding", "fix"].map((t) => (data?.nodes ?? []).filter((n) => n.type === t).length));
     return Math.max(520, Math.round(((tallest - 1) * 96 + 90) * 0.86 + 60));
   }, [data]);
   const initialEdges: Edge[] = useMemo(
@@ -198,7 +202,7 @@ export function GraphPage() {
               ))}
               <li className="flex items-center gap-2.5">
                 <span className="h-1.5 w-6 bg-camel" aria-hidden="true" />
-                Root domain, host, or fix
+                Root, host, package, or fix
               </li>
               <li className="flex items-center gap-2.5">
                 <span className="h-1.5 w-6 bg-kiwi" aria-hidden="true" />

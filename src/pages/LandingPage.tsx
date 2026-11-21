@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, RotateCcw } from "lucide-react";
 import { fixtures } from "@/mocks/fixtures";
 import { DEMO_PROJECT_ID } from "@/lib/constants";
+import { apiConfig } from "@/lib/api";
 import { ClassificationBand } from "@/components/ClassificationBand";
 import { EnvironmentTag } from "@/components/EnvironmentTag";
 import { SeverityBadge } from "@/components/SeverityBadge";
@@ -11,7 +12,7 @@ import { cn } from "@/lib/utils";
 import type { Severity } from "@/lib/types";
 
 const { assets, findings, analysis, scan, project } = fixtures;
-const DEMO = `/projects/${DEMO_PROJECT_ID}`;
+const DEMO = apiConfig.USE_MOCKS ? `/projects/${DEMO_PROJECT_ID}` : "/projects";
 const ruleFindings = findings.filter((f) => f.source === "rules").length;
 const scanSeconds = Math.round((Date.parse(scan.completed_at) - Date.parse(scan.started_at)) / 1000);
 const hhmm = (iso: string) => iso.slice(11, 16);

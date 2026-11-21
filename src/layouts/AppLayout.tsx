@@ -1,9 +1,10 @@
 import { Link, NavLink, Outlet, useNavigate, useParams } from "react-router-dom";
-import { LayoutDashboard, Server, AlertTriangle, Package, Network, FileText, Plus } from "lucide-react";
+import { LayoutDashboard, Server, AlertTriangle, Package, Network, FileText } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
-import { useCreateScan } from "@/hooks/useCreateScan";
+import { useProject } from "@/hooks/useProject";
 import { ClassificationBand } from "@/components/ClassificationBand";
-import { DEMO_PROJECT_ID } from "@/lib/constants";
+import { AccountMenu } from "@/components/AccountMenu";
+import { StartScanButton } from "@/components/ScanGate";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -16,16 +17,10 @@ const navItems = [
 ];
 
 export function AppLayout() {
-  const { id } = useParams();
-  const projectId = id || DEMO_PROJECT_ID;
+  const { id: projectId = "" } = useParams();
   const navigate = useNavigate();
   const { data: projects } = useProjects();
-  const createScan = useCreateScan(projectId);
-
-  const onNewScan = async () => {
-    const result = await createScan.mutateAsync();
-    navigate(`/projects/${projectId}/scans/${result.scan_id}`);
-  };
+  const { data: project } = useProject(projectId);
 
   return (
     <div className="grain min-h-screen text-fg">
@@ -55,11 +50,13 @@ export function AppLayout() {
                   {p.root_domain}
                 </option>
               ))}
-              {!projects?.length ? <option value={projectId}>acme-demo.com</option> : null}
+              {!projects?.some((p) => p.id === projectId) ? <option value={projectId}>{project?.root_domain ?? "…"}</option> : null}
             </select>
-            <button onClick={onNewScan} disabled={createScan.isPending} className="btn-primary py-2">
-              <Plus size={16} aria-hidden="true" /> {createScan.isPending ? "Starting…" : "New scan"}
-            </button>
+            {project?.verification_status === "verified" ? <StartScanButton projectId={projectId} label="New scan" className="btn-primary py-2" /> : null}
+            <Link to="/projects" className="text-[13px] font-semibold text-fg-soft hover:text-kiwi">
+              All projects
+            </Link>
+            <AccountMenu />
           </div>
         </header>
 

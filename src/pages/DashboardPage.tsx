@@ -1,35 +1,103 @@
-import { useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { useAssets } from "@/hooks/useAssets";
-import { useFindings } from "@/hooks/useFindings";
+import { useAssets, useCurrentScan, useFindings } from "@/hooks/useScanData";
 import { useDependencies } from "@/hooks/useDependencies";
-import { useAnalysis } from "@/hooks/useAnalysis";
-import { useProject } from "@/hooks/useProject";
+import { useAnalysis, useRequestAnalysis } from "@/hooks/useAnalysis";
 import { useScan } from "@/hooks/useScan";
 import { SeverityBadge } from "@/components/SeverityBadge";
 import { PageSkeleton } from "@/components/LoadingSkeleton";
 import { PageHeader } from "@/components/PageHeader";
 import { Stamp } from "@/components/Stamp";
-import { DEMO_SCAN_ID } from "@/lib/constants";
+import { ScanGate } from "@/components/ScanGate";
+import { VerificationPanel } from "@/components/VerificationPanel";
 import { bySeverity, severityColors, severityOrder, severityWeight } from "@/lib/severity";
 import { cn } from "@/lib/utils";
 
 export function DashboardPage() {
-  const { id: projectId } = useParams();
-  const scanId = DEMO_SCAN_ID;
-  const project = useProject(projectId);
+  const { project } = useCurrentScan();
+  const p = project.data;
+  return (
+    <div className="space-y-9">
+      <PageHeader title="Dashboard" description="What the latest scan put on file, and what to fix first." />
+      {/* Verification lapsed on a project that already has scans: results stay readable, new scans need re-verifying. */}
+      {p && p.latest_scan_id && p.verification_status !== "verified" ? <VerificationPanel project={p} /> : null}
+      <ScanGate>{(scanId) => <DashboardView scanId={scanId} />}</ScanGate>
+    </div>
+  );
+}
+
+function AnalystMemo({ scanId, rootDomain }: { scanId: string; rootDomain: string }) {
+  const analysis = useAnalysis(scanId);
+  const request = useRequestAnalysis(scanId);
+  const a = analysis.data;
+  const running = request.isPending || a?.status === "queued" || a?.status === "running";
+  const from = a?.source === "gemini" ? `AttackSurface analyst (${a.model ?? "Gemini"})` : a?.source === "fallback" ? "Deterministic analyst (AI not used)" : "AttackSurface analyst";
+  return (
+    <section className="border border-camel/25" aria-busy={running}>
+      <dl className="mono grid grid-cols-[4.5rem_minmax(0,1fr)] gap-y-1 border-b-2 border-camel px-5 py-4 text-[13px] sm:px-7">
+        <dt className="text-camel">TO:</dt>
+        <dd>Engineering, {rootDomain}</dd>
+        <dt className="text-camel">FROM:</dt>
+        <dd>{from}</dd>
+        <dt className="text-camel">RE:</dt>
+        <dd className="font-bold">Overall exposure</dd>
+      </dl>
+      <div className="space-y-4 px-5 py-5 sm:px-7">
+        {analysis.isLoading ? (
+          <div className="h-3.5 w-2/3 animate-pulse bg-camel/10" />
+        ) : running ? (
+          <div className="space-y-2">
+            {[100, 92, 96, 60].map((w) => (
+              <div key={w} className="h-3.5 animate-pulse bg-camel/10" style={{ width: `${w}%` }} />
+            ))}
+            <p className="pt-1 text-xs text-fg-soft">The analyst is reading the evidence…</p>
+          </div>
+        ) : a?.status === "completed" ? (
+          <>
+            <p className="max-w-[72ch] text-[15px] leading-relaxed">{a.executive_summary}</p>
+            {a.source === "fallback" ? (
+              <p className="text-xs text-fg-faint">Written by deterministic rules, not AI. {a.validation_errors?.[0] ?? ""}</p>
+            ) : (
+              <p className="text-xs text-fg-faint">AI interpretation of the findings above. Severity and evidence come from the scan, not the model.</p>
+            )}
+            {a.missing_evidence?.length ? (
+              <div>
+                <div className="field-label mb-1">Gaps in evidence</div>
+                <ol className="list-decimal space-y-1 pl-5 text-sm text-fg-soft">
+                  {a.missing_evidence.map((m) => (
+                    <li key={m}>{m}</li>
+                  ))}
+                </ol>
+              </div>
+            ) : null}
+          </>
+        ) : (
+          <>
+            <p className="text-sm text-fg-soft">
+              {a?.status === "failed" ? `The last analysis failed${a.error ? `: ${a.error}` : ""}. The findings above are unaffected.` : "No analysis yet. The analyst ranks the findings and writes the memo you'd forward to engineering."}
+            </p>
+            <button onClick={() => request.mutate()} className="btn-primary py-2">
+              {a?.status === "failed" ? "Try again" : "Request analysis"}
+            </button>
+          </>
+        )}
+        {request.error ? (
+          <p role="alert" className="text-sm text-severity-critical">
+            {(request.error as Error).message}
+          </p>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+function DashboardView({ scanId }: { scanId: string }) {
+  const { projectId, project } = useCurrentScan();
   const scan = useScan(scanId);
   const assets = useAssets(scanId);
   const findings = useFindings(scanId);
   const deps = useDependencies(projectId);
-  const analysisMutation = useAnalysis(scanId);
-
-  useEffect(() => {
-    if (!analysisMutation.data && !analysisMutation.isPending && !analysisMutation.error) {
-      analysisMutation.mutate();
-    }
-  }, [analysisMutation]);
+  const analysis = useAnalysis(scanId);
 
   if (assets.isLoading || findings.isLoading || deps.isLoading) return <PageSkeleton />;
   if (assets.error || findings.error)
@@ -58,8 +126,8 @@ export function DashboardPage() {
   const maxRisk = Math.max(1, ...riskByAsset.map((r) => r.score));
 
   const topPriorities = [...findingList].sort(bySeverity).slice(0, 3);
-  const hostOf = (assetId: string) => assetList.find((a) => a.id === assetId)?.hostname ?? assetId;
-  const memoFor = (findingId: string) => analysisMutation.data?.findings.find((f) => f.finding_id === findingId);
+  const hostOf = (assetId: string | null) => assetList.find((a) => a.id === assetId)?.hostname ?? "unmapped deployment";
+  const memoFor = (findingId: string) => analysis.data?.findings.find((f) => f.finding_id === findingId);
 
   const ledger: [string, string][] = [
     ["SUBJECT", project.data?.root_domain ?? "—"],
@@ -78,8 +146,6 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-9">
-      <PageHeader title="Dashboard" description="What the latest scan put on file, and what to fix first." />
-
       <dl className="mono grid grid-cols-[6rem_minmax(0,1fr)] border-b border-camel/25 text-[13.5px] sm:grid-cols-[7.5rem_minmax(0,1fr)]">
         {ledger.map(([k, v]) => (
           <div key={k} className="contents">
@@ -161,30 +227,7 @@ export function DashboardPage() {
         </section>
       </div>
 
-      <section className="border border-camel/25">
-        <dl className="mono grid grid-cols-[4.5rem_minmax(0,1fr)] gap-y-1 border-b-2 border-camel px-5 py-4 text-[13px] sm:px-7">
-          <dt className="text-camel">TO:</dt>
-          <dd>Engineering, {project.data?.root_domain ?? "this project"}</dd>
-          <dt className="text-camel">FROM:</dt>
-          <dd>AttackSurface analyst (Gemini)</dd>
-          <dt className="text-camel">RE:</dt>
-          <dd className="font-bold">Overall exposure</dd>
-        </dl>
-        <div className="px-5 py-5 sm:px-7">
-          {analysisMutation.data ? (
-            <p className="max-w-[72ch] text-[15px] leading-relaxed">{analysisMutation.data.executive_summary}</p>
-          ) : analysisMutation.isPending ? (
-            <div className="space-y-2" aria-busy="true">
-              {[100, 92, 96, 60].map((w) => (
-                <div key={w} className="h-3.5 animate-pulse bg-camel/10" style={{ width: `${w}%` }} />
-              ))}
-              <p className="pt-1 text-xs text-fg-soft">Writing the memo…</p>
-            </div>
-          ) : (
-            <p className="text-sm text-fg-soft">The analyst memo isn’t available right now. The findings above are unaffected.</p>
-          )}
-        </div>
-      </section>
+      <AnalystMemo scanId={scanId} rootDomain={project.data?.root_domain ?? "this project"} />
     </div>
   );
 }

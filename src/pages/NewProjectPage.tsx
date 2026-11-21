@@ -32,7 +32,7 @@ export function NewProjectPage() {
     <div className="grain min-h-screen text-fg">
       <ClassificationBand>Passive recon only // Authorized targets</ClassificationBand>
       <div className="mx-auto max-w-2xl px-4 py-10 md:py-14">
-        <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-fg-soft hover:text-fg hover:underline">
+        <Link to="/projects" className="inline-flex items-center gap-1.5 text-sm font-semibold text-fg-soft hover:text-fg hover:underline">
           <ArrowLeft size={15} aria-hidden="true" /> Back
         </Link>
 

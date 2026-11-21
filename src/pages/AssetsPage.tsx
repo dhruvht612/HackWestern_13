@@ -1,7 +1,6 @@
 import { useMemo } from "react";
-import { useAssets } from "@/hooks/useAssets";
-import { useFindings } from "@/hooks/useFindings";
-import { DEMO_SCAN_ID } from "@/lib/constants";
+import { useAssets, useFindings } from "@/hooks/useScanData";
+import { ScanGate } from "@/components/ScanGate";
 import { DataTable, type Column } from "@/components/DataTable";
 import { EnvironmentTag } from "@/components/EnvironmentTag";
 import { SeverityBadge } from "@/components/SeverityBadge";
@@ -13,8 +12,12 @@ import { bySeverity } from "@/lib/severity";
 type Row = Asset & { findingCount: number; topSeverity?: Severity };
 
 export function AssetsPage() {
-  const assets = useAssets(DEMO_SCAN_ID);
-  const findings = useFindings(DEMO_SCAN_ID);
+  return <ScanGate>{(scanId) => <AssetsView scanId={scanId} />}</ScanGate>;
+}
+
+function AssetsView({ scanId }: { scanId: string }) {
+  const assets = useAssets(scanId);
+  const findings = useFindings(scanId);
 
   const rows = useMemo<Row[]>(() => {
     const f = findings.data || [];
