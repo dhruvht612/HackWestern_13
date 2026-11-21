@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.config import settings
-from app.routers import analysis, dependencies, projects, reports, scans
-from app.schemas import Health
+from .config import settings
+from .routers import analysis, dependencies, projects, reports, scans
+from .schemas import Health
 
 app = FastAPI(title=settings.app_name)
 

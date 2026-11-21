@@ -1,4 +1,4 @@
-from app.validation import is_valid_root_domain
+from attacksurface.validation import is_valid_root_domain
 
 
 def test_accepts_registrable_domain() -> None:

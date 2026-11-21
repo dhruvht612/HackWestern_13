@@ -1,12 +1,14 @@
 from fastapi import APIRouter
 
-from app.fixture_loader import load_fixture
-from app.schemas import Asset, Finding, Scan, ScanCreated
+from attacksurface.fixture_loader import load_fixture
+from attacksurface.schemas import Asset, Finding, Scan, ScanCreated
 
 router = APIRouter(tags=["scans"])
 
 
-@router.post("/projects/{project_id}/scans", response_model=ScanCreated, status_code=201)
+@router.post(
+    "/projects/{project_id}/scans", response_model=ScanCreated, status_code=201
+)
 def create_scan(project_id: str) -> dict:
     _ = project_id
     return load_fixture("scan_created.json")
