@@ -8,8 +8,9 @@ router = APIRouter(prefix="/projects/{project_id}/dependencies", tags=["dependen
 
 @router.post("", response_model=list[Dependency])
 async def upload_dependencies(
-    project_id: str, file: UploadFile = File(...)
-) -> list[dict]:  # noqa: B008
+    project_id: str,
+    file: UploadFile = File(...),  # noqa: B008
+) -> list[dict]:
     _ = project_id
     # Stub: accept package.json/package-lock.json and return fixture data.
     await file.read()

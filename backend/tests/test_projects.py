@@ -1,5 +1,6 @@
-from attacksurface.main import app
 from fastapi.testclient import TestClient
+
+from attacksurface.main import app
 
 client = TestClient(app)
 
