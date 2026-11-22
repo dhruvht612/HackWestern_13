@@ -2,10 +2,9 @@ import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { DataTable } from "@/components/DataTable";
 import { AdminState } from "@/components/admin/AdminState";
-import { AdminFilter } from "@/components/admin/AdminControls";
+import { AdminFilter, When } from "@/components/admin/AdminControls";
 import { adminApi } from "@/lib/adminApi";
 import { useAdminList } from "@/lib/adminQueries";
-import { formatDate } from "@/lib/utils";
 
 export function EventsPage() {
   const [type, setType] = useState("");
@@ -41,7 +40,7 @@ export function EventsPage() {
             rows={data.items}
             rowKey={(e) => String(e.id)}
             columns={[
-              { key: "time", header: "Time", render: (e) => formatDate(e.created_at) },
+              { key: "time", header: "Time", render: (e) => <When iso={e.created_at} /> },
               {
                 key: "type",
                 header: "Type",
@@ -49,7 +48,7 @@ export function EventsPage() {
                   <>
                     {e.type.replaceAll("_", " ")}
                     {["blocklist_hit", "verify_failed"].includes(e.type) && (
-                      <span className="ml-2 border border-camel px-1 text-xs">
+                      <span className="ml-2 border border-silver px-1 text-xs">
                         {e.type === "blocklist_hit" ? "Blocklist" : "Failed check"}
                       </span>
                     )}

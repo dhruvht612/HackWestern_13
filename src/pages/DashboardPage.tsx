@@ -8,6 +8,7 @@ import { SeverityBadge } from "@/components/SeverityBadge";
 import { PageSkeleton } from "@/components/LoadingSkeleton";
 import { PageHeader } from "@/components/PageHeader";
 import { Stamp } from "@/components/Stamp";
+import { ScopeCorners } from "@/components/ScopeFrame";
 import { ScanGate } from "@/components/ScanGate";
 import { VerificationPanel } from "@/components/VerificationPanel";
 import { bySeverity, severityColors, severityOrder, severityWeight } from "@/lib/severity";
@@ -33,22 +34,22 @@ function AnalystMemo({ scanId, rootDomain }: { scanId: string; rootDomain: strin
   const running = request.isPending || a?.status === "queued" || a?.status === "running";
   const from = a?.source === "gemini" ? `ShadowScope analyst (${a.model ?? "Gemini"})` : a?.source === "fallback" ? "Deterministic analyst (AI not used)" : "ShadowScope analyst";
   return (
-    <section className="border border-camel/25" aria-busy={running}>
-      <dl className="mono grid grid-cols-[4.5rem_minmax(0,1fr)] gap-y-1 border-b-2 border-camel px-5 py-4 text-[13px] sm:px-7">
-        <dt className="text-camel">TO:</dt>
+    <section className="border border-silver/25" aria-busy={running}>
+      <dl className="mono grid grid-cols-[4.5rem_minmax(0,1fr)] gap-y-1 border-b-2 border-silver px-5 py-4 text-[13px] sm:px-7">
+        <dt className="text-silver">TO:</dt>
         <dd>Engineering, {rootDomain}</dd>
-        <dt className="text-camel">FROM:</dt>
+        <dt className="text-silver">FROM:</dt>
         <dd>{from}</dd>
-        <dt className="text-camel">RE:</dt>
+        <dt className="text-silver">RE:</dt>
         <dd className="font-bold">Overall exposure</dd>
       </dl>
       <div className="space-y-4 px-5 py-5 sm:px-7">
         {analysis.isLoading ? (
-          <div className="h-3.5 w-2/3 animate-pulse bg-camel/10" />
+          <div className="skeleton h-3.5 w-2/3" />
         ) : running ? (
           <div className="space-y-2">
             {[100, 92, 96, 60].map((w) => (
-              <div key={w} className="h-3.5 animate-pulse bg-camel/10" style={{ width: `${w}%` }} />
+              <div key={w} className="skeleton h-3.5" style={{ width: `${w}%` }} />
             ))}
             <p className="pt-1 text-xs text-fg-soft">The analyst is reading the evidence…</p>
           </div>
@@ -146,11 +147,11 @@ function DashboardView({ scanId }: { scanId: string }) {
 
   return (
     <div className="space-y-9">
-      <dl className="mono grid grid-cols-[6rem_minmax(0,1fr)] border-b border-camel/25 text-[13.5px] sm:grid-cols-[7.5rem_minmax(0,1fr)]">
+      <dl className="mono grid grid-cols-[6rem_minmax(0,1fr)] border-b border-silver/25 text-[13.5px] sm:grid-cols-[7.5rem_minmax(0,1fr)]">
         {ledger.map(([k, v]) => (
           <div key={k} className="contents">
-            <dt className="border-t border-camel/15 py-2 text-camel first-of-type:border-t-0">{k}</dt>
-            <dd className="tabular border-t border-camel/15 py-2 text-fg">
+            <dt className="border-t border-silver/15 py-2 text-silver first-of-type:border-t-0">{k}</dt>
+            <dd className="tabular border-t border-silver/15 py-2 text-fg">
               {/* dates and hostnames must not break at their hyphens */}
               {v.split(/(\s+)/).map((t, i) => (t.includes("-") ? <span key={i} className="whitespace-nowrap">{t}</span> : t))}
             </dd>
@@ -159,24 +160,30 @@ function DashboardView({ scanId }: { scanId: string }) {
       </dl>
 
       <section>
-        <div className="flex items-baseline justify-between border-b-2 border-camel pb-2">
+        <div className="flex items-baseline justify-between border-b-2 border-silver pb-2">
           <h2 className="display text-2xl font-extrabold">Fix first</h2>
-          <Link to={`/projects/${projectId}/findings`} className="inline-flex items-center gap-1 text-[13px] font-semibold underline underline-offset-4 hover:text-kiwi">
+          <Link to={`/projects/${projectId}/findings`} className="inline-flex items-center gap-1 text-[13px] font-semibold underline underline-offset-4 hover:text-lime">
             All findings <ArrowRight size={13} aria-hidden="true" />
           </Link>
         </div>
-        <ol className="divide-y divide-camel/15">
+        <ol className="divide-y divide-silver/15">
           {topPriorities.map((f, i) => {
             const lead = i === 0;
             const priority = memoFor(f.id)?.suggested_priority;
             return (
               <li key={f.id} className="relative grid grid-cols-[2rem_minmax(0,1fr)] gap-3 py-5 sm:pr-48">
+                {/* the scope rests on the one thing to fix first */}
+                {lead ? (
+                  <span aria-hidden="true" className="pointer-events-none absolute -inset-x-3 inset-y-2">
+                    <ScopeCorners />
+                  </span>
+                ) : null}
                 <span className={cn("tabular font-mono text-lg font-bold", lead ? "text-fg" : "text-fg-faint")}>{i + 1}.</span>
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <SeverityBadge severity={f.severity} />
                     {priority && !(lead && priority === "P0") ? (
-                      <span className="border-[1.5px] border-camel px-1.5 font-mono text-[11px] font-bold">{priority}</span>
+                      <span className="border-[1.5px] border-silver px-1.5 font-mono text-[11px] font-bold">{priority}</span>
                     ) : null}
                     <span className="mono text-[13px] text-fg-soft">{hostOf(f.asset_id)}</span>
                   </div>
@@ -194,12 +201,12 @@ function DashboardView({ scanId }: { scanId: string }) {
 
       <div className="grid gap-9 xl:grid-cols-2">
         <section>
-          <h2 className="field-label border-b border-camel/25 pb-2 !text-fg">Findings by severity</h2>
+          <h2 className="field-label border-b border-silver/25 pb-2 !text-fg">Findings by severity</h2>
           <ul className="mt-3 space-y-2.5">
             {severityCounts.map(({ sev, count }) => (
               <li key={sev} className="grid grid-cols-[6rem_minmax(0,1fr)_2rem] items-center gap-3">
                 <SeverityBadge severity={sev} className="justify-self-start" />
-                <span className="h-3 border-y border-camel/10">
+                <span className="h-3 border-y border-silver/10">
                   <span className="block h-full" style={{ width: `${(count / maxSev) * 100}%`, background: severityColors[sev] }} />
                 </span>
                 <span className="tabular text-right font-mono text-sm font-bold">{count}</span>
@@ -209,15 +216,15 @@ function DashboardView({ scanId }: { scanId: string }) {
         </section>
 
         <section>
-          <h2 className="field-label border-b border-camel/25 pb-2 !text-fg">Exposure by host (weighted)</h2>
+          <h2 className="field-label border-b border-silver/25 pb-2 !text-fg">Exposure by host (weighted)</h2>
           <ul className="mt-3 space-y-2.5">
             {riskByAsset.map((r, i) => (
               <li key={r.host} className="grid grid-cols-[minmax(0,11rem)_minmax(0,1fr)_2rem] items-center gap-3">
                 <span className={cn("mono truncate text-[13px]", i === 0 ? "text-fg" : "text-fg-soft")} title={r.host}>
                   {r.host}
                 </span>
-                <span className="h-3 border-y border-camel/10">
-                  <span className={cn("block h-full", i === 0 ? "bg-kiwi" : "bg-camel/45")} style={{ width: `${(r.score / maxRisk) * 100}%` }} />
+                <span className="h-3 border-y border-silver/10">
+                  <span className={cn("block h-full", i === 0 ? "bg-lime" : "bg-silver/45")} style={{ width: `${(r.score / maxRisk) * 100}%` }} />
                 </span>
                 <span className="tabular text-right font-mono text-sm font-bold">{r.score}</span>
               </li>

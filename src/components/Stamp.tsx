@@ -3,17 +3,17 @@ import { cn } from "@/lib/utils";
 
 /**
  * Rubber-stamp impression drawn as SVG so the ink texture renders the same in every browser.
- * Tone "accent" (Electric Kiwi) is reserved for the single top-priority item on a surface;
- * every other stamp is structural camel.
+ * Tone "accent" (Lime) is reserved for the single top-priority item on a surface;
+ * every other stamp is structural silver.
  */
 export function Stamp({
   lines,
-  tone = "camel",
+  tone = "silver",
   rotate = -6,
   className,
 }: {
   lines: [string] | [string, string];
-  tone?: "accent" | "camel";
+  tone?: "accent" | "silver";
   rotate?: number;
   className?: string;
 }) {

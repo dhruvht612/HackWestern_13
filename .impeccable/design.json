@@ -4,9 +4,9 @@
   "title": "Design System: ShadowScope",
   "extensions": {
     "colorMeta": {
-      "abyss-navy": {
+      "ink-black": {
         "role": "primary",
-        "displayName": "Abyss Navy (60%)",
+        "displayName": "Ink Black (60%)",
         "canonical": "oklch(25.5% 0.040 266.9)",
         "tonalRamp": [
           "oklch(15% 0.040 266.9)",
@@ -19,9 +19,9 @@
           "oklch(95% 0.040 266.9)"
         ]
       },
-      "navy-deep": {
+      "ink-deep": {
         "role": "neutral",
-        "displayName": "Navy Deep",
+        "displayName": "Ink Deep",
         "canonical": "oklch(21.5% 0.033 265.6)",
         "tonalRamp": [
           "oklch(15% 0.033 265.6)",
@@ -34,9 +34,9 @@
           "oklch(95% 0.033 265.6)"
         ]
       },
-      "navy-raised": {
+      "ink-raised": {
         "role": "neutral",
-        "displayName": "Navy Raised",
+        "displayName": "Ink Raised",
         "canonical": "oklch(28.7% 0.043 266.7)",
         "tonalRamp": [
           "oklch(15% 0.043 266.7)",
@@ -49,9 +49,9 @@
           "oklch(95% 0.043 266.7)"
         ]
       },
-      "navy-high": {
+      "ink-high": {
         "role": "neutral",
-        "displayName": "Navy High",
+        "displayName": "Ink High",
         "canonical": "oklch(32.4% 0.047 267.1)",
         "tonalRamp": [
           "oklch(15% 0.047 267.1)",
@@ -64,9 +64,9 @@
           "oklch(95% 0.047 267.1)"
         ]
       },
-      "camel-suede": {
+      "silver-glass": {
         "role": "secondary",
-        "displayName": "Camel Suede (30%)",
+        "displayName": "Silver Glass (30%)",
         "canonical": "oklch(71.1% 0.078 71.2)",
         "tonalRamp": [
           "oklch(15% 0.078 71.2)",
@@ -79,9 +79,9 @@
           "oklch(95% 0.050 71.2)"
         ]
       },
-      "electric-kiwi": {
+      "lime": {
         "role": "accent",
-        "displayName": "Electric Kiwi (10%)",
+        "displayName": "Lime (10%)",
         "canonical": "oklch(92.6% 0.228 125.1)",
         "tonalRamp": [
           "oklch(15% 0.228 125.1)",
@@ -94,9 +94,9 @@
           "oklch(95% 0.050 125.1)"
         ]
       },
-      "kiwi-hover": {
+      "lime-hover": {
         "role": "accent",
-        "displayName": "Kiwi Hover",
+        "displayName": "Lime Hover",
         "canonical": "oklch(93.9% 0.192 123.1)",
         "tonalRamp": [
           "oklch(15% 0.192 123.1)",
@@ -268,7 +268,7 @@
       {
         "name": "sheet",
         "value": "inset 0 0 0 1px rgb(193 154 107 / 0.16), 0 18px 40px -16px rgb(0 0 0 / 0.65)",
-        "purpose": "A raised navy sheet (or the landing folder) lying in the file."
+        "purpose": "A raised ink sheet (or the landing folder) lying in the file."
       },
       {
         "name": "lift",
@@ -322,33 +322,33 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Kiwi-filled square action with navy text; the main call to act on a surface.",
+      "description": "Lime-filled square action with ink text; the main call to act on a surface.",
       "html": "<button class=\"ds-btn-primary\">Open the demo file</button>",
-      "css": ".ds-btn-primary{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:#C4FF1F;color:#1A2236;border:0;border-radius:0;font:700 14px/1.25 'Public Sans',sans-serif;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;transition:all 150ms ease-out}.ds-btn-primary:hover{background:#D3FF5C;transform:translateY(-1px);box-shadow:0 8px 18px -8px rgb(196 255 31 / .35)}.ds-btn-primary:active{transform:none;box-shadow:none}.ds-btn-primary:focus-visible{outline:2px solid #C4FF1F;outline-offset:2px}"
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:#B4F03C;color:#0B0D10;border:0;border-radius:0;font:700 14px/1.25 'Public Sans',sans-serif;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;transition:all 150ms ease-out}.ds-btn-primary:hover{background:#C8F86C;transform:translateY(-1px);box-shadow:0 8px 18px -8px rgb(196 255 31 / .35)}.ds-btn-primary:active{transform:none;box-shadow:none}.ds-btn-primary:focus-visible{outline:2px solid #B4F03C;outline-offset:2px}"
     },
     {
       "name": "Secondary Button",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Camel-bordered square action with off-white text.",
+      "description": "Silver-bordered square action with off-white text.",
       "html": "<button class=\"ds-btn-secondary\">Start on your domain</button>",
-      "css": ".ds-btn-secondary{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:transparent;color:#F8F7F3;border:2px solid #C19A6B;border-radius:0;font:700 14px/1.25 'Public Sans',sans-serif;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;transition:all 150ms ease-out}.ds-btn-secondary:hover{background:rgb(193 154 107 / .1)}.ds-btn-secondary:focus-visible{outline:2px solid #C4FF1F;outline-offset:2px}"
+      "css": ".ds-btn-secondary{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:transparent;color:#F3F5F8;border:2px solid #C0C6CF;border-radius:0;font:700 14px/1.25 'Public Sans',sans-serif;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;transition:all 150ms ease-out}.ds-btn-secondary:hover{background:rgb(193 154 107 / .1)}.ds-btn-secondary:focus-visible{outline:2px solid #B4F03C;outline-offset:2px}"
     },
     {
       "name": "Field",
       "kind": "input",
       "refersTo": "field",
-      "description": "Raised navy field with a camel border and kiwi focus.",
+      "description": "Raised ink field with a silver border and lime focus.",
       "html": "<label class=\"ds-field-label\">Root domain</label><input class=\"ds-field\" placeholder=\"acme-demo.com\">",
-      "css": ".ds-field-label{display:block;margin-bottom:6px;font:600 11px 'Public Sans',sans-serif;text-transform:uppercase;letter-spacing:.09em;color:#C19A6B}.ds-field{width:100%;padding:8px 12px;background:#212A40;color:#F8F7F3;caret-color:#C4FF1F;border:1px solid rgb(193 154 107 / .45);border-radius:0;font:400 14px 'Public Sans',sans-serif;transition:border-color 150ms}.ds-field::placeholder{color:#9AA0AC}.ds-field:hover,.ds-field:focus{border-color:#C19A6B}.ds-field:focus-visible{outline:2px solid #C4FF1F;outline-offset:2px}"
+      "css": ".ds-field-label{display:block;margin-bottom:6px;font:600 11px 'Public Sans',sans-serif;text-transform:uppercase;letter-spacing:.09em;color:#C0C6CF}.ds-field{width:100%;padding:8px 12px;background:#14171C;color:#F3F5F8;caret-color:#B4F03C;border:1px solid rgb(193 154 107 / .45);border-radius:0;font:400 14px 'Public Sans',sans-serif;transition:border-color 150ms}.ds-field::placeholder{color:#9AA0AC}.ds-field:hover,.ds-field:focus{border-color:#C0C6CF}.ds-field:focus-visible{outline:2px solid #B4F03C;outline-offset:2px}"
     },
     {
       "name": "Folder Tabs",
       "kind": "nav",
       "refersTo": "tab-active",
-      "description": "Die-cut tabs: camel when inactive, raised navy with a kiwi top edge when active.",
+      "description": "Die-cut tabs: silver when inactive, raised ink with a lime top edge when active.",
       "html": "<nav class=\"ds-tabs\"><a class=\"ds-tab ds-tab-on\">Dashboard</a><a class=\"ds-tab\">Findings</a><a class=\"ds-tab\">Report</a></nav><div class=\"ds-tab-sheet\"></div>",
-      "css": ".ds-tabs{display:flex;gap:2px;padding:4px 4px 0;background:#1A2236}.ds-tab{clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 100%,0 100%);padding:10px 20px 8px;background:#C19A6B;color:#1A2236;font:600 14px 'Public Sans',sans-serif;text-decoration:none;transition:background 150ms,color 150ms}.ds-tab:hover{background:rgb(193 154 107 / .8)}.ds-tab-on,.ds-tab-on:hover{background:#212A40;color:#F8F7F3;box-shadow:inset 0 3px 0 #C4FF1F}.ds-tab:focus-visible{outline:2px solid #C4FF1F;outline-offset:2px}.ds-tab-sheet{height:24px;background:#212A40}"
+      "css": ".ds-tabs{display:flex;gap:2px;padding:4px 4px 0;background:#0B0D10}.ds-tab{clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 100%,0 100%);padding:10px 20px 8px;background:#C0C6CF;color:#0B0D10;font:600 14px 'Public Sans',sans-serif;text-decoration:none;transition:background 150ms,color 150ms}.ds-tab:hover{background:rgb(193 154 107 / .8)}.ds-tab-on,.ds-tab-on:hover{background:#14171C;color:#F3F5F8;box-shadow:inset 0 3px 0 #B4F03C}.ds-tab:focus-visible{outline:2px solid #B4F03C;outline-offset:2px}.ds-tab-sheet{height:24px;background:#14171C}"
     },
     {
       "name": "Severity Badges",
@@ -356,52 +356,52 @@
       "refersTo": "severity-badge",
       "description": "Severity on the edge and swatch; the label is always present and neutral.",
       "html": "<span class=\"ds-sev ds-sev-crit\" style=\"border-color:#FF5D5D\"><i style=\"background:#FF5D5D\"></i>Critical</span> <span class=\"ds-sev\" style=\"border-color:#FF8C42\"><i style=\"background:#FF8C42\"></i>High</span> <span class=\"ds-sev\" style=\"border-color:#F2C14E\"><i style=\"background:#F2C14E\"></i>Medium</span> <span class=\"ds-sev\" style=\"border-color:#7FB7A4\"><i style=\"background:#7FB7A4\"></i>Low</span> <span class=\"ds-sev\" style=\"border-color:#9AA0AC\"><i style=\"background:#9AA0AC\"></i>Info</span>",
-      "css": ".ds-sev{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border:1.5px solid;color:#F8F7F3;background:#212A40;font:700 11px 'Public Sans',sans-serif;text-transform:uppercase;letter-spacing:.08em}.ds-sev i{width:8px;height:8px;display:inline-block}.ds-sev-crit{border-width:2px}"
+      "css": ".ds-sev{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border:1.5px solid;color:#F3F5F8;background:#14171C;font:700 11px 'Public Sans',sans-serif;text-transform:uppercase;letter-spacing:.08em}.ds-sev i{width:8px;height:8px;display:inline-block}.ds-sev-crit{border-width:2px}"
     },
     {
       "name": "Environment Tags",
       "kind": "chip",
       "refersTo": "severity-badge",
-      "description": "Environment told by line style in camel: filled prod, outlined staging, dashed dev, dotted unknown.",
-      "html": "<span class=\"ds-env ds-env-prod\">prod</span> <span class=\"ds-env\">staging</span> <span class=\"ds-env\" style=\"border-style:dashed\">dev</span> <span class=\"ds-env\" style=\"border-style:dotted;border-color:#9AA0AC;color:#D1D5DB\">unknown</span>",
-      "css": ".ds-env{display:inline-flex;padding:1px 6px;border:1.5px solid #C19A6B;color:#F8F7F3;font:700 11px 'Courier Prime',monospace;text-transform:uppercase;letter-spacing:.06em}.ds-env-prod{background:#C19A6B;color:#1A2236}"
+      "description": "Environment told by line style in silver: filled prod, outlined staging, dashed dev, dotted unknown.",
+      "html": "<span class=\"ds-env ds-env-prod\">prod</span> <span class=\"ds-env\">staging</span> <span class=\"ds-env\" style=\"border-style:dashed\">dev</span> <span class=\"ds-env\" style=\"border-style:dotted;border-color:#9AA0AC;color:#C9CDD4\">unknown</span>",
+      "css": ".ds-env{display:inline-flex;padding:1px 6px;border:1.5px solid #C0C6CF;color:#F3F5F8;font:700 11px 'Courier Prime',monospace;text-transform:uppercase;letter-spacing:.06em}.ds-env-prod{background:#C0C6CF;color:#0B0D10}"
     },
     {
       "name": "Classification Band",
       "kind": "banner",
       "refersTo": "classification-band",
-      "description": "Camel strip of navy band type stating scope, top of every surface.",
+      "description": "Silver strip of ink band type stating scope, top of every surface.",
       "html": "<div class=\"ds-band\">Passive recon only // Authorized targets</div>",
-      "css": ".ds-band{background:#C19A6B;color:#1A2236;padding:6px 16px;text-align:center;font:700 11px Archivo,sans-serif;font-stretch:90%;text-transform:uppercase;letter-spacing:.22em}"
+      "css": ".ds-band{background:#C0C6CF;color:#0B0D10;padding:6px 16px;text-align:center;font:700 11px Archivo,sans-serif;font-stretch:90%;text-transform:uppercase;letter-spacing:.22em}"
     },
     {
       "name": "Sheet with Ledger",
       "kind": "card",
       "refersTo": "sheet",
-      "description": "A raised navy sheet holding a ledger with a camel head rule.",
+      "description": "A raised ink sheet holding a ledger with a silver head rule.",
       "html": "<div class=\"ds-sheet\"><table class=\"ds-ledger\"><thead><tr><th>Hostname</th><th>Env</th><th>Findings</th></tr></thead><tbody><tr><td class=\"m\">api.acme-demo.com</td><td>prod</td><td>3</td></tr><tr><td class=\"m\">staging.acme-demo.com</td><td>staging</td><td>6</td></tr></tbody></table></div>",
-      "css": ".ds-sheet{background:#212A40;padding:24px;box-shadow:inset 0 0 0 1px rgb(193 154 107 / .16),0 18px 40px -16px rgb(0 0 0 / .65)}.ds-ledger{width:100%;border-collapse:collapse;font:400 14px 'Public Sans',sans-serif;color:#F8F7F3}.ds-ledger th{text-align:left;border-bottom:2px solid #C19A6B;padding:8px 12px;font:600 11px 'Public Sans',sans-serif;text-transform:uppercase;letter-spacing:.09em;color:#C19A6B}.ds-ledger td{padding:10px 12px;border-top:1px solid rgb(193 154 107 / .15)}.ds-ledger .m{font-family:'Courier Prime',monospace;font-weight:700}"
+      "css": ".ds-sheet{background:#14171C;padding:24px;box-shadow:inset 0 0 0 1px rgb(193 154 107 / .16),0 18px 40px -16px rgb(0 0 0 / .65)}.ds-ledger{width:100%;border-collapse:collapse;font:400 14px 'Public Sans',sans-serif;color:#F3F5F8}.ds-ledger th{text-align:left;border-bottom:2px solid #C0C6CF;padding:8px 12px;font:600 11px 'Public Sans',sans-serif;text-transform:uppercase;letter-spacing:.09em;color:#C0C6CF}.ds-ledger td{padding:10px 12px;border-top:1px solid rgb(193 154 107 / .15)}.ds-ledger .m{font-family:'Courier Prime',monospace;font-weight:700}"
     }
   ],
   "narrative": {
-    "northStar": "The Attacker's Dossier",
-    "overview": "Every surface is a page from the file an outsider would keep on you, kept as a dark intelligence dossier on a strict 60/30/10: Abyss Navy surfaces, Camel Suede structure (tabs, bands, rules, labels, redaction tape, infrastructure lines), Electric Kiwi only for action, focus, and the single thing to fix first. Typed exhibits are Courier Prime, prose is Public Sans, titles are condensed Archivo. Structure comes from rules, not fills; evidence is annotated where it sits.",
+    "northStar": "The Shadow Dossier",
+    "overview": "Shadow is everything not yet seen (the ink field, silver redaction tape); Scope is bringing one thing into view (the lens mark, the lime reticle, the P0 it rests on). Every surface is a page from the file an outsider would keep on you, kept as a dark intelligence dossier on a strict 60/30/10: Ink Black surfaces, Silver Glass structure (tabs, bands, rules, labels, redaction tape, infrastructure lines), Lime only for action, focus, and the single thing to fix first. Typed exhibits are Courier Prime, prose is Public Sans, titles are condensed Archivo. Structure comes from rules, not fills; evidence is annotated where it sits.",
     "keyCharacteristics": [
-      "A strict 60 / 30 / 10: Abyss Navy surfaces, Camel Suede structure, Electric Kiwi action.",
-      "Square corners everywhere; the die-cut tab and the drawn stamp are the only other silhouettes.",
+      "A strict 60 / 30 / 10: Ink Black surfaces, Silver Glass structure, Lime action.",
+      "Square corners everywhere; the die-cut tab, the drawn stamp, and the scope lens are the only other silhouettes.",
       "Rules and line style carry structure and category; fills are reserved for bands, tabs, and the folder.",
-      "Kiwi appears on the primary action, focus, the active tab, and once per surface on the P0.",
+      "Lime appears on the primary action, focus, the active tab, and once per surface on the P0.",
       "Condensed Archivo for titles and stamps, Public Sans for prose, Courier Prime for anything collected."
     ],
     "rules": [
       {
         "name": "The 60/30/10 Rule",
-        "body": "Navy owns the surface, camel owns the structure, kiwi owns the action. If a new element is neither, it is text.",
+        "body": "Ink owns the surface, silver owns the structure, lime owns the action. If a new element is neither, it is text.",
         "section": "colors"
       },
       {
-        "name": "The One Kiwi Mark Rule",
-        "body": "A surface carries one kiwi stamp, on the one item to fix first; the same item may repeat kiwi in its P0 chip.",
+        "name": "The One Lime Mark Rule",
+        "body": "A surface carries one lime stamp, on the one item to fix first; the same item may repeat lime in its P0 chip.",
         "section": "colors"
       },
       {
@@ -411,7 +411,7 @@
       },
       {
         "name": "The Untinted Panel Rule",
-        "body": "Panels, cards, and memos are raised navy or transparent with camel rules; row hover washes are state, not structure.",
+        "body": "Panels, cards, and memos are raised ink or transparent with silver rules; row hover washes are state, not structure.",
         "section": "colors"
       },
       {
@@ -426,7 +426,7 @@
       },
       {
         "name": "The Neutral Prose Rule",
-        "body": "Paragraphs are off-white or secondary text; camel and kiwi never color running text.",
+        "body": "Paragraphs are off-white or secondary text; silver and lime never color running text.",
         "section": "typography"
       },
       {
@@ -436,18 +436,18 @@
       }
     ],
     "dos": [
-      "Do keep the balance: navy surfaces, camel structure, kiwi only where the user acts or must act first.",
-      "Do put every content surface on a raised navy sheet over the grained navy field.",
-      "Do build structure from camel rules: 2px for heads, 1px hairlines at 15 to 30% for dividers.",
+      "Do keep the balance: ink surfaces, silver structure, lime only where the user acts or must act first.",
+      "Do put every content surface on a raised ink sheet over the grained ink field.",
+      "Do build structure from silver rules: 2px for heads, 1px hairlines at 15 to 30% for dividers.",
       "Do set collected data in Courier Prime and prose in Public Sans, in off-white or secondary text.",
       "Do carry severity on borders, swatches, bars, and edges, with a text label every time.",
-      "Do draw the live path in kiwi and fade the rest to camel until hovered.",
+      "Do draw the live path in lime and fade the rest to silver until hovered.",
       "Do frame every surface with a classification band stating the passive, authorized scope.",
       "Do give every motion a reduced-motion state that shows the finished result."
     ],
     "donts": [
-      "Don't use kiwi for large backgrounds, every icon or border, or a second stamp.",
-      "Don't set paragraphs in camel or kiwi.",
+      "Don't use lime for large backgrounds, every icon or border, or a second stamp.",
+      "Don't set paragraphs in silver or lime.",
       "Don't introduce purple, pink, cyan, or blue accents, SaaS gradients, glow, or glassmorphism.",
       "Don't hardcode a color in a component; add or reuse a token in globals.css.",
       "Don't round corners or cast shadows inside a sheet.",

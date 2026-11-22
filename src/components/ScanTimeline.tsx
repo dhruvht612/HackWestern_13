@@ -9,11 +9,11 @@ function clock(value: string) {
 export function ScanTimeline({ events, status }: { events: ScanEvent[]; status: string }) {
   return (
     <section className="panel">
-      <div className="flex items-center justify-between border-b border-camel/20 px-5 py-3">
+      <div className="flex items-center justify-between border-b border-silver/20 px-5 py-3">
         <h3 className="field-label !text-fg">Collection log</h3>
         <span className="field-label">{status}</span>
       </div>
-      <ol className="divide-y divide-camel/10">
+      <ol className="divide-y divide-silver/10">
         {events.map((event, i) => (
           <li key={`${event.timestamp}-${i}`} className="grid grid-cols-[5.5rem_1fr] gap-3 px-5 py-3 text-sm sm:grid-cols-[6.5rem_4rem_1fr]">
             <span className="mono tabular text-fg-soft">{clock(event.timestamp)}Z</span>
@@ -29,7 +29,7 @@ export function ScanTimeline({ events, status }: { events: ScanEvent[]; status: 
         ))}
         {status !== "completed" ? (
           <li className="grid grid-cols-[5.5rem_1fr] gap-3 px-5 py-3 text-sm sm:grid-cols-[6.5rem_4rem_1fr]">
-            <span className="h-3.5 w-16 animate-pulse self-center bg-camel/15" />
+            <span className="skeleton h-3.5 w-16 self-center" />
             <span className="hidden sm:block" />
             <span className="text-fg-soft">Collecting…</span>
           </li>

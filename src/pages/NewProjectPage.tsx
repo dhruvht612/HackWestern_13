@@ -37,7 +37,7 @@ export function NewProjectPage() {
         </Link>
 
         <div className="sheet mt-4 px-5 py-7 sm:px-10 sm:py-10">
-          <div className="border-b-2 border-camel pb-4">
+          <div className="border-b-2 border-silver pb-4">
             <h1 className="display text-[2.4rem] font-extrabold leading-none">Open a new file</h1>
             <p className="mt-3 text-sm leading-relaxed text-fg-soft">
               Add a root domain you’re authorized to assess. ShadowScope maps what’s exposed using passive signals only.
@@ -45,8 +45,8 @@ export function NewProjectPage() {
           </div>
 
           <form onSubmit={onSubmit} className="mt-6">
-            <div className="grid border border-camel/40 sm:grid-cols-2">
-              <div className="border-b border-camel/40 p-3 focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-kiwi sm:border-b-0 sm:border-r">
+            <div className="grid border border-silver/40 sm:grid-cols-2">
+              <div className="border-b border-silver/40 p-3 focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-lime sm:border-b-0 sm:border-r">
                 <label htmlFor="project-name" className="field-label">
                   1. Project name
                 </label>
@@ -60,7 +60,7 @@ export function NewProjectPage() {
                   required
                 />
               </div>
-              <div className="p-3 focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-kiwi">
+              <div className="p-3 focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-lime">
                 <label htmlFor="root-domain" className="field-label">
                   2. Root domain
                 </label>
@@ -81,17 +81,17 @@ export function NewProjectPage() {
               A registrable domain only: no IP addresses, wildcards, schemes, or paths.
             </p>
 
-            <div className="mt-6 border-[1.5px] border-camel p-4">
+            <div className="mt-6 border-[1.5px] border-silver p-4">
               <div className="field-label !text-fg">3. Scope of collection</div>
               <p className="mt-1.5 text-sm leading-relaxed">
                 Certificate Transparency logs, DNS, and HTTP headers / TLS metadata. No brute-forcing, port scanning, or exploitation.
               </p>
             </div>
 
-            <label className="mt-4 flex cursor-pointer items-start gap-3 border-[1.5px] border-dashed border-camel/50 p-4 text-sm leading-relaxed transition-colors hover:border-camel">
+            <label className="mt-4 flex cursor-pointer items-start gap-3 border-[1.5px] border-dashed border-silver/50 p-4 text-sm leading-relaxed transition-colors hover:border-silver">
               <input
                 type="checkbox"
-                className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-kiwi"
+                className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-lime"
                 checked={authorized}
                 onChange={(e) => setAuthorized(e.target.checked)}
               />

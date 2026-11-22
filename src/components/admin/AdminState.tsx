@@ -34,7 +34,7 @@ export function AdminState<T>({
     if (!query.isFetchNextPageError || query.data === undefined) {
       const notBuilt = err instanceof ApiError && (err.status === 404 || err.status === 405);
       return (
-        <p role="alert" className="border-2 border-dashed border-camel/60 p-4 text-sm">
+        <p role="alert" className="border-2 border-dashed border-silver/60 p-4 text-sm">
           {notBuilt
             ? "This part of the admin API isn't available yet."
             : `Couldn't load this: ${err.message}`}

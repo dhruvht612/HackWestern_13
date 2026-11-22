@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { ClassificationBand } from "@/components/ClassificationBand";
+import { Logo } from "@/components/Logo";
 import { api, apiConfig } from "@/lib/api";
 import { session, useSession } from "@/lib/session";
 import { cn } from "@/lib/utils";
@@ -57,14 +58,8 @@ export function SignInPage({ mode: requestedMode }: { mode?: "signin" | "signup"
           <ArrowLeft size={15} aria-hidden="true" /> Back
         </Link>
 
-        <div className="mt-6 flex items-center gap-2.5">
-          <svg viewBox="0 0 32 32" className="h-7 w-7" aria-hidden="true">
-            <path className="fill-camel" d="M2 8.5h10l2.5-3H30v22H2z" />
-            <path className="fill-navy" d="M6 14h20v3H6zm0 6h13v3H6z" />
-          </svg>
-          <span className="display text-[1.35rem] font-extrabold uppercase tracking-[0.02em]">ShadowScope</span>
-        </div>
-        <p className="mono mt-1 text-[13px] text-camel">See Beyond the Surface.</p>
+        <Logo className="mt-6" />
+        <p className="mono mt-1 text-[13px] text-silver">See Beyond the Surface.</p>
 
         <div className="mt-4 flex gap-0.5 px-1" role="tablist" aria-label="Account">
           {(["signin", "signup"] as const).map((m) => (
@@ -89,7 +84,7 @@ export function SignInPage({ mode: requestedMode }: { mode?: "signin" | "signup"
           </p>
 
           {notice ? (
-            <p role="status" className="mt-5 border border-camel/40 p-3 text-sm">
+            <p role="status" className="mt-5 border border-silver/40 p-3 text-sm">
               {notice}
             </p>
           ) : null}

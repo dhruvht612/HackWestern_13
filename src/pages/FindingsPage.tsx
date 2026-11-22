@@ -23,12 +23,12 @@ function EvidenceRecords({ scanId, ids }: { scanId: string; ids: string[] }) {
   if (!ids.length) return null;
   const rows = (evidence.data || []).filter((e) => ids.includes(e.id));
   return (
-    <details className="mt-2 border border-camel/25 p-3 text-[13px]">
-      <summary className="cursor-pointer font-semibold hover:text-kiwi">Evidence records ({ids.length})</summary>
+    <details className="mt-2 border border-silver/25 p-3 text-[13px]">
+      <summary className="cursor-pointer font-semibold hover:text-lime">Evidence records ({ids.length})</summary>
       {evidence.isLoading ? <p className="mt-2 text-fg-soft">Loading…</p> : null}
       {rows.map((e) => (
         <div key={e.id} className="mt-3">
-          <div className="mono text-camel">{e.kind.toUpperCase()} · {e.source} · {new Date(e.collected_at).toISOString().slice(0, 19)}Z</div>
+          <div className="mono text-silver">{e.kind.toUpperCase()} · {e.source} · {new Date(e.collected_at).toISOString().slice(0, 19)}Z</div>
           <pre className="mono mt-1 max-h-64 overflow-auto whitespace-pre-wrap break-words text-[12px] text-fg-soft">{JSON.stringify(e.data, null, 2)}</pre>
         </div>
       ))}
@@ -73,7 +73,7 @@ function FindingsView({ scanId }: { scanId: string }) {
               disabled={count === 0}
               className={cn(
                 "border-[1.5px] px-3 py-1.5 text-[13px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40",
-                active ? "border-kiwi bg-kiwi text-navy" : "border-camel/35 text-fg hover:border-camel",
+                active ? "border-lime bg-lime text-ink" : "border-silver/35 text-fg hover:border-silver",
               )}
             >
               {s === "all" ? "All" : severityLabels[s]} <span className="tabular ml-1 font-mono">{count}</span>
@@ -84,18 +84,18 @@ function FindingsView({ scanId }: { scanId: string }) {
 
       <div className={cn("grid gap-6", selected && "xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]")}>
         {filtered.length ? (
-          <ul className="border-y border-camel/25">
+          <ul className="border-y border-silver/25">
             {filtered.map((f) => {
               const active = selected?.id === f.id;
               const urgent = f.severity === "critical";
               return (
-                <li key={f.id} className={cn("border-t first:border-t-0", active ? "border-kiwi" : "border-camel/15", active && "[&+li]:border-kiwi")}>
+                <li key={f.id} className={cn("border-t first:border-t-0", active ? "border-lime" : "border-silver/15", active && "[&+li]:border-lime")}>
                   <button
                     onClick={() => setSelected(f)}
                     aria-current={active || undefined}
                     className={cn(
                       "grid w-full grid-cols-[6rem_minmax(0,1fr)] gap-x-4 px-3 py-4 text-left transition-colors",
-                      !active && "hover:bg-camel/10",
+                      !active && "hover:bg-silver/10",
                     )}
                   >
                     <SeverityBadge severity={f.severity} className="h-fit justify-self-start" />

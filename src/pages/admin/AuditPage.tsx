@@ -2,10 +2,9 @@ import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { DataTable } from "@/components/DataTable";
 import { AdminState } from "@/components/admin/AdminState";
-import { AdminFilter } from "@/components/admin/AdminControls";
+import { AdminFilter, When } from "@/components/admin/AdminControls";
 import { adminApi } from "@/lib/adminApi";
 import { useAdminList } from "@/lib/adminQueries";
-import { formatDate } from "@/lib/utils";
 
 export function AuditPage() {
   const [action, setAction] = useState("");
@@ -37,7 +36,7 @@ export function AuditPage() {
             rows={data.items}
             rowKey={(a) => String(a.id)}
             columns={[
-              { key: "time", header: "Time", render: (a) => formatDate(a.created_at) },
+              { key: "time", header: "Time", render: (a) => <When iso={a.created_at} /> },
               {
                 key: "actor",
                 header: "Actor",

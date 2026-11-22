@@ -13,7 +13,7 @@ export function OverviewPage() {
       <AdminState query={query}>
         {(data) => (
           <div className="space-y-6">
-            <dl className="grid grid-cols-2 divide-camel/30 border-l border-t border-camel/30 lg:grid-cols-4">
+            <dl className="grid grid-cols-2 divide-silver/30 border-l border-t border-silver/30 lg:grid-cols-4">
               {[
                 ["Users", data.users],
                 ["Verified domains", data.verified_domains],
@@ -33,7 +33,7 @@ export function OverviewPage() {
                     : `${Math.round(data.ai_fallback_rate * 100)}%`,
                 ],
               ].map(([label, value]) => (
-                <div key={String(label)} className="min-w-0 border-b border-r border-camel/30 p-4">
+                <div key={String(label)} className="min-w-0 border-b border-r border-silver/30 p-4">
                   <dt className="text-sm text-fg-soft">{label}</dt>
                   <dd className="mono mt-3 text-3xl">{value}</dd>
                 </div>

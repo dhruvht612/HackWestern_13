@@ -1,8 +1,9 @@
-import { Link, NavLink, Outlet, useNavigate, useParams } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { LayoutDashboard, Server, AlertTriangle, Package, Network, FileText } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { useProject } from "@/hooks/useProject";
 import { ClassificationBand } from "@/components/ClassificationBand";
+import { Logo } from "@/components/Logo";
 import { AccountMenu } from "@/components/AccountMenu";
 import { StartScanButton } from "@/components/ScanGate";
 import { cn } from "@/lib/utils";
@@ -19,6 +20,7 @@ const navItems = [
 export function AppLayout() {
   const { id: projectId = "" } = useParams();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { data: projects } = useProjects();
   const { data: project } = useProject(projectId);
 
@@ -28,13 +30,7 @@ export function AppLayout() {
 
       <div className="mx-auto max-w-[1440px] px-3 pb-10 md:px-6">
         <header className="no-print flex flex-wrap items-center justify-between gap-3 py-4">
-          <Link to="/" className="flex items-center gap-2.5" aria-label="ShadowScope home">
-            <svg viewBox="0 0 32 32" className="h-7 w-7" aria-hidden="true">
-              <path className="fill-camel" d="M2 8.5h10l2.5-3H30v22H2z" />
-              <path className="fill-navy" d="M6 14h20v3H6zm0 6h13v3H6z" />
-            </svg>
-            <span className="display text-[1.35rem] font-extrabold uppercase tracking-[0.02em]">ShadowScope</span>
-          </Link>
+          <Logo to="/" />
           <div className="flex flex-wrap items-center gap-2">
             <label htmlFor="project-select" className="sr-only">
               Project
@@ -53,7 +49,7 @@ export function AppLayout() {
               {!projects?.some((p) => p.id === projectId) ? <option value={projectId}>{project?.root_domain ?? "…"}</option> : null}
             </select>
             {project?.verification_status === "verified" ? <StartScanButton projectId={projectId} label="New scan" className="btn-primary py-2" /> : null}
-            <Link to="/projects" className="text-[13px] font-semibold text-fg-soft hover:text-kiwi">
+            <Link to="/projects" className="text-[13px] font-semibold text-fg-soft hover:text-lime">
               All projects
             </Link>
             <AccountMenu />
@@ -80,7 +76,9 @@ export function AppLayout() {
         </nav>
 
         <main className="sheet relative min-h-[70vh] p-4 sm:p-6 lg:p-8">
-          <Outlet />
+          <div key={pathname} className="route-in">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

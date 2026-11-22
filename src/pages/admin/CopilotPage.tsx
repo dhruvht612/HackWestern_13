@@ -38,7 +38,7 @@ export function CopilotPage() {
       {ask.error && <p role="alert">{ask.error.message}</p>}
       {result && (
         <section
-          className="max-w-3xl space-y-4 break-words border border-camel/30 p-4"
+          className="max-w-3xl space-y-4 break-words border border-silver/30 p-4"
           aria-label="Copilot answer"
           aria-live="polite"
         >

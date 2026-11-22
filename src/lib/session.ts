@@ -3,14 +3,21 @@ import type { AuthSession } from "./types";
 
 // ponytail: tokens in localStorage keep the session across reloads; move to httpOnly cookies
 // behind a backend session endpoint if XSS exposure of the token becomes a concern.
-const KEY = "attacksurface.session";
+const KEY = "shadowscope.session";
+const LEGACY_KEY = "attacksurface.session"; // pre-rename; moved to KEY on first read
 const listeners = new Set<() => void>();
 let cached: AuthSession | null | undefined;
 
 function read(): AuthSession | null {
   if (cached !== undefined) return cached;
   try {
-    const raw = localStorage.getItem(KEY);
+    let raw = localStorage.getItem(KEY);
+    const legacy = raw ? null : localStorage.getItem(LEGACY_KEY);
+    if (legacy) {
+      localStorage.setItem(KEY, legacy);
+      localStorage.removeItem(LEGACY_KEY);
+      raw = legacy;
+    }
     cached = raw ? (JSON.parse(raw) as AuthSession) : null;
   } catch {
     cached = null;

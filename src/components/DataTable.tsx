@@ -30,11 +30,11 @@ export function DataTable<T>({
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-camel/15">
+        <tbody className="divide-y divide-silver/15">
           {rows.map((row) => (
             <tr
               key={rowKey(row)}
-              className={onRowClick ? "cursor-pointer transition-colors hover:bg-camel/15" : "transition-colors hover:bg-camel/10"}
+              className={onRowClick ? "cursor-pointer transition-colors hover:bg-silver/15" : "transition-colors hover:bg-silver/10"}
               onClick={() => onRowClick?.(row)}
             >
               {columns.map((col) => (

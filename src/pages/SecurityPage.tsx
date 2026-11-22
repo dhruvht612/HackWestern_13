@@ -1,9 +1,9 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AccountMenu } from "@/components/AccountMenu";
 import { ClassificationBand } from "@/components/ClassificationBand";
+import { Logo } from "@/components/Logo";
 import { PageSkeleton } from "@/components/LoadingSkeleton";
 import { PageHeader } from "@/components/PageHeader";
 import { api } from "@/lib/api";
@@ -52,9 +52,7 @@ export function SecurityPage() {
       <ClassificationBand>Account security</ClassificationBand>
       <div className="mx-auto max-w-2xl px-4 py-8">
         <header className="flex flex-wrap items-center justify-between gap-3">
-          <Link to="/projects" className="display text-[1.35rem] font-extrabold uppercase">
-            ShadowScope
-          </Link>
+          <Logo to="/projects" />
           <AccountMenu />
         </header>
         <div className="sheet mt-6 p-5 sm:p-8">
@@ -69,7 +67,7 @@ export function SecurityPage() {
               Couldn&apos;t load two-factor status: {(factors.error as Error).message}
             </p>
           ) : verified && elevated ? (
-            <p role="status" className="mt-6 border border-camel/40 p-4 text-sm">
+            <p role="status" className="mt-6 border border-silver/40 p-4 text-sm">
               Two-factor is on for this session.
             </p>
           ) : (

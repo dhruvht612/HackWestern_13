@@ -8,12 +8,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        // 60: Abyss Navy and its depth steps
-        navy: { DEFAULT: c("primary"), deep: c("primary-deep"), raised: c("primary-raised"), high: c("primary-high") },
-        // 30: Camel Suede
-        camel: c("secondary"),
-        // 10: Electric Kiwi
-        kiwi: { DEFAULT: c("accent"), hover: c("accent-hover") },
+        // 60: Ink Black and its depth steps
+        ink: { DEFAULT: c("primary"), deep: c("primary-deep"), raised: c("primary-raised"), high: c("primary-high") },
+        // 30: Silver Glass
+        silver: c("secondary"),
+        // 10: Lime
+        lime: { DEFAULT: c("accent"), hover: c("accent-hover") },
         // Neutral text
         fg: { DEFAULT: c("text-primary"), soft: c("text-secondary"), faint: c("text-muted") },
         // Semantic severity (always paired with a label)
@@ -31,7 +31,7 @@ export default {
         display: ["Archivo", '"Public Sans"', "ui-sans-serif", "sans-serif"],
       },
       boxShadow: {
-        sheet: "inset 0 0 0 1px rgb(var(--rgb-secondary) / 0.16), 0 18px 40px -16px rgb(0 0 0 / 0.65)",
+        sheet: "inset 0 0 0 1px rgb(var(--rgb-secondary) / 0.18), inset 0 1px 0 rgb(255 255 255 / 0.06), 0 18px 40px -16px rgb(0 0 0 / 0.8)",
         lift: "0 8px 18px -8px rgb(var(--rgb-accent) / 0.35)",
       },
     },

@@ -65,7 +65,7 @@ export function ScanGate({ children }: { children: (scanId: string) => ReactNode
   const canStart = scanAuthorized(p);
   const authorization = p.authorization ?? "not_routed";
   const blocked = !canStart && (p.verification_status === "verified" || authorization === "revoked" || authorization === "rejected");
-  const blockedNotice = <p role="status" className="border border-camel p-4 text-sm">{authorizationMessage[authorization]}</p>;
+  const blockedNotice = <p role="status" className="border border-silver p-4 text-sm">{authorizationMessage[authorization]}</p>;
   if (!scanId) {
     return blocked ? blockedNotice : p.verification_status !== "verified" ? (
       <VerificationPanel project={p} />
@@ -98,7 +98,7 @@ export function ScanGate({ children }: { children: (scanId: string) => ReactNode
       {status === "partial" ? (
         <p role="status" className="mb-6 border-2 border-severity-medium p-3 text-sm">
           This scan is <strong>partial</strong>: at least one data source failed, so the results below may be incomplete.{" "}
-          <Link className="underline underline-offset-4 hover:text-kiwi" to={`/projects/${projectId}/scans/${scanId}`}>See the log</Link>.
+          <Link className="underline underline-offset-4 hover:text-lime" to={`/projects/${projectId}/scans/${scanId}`}>See the log</Link>.
         </p>
       ) : null}
       {children(scanId)}

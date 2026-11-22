@@ -36,20 +36,20 @@ function CardNode({ data, selected }: NodeProps<Node<NodeData>>) {
   const root = data.nodeType === "root";
   return (
     <div
-      className={`min-w-[210px] border-[1.5px] px-3 py-2.5 text-sm transition-opacity duration-200 ${root ? "bg-camel text-navy" : "bg-navy-raised text-fg"} ${data.dimmed ? "opacity-20" : "opacity-100"}`}
+      className={`min-w-[210px] border-[1.5px] px-3 py-2.5 text-sm transition-opacity duration-200 ${root ? "bg-silver text-ink" : "bg-ink-raised text-fg"} ${data.dimmed ? "opacity-20" : "opacity-100"}`}
       style={{
         borderColor: selected ? KIWI : data.severity ? color : CAMEL,
         borderTopWidth: data.severity ? 5 : 1.5,
         boxShadow: selected ? `0 0 0 2px ${KIWI}` : "0 2px 6px rgb(0 0 0 / 0.35)",
       }}
     >
-      <Handle type="target" position={Position.Left} className="!h-2 !w-2 !rounded-none !border-0 !bg-camel" />
-      <div className={`mb-0.5 text-[11px] font-semibold uppercase tracking-[0.09em] ${root ? "text-navy/75" : "text-fg-soft"}`}>
+      <Handle type="target" position={Position.Left} className="!h-2 !w-2 !rounded-none !border-0 !bg-silver" />
+      <div className={`mb-0.5 text-[11px] font-semibold uppercase tracking-[0.09em] ${root ? "text-ink/75" : "text-fg-soft"}`}>
         {kindLabel[data.nodeType]}
       </div>
       <div className="font-mono text-[14px] font-bold">{data.label}</div>
       {data.severity ? <div className="mt-1 text-[11px] font-bold uppercase tracking-[0.08em]">{data.severity}</div> : null}
-      <Handle type="source" position={Position.Right} className="!h-2 !w-2 !rounded-none !border-0 !bg-camel" />
+      <Handle type="source" position={Position.Right} className="!h-2 !w-2 !rounded-none !border-0 !bg-silver" />
     </div>
   );
 }
@@ -167,12 +167,12 @@ function GraphView({ scanId }: { scanId: string }) {
         description="How each host connects to its findings and their fixes. Select a card to trace its path; select the background to clear."
       />
 
-      <p className="inline-flex border-[1.5px] border-camel px-3 py-1.5 text-[13px] font-semibold">
+      <p className="inline-flex border-[1.5px] border-silver px-3 py-1.5 text-[13px] font-semibold">
         Potential exposure paths, not confirmed attack chains.
       </p>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_300px]">
-        <div className="overflow-hidden border border-camel/30 bg-navy-deep" style={{ height: boardHeight }}>
+        <div className="overflow-hidden border border-silver/30 bg-ink-deep" style={{ height: boardHeight }}>
           <ReactFlow
             zoomOnScroll={false}
             preventScrolling={false}
@@ -191,8 +191,8 @@ function GraphView({ scanId }: { scanId: string }) {
         </div>
 
         <div className="space-y-5">
-          <section className="border border-camel/25 p-4">
-            <h2 className="field-label border-b border-camel/20 pb-2 !text-fg">Legend</h2>
+          <section className="border border-silver/25 p-4">
+            <h2 className="field-label border-b border-silver/20 pb-2 !text-fg">Legend</h2>
             <ul className="mt-3 space-y-2 text-[13px]">
               {severityOrder.map((s) => (
                 <li key={s} className="flex items-center gap-2.5">
@@ -201,11 +201,11 @@ function GraphView({ scanId }: { scanId: string }) {
                 </li>
               ))}
               <li className="flex items-center gap-2.5">
-                <span className="h-1.5 w-6 bg-camel" aria-hidden="true" />
+                <span className="h-1.5 w-6 bg-silver" aria-hidden="true" />
                 Root, host, package, or fix
               </li>
               <li className="flex items-center gap-2.5">
-                <span className="h-1.5 w-6 bg-kiwi" aria-hidden="true" />
+                <span className="h-1.5 w-6 bg-lime" aria-hidden="true" />
                 Traced path (select a card)
               </li>
             </ul>
