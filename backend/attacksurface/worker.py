@@ -69,7 +69,7 @@ def process_outbox(db: Any, apply: Callable[[str, str], None] | None = None) -> 
         db.table("auth_outbox").update({
             "attempts": attempts, "last_error": str(exc)[:500],
             "status": "failed" if attempts >= OUTBOX_MAX_ATTEMPTS else "pending",
-            # 1, 2, 4 … minutes, capped at an hour: rides out an Auth outage instead of burning retries.
+            # 1, 2, 4 â€¦ minutes, capped at an hour: rides out an Auth outage instead of burning retries.
             "next_attempt_at": (now + timedelta(minutes=min(2 ** (attempts - 1), 60))).isoformat(),
         }).eq("id", row["id"]).execute()
         log.warning("auth outbox %s %s failed (attempt %s): %s", row["action"], row["user_id"], attempts, exc)
