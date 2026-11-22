@@ -35,24 +35,24 @@
 
 /*
  * The one place colors live. 60 / 30 / 10:
- *   60  Abyss Navy    #1A2236  surfaces
- *   30  Camel Suede   #C19A6B  structure: rules, tabs, labels, infrastructure lines
- *   10  Electric Kiwi #C4FF1F  action, focus, the single top-priority mark
- * Channels (--rgb-*) are the source of truth so Tailwind opacity modifiers work (bg-camel/15).
+ *   60  Ink Black     #0B0D10  surfaces
+ *   30  Silver Glass  #C0C6CF  structure: rules, tabs, labels, tape, infrastructure lines, glass edges
+ *   10  Lime          #B4F03C  action, focus, the single top-priority mark
+ * Channels (--rgb-*) are the source of truth so Tailwind opacity modifiers work (bg-silver/15).
  */
 :root {
   color-scheme: dark;
 
-  --rgb-primary: 26 34 54; /* #1A2236 */
-  --rgb-primary-deep: 18 25 41; /* #121929 bands, quiet passages */
-  --rgb-primary-raised: 33 42 64; /* #212A40 sheets, fields, active tab */
-  --rgb-primary-high: 41 51 76; /* #29334C pressed / emphasis surface */
-  --rgb-secondary: 193 154 107; /* #C19A6B */
-  --rgb-accent: 196 255 31; /* #C4FF1F */
-  --rgb-accent-hover: 211 255 92; /* #D3FF5C */
-  --rgb-text-primary: 248 247 243; /* #F8F7F3 */
-  --rgb-text-secondary: 209 213 219; /* #D1D5DB */
-  --rgb-text-muted: 154 160 172; /* #9AA0AC tertiary + disabled */
+  --rgb-primary: 11 13 16; /* #0B0D10 ink black */
+  --rgb-primary-deep: 6 7 9; /* #060709 bands, quiet passages */
+  --rgb-primary-raised: 20 23 28; /* #14171C glass sheets, fields, active tab */
+  --rgb-primary-high: 29 33 40; /* #1D2128 pressed / emphasis surface */
+  --rgb-secondary: 192 198 207; /* #C0C6CF silver glass */
+  --rgb-accent: 180 240 60; /* #B4F03C lime */
+  --rgb-accent-hover: 200 248 108; /* #C8F86C */
+  --rgb-text-primary: 243 245 248; /* #F3F5F8 */
+  --rgb-text-secondary: 201 205 212; /* #C9CDD4 */
+  --rgb-text-muted: 142 148 158; /* #8E949E tertiary + disabled (6.4:1 on ink) */
 
   /* Severity is semantic, not palette: always paired with a text label. */
   --rgb-sev-critical: 255 93 93; /* #FF5D5D */
@@ -134,6 +134,11 @@ a {
   text-decoration-thickness: 1px;
 }
 
+html {
+  scrollbar-color: rgb(var(--rgb-secondary) / 0.45) transparent; /* Firefox */
+  scrollbar-width: thin;
+}
+
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -148,21 +153,21 @@ a {
 }
 
 @layer components {
-  /* The folder: navy field with a faint camel fiber. */
+  /* The field: ink black with a faint silver fiber. */
   .grain {
     background-color: var(--color-background);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .76 0 0 0 0 .6 0 0 0 0 .42 .26 0 0 0 -.11'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .75 0 0 0 0 .78 0 0 0 0 .81 .22 0 0 0 -.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  /* A sheet in the file: raised navy, camel hairline edge, soft drop. */
+  /* A sheet of silver glass: raised ink, a cool sheen from the top edge, silver hairline, soft drop. */
   .sheet {
-    @apply bg-navy-raised shadow-sheet;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .97 0 0 0 0 .97 0 0 0 0 .95 .16 0 0 0 -.07'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
+    @apply bg-ink-raised shadow-sheet;
+    background-image: linear-gradient(180deg, rgb(var(--rgb-secondary) / 0.07), rgb(var(--rgb-secondary) / 0) 38%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .97 0 0 0 0 .97 0 0 0 0 .95 .16 0 0 0 -.07'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
   }
 
   /* Ruled box: structure from rules, never tinted fills. */
   .panel {
-    @apply border border-camel/25;
+    @apply border border-silver/25;
   }
 
   .mono {
@@ -180,12 +185,12 @@ a {
   }
 
   .field-label {
-    @apply text-[11px] font-semibold uppercase tracking-[0.09em] text-camel;
+    @apply text-[11px] font-semibold uppercase tracking-[0.09em] text-silver;
   }
 
   .field {
-    @apply w-full border border-camel/45 bg-navy-raised px-3 py-2 text-sm text-fg placeholder:text-fg-faint transition-colors;
-    @apply hover:border-camel focus:border-camel focus:outline-none focus-visible:outline-2 focus-visible:outline-kiwi;
+    @apply w-full border border-silver/45 bg-ink-raised px-3 py-2 text-sm text-fg placeholder:text-fg-faint transition-colors;
+    @apply hover:border-silver focus:border-silver focus:outline-none focus-visible:outline-2 focus-visible:outline-lime;
   }
 
   .btn {
@@ -193,42 +198,36 @@ a {
     @apply disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none;
   }
   .btn-primary {
-    @apply btn bg-kiwi text-navy hover:-translate-y-px hover:bg-kiwi-hover hover:shadow-lift active:translate-y-0 active:shadow-none;
+    @apply btn bg-lime text-ink hover:-translate-y-px hover:bg-lime-hover hover:shadow-lift active:translate-y-0 active:shadow-none;
   }
   .btn-secondary {
-    @apply btn border-2 border-camel text-fg hover:bg-camel/10 hover:text-fg;
+    @apply btn border-2 border-silver text-fg hover:bg-silver/10 hover:text-fg;
   }
   /* Destructive admin actions (reject, suspend, revoke): a critical 2px edge, never a fill. */
   .btn-danger {
     @apply btn border-2 border-severity-critical text-fg hover:bg-severity-critical/15;
   }
 
-  /* Folder tab, die-cut. Active tabs carry a kiwi indicator on their top edge. */
+  /* Folder tab, die-cut. Active tabs carry a lime indicator on their top edge. */
   .tab {
     clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 100%, 0 100%);
     @apply inline-flex shrink-0 items-center gap-2 whitespace-nowrap px-5 pb-2 pt-2.5 text-sm font-semibold transition-colors duration-150;
   }
   .tab-active {
-    @apply bg-navy-raised text-fg;
+    @apply bg-ink-raised text-fg;
     box-shadow: inset 0 3px 0 var(--color-accent);
   }
   .tab-inactive {
-    @apply bg-camel text-navy hover:bg-camel/80;
+    @apply bg-silver text-ink hover:bg-silver/80;
   }
 
-  /* Redaction tape is camel: structure laid over the evidence until it's declassified. */
+  /* Redaction tape is silver: structure laid over the evidence until it's declassified. */
   .redaction {
-    @apply bg-camel;
+    @apply bg-silver;
   }
 
   .ledger-head {
-    @apply border-b-2 border-camel text-left text-[11px] font-semibold uppercase tracking-[0.09em] text-camel;
-  }
-
-  /* A quiet live signal: one kiwi dot, transform/opacity only. */
-  .signal-dot {
-    @apply inline-block h-1.5 w-1.5 bg-kiwi;
-    animation: signal-pulse 2.4s ease-in-out infinite;
+    @apply border-b-2 border-silver text-left text-[11px] font-semibold uppercase tracking-[0.09em] text-silver;
   }
 
   /* A slow trace across a rule, like a scanner settling on a result. */
@@ -246,17 +245,6 @@ a {
     transform-origin: left center;
     animation: trace 5s ease-in-out infinite;
   }
-  @keyframes signal-pulse {
-    0%,
-    100% {
-      opacity: 0.35;
-      transform: scale(0.8);
-    }
-    50% {
-      opacity: 1;
-      transform: scale(1.15);
-    }
-  }
   @keyframes trace {
     0%,
     100% {
@@ -269,7 +257,6 @@ a {
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .signal-dot,
     .trace-line::after {
       animation: none;
     }
@@ -296,6 +283,40 @@ a {
   .stamp-in {
     animation: stamp-in 460ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
+
+  /* Loading reads as redaction tape with a slow scope sweep across it: content not yet in view. */
+  .skeleton {
+    background-color: rgb(var(--rgb-secondary) / 0.12);
+    background-image: linear-gradient(90deg, transparent 0%, rgb(var(--rgb-secondary) / 0.16) 50%, transparent 100%);
+    background-size: 40% 100%;
+    background-repeat: no-repeat;
+    animation: scope-sweep 1.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+
+  /* Route change: the next page settles into view. State, not decoration: 200ms. */
+  .route-in {
+    animation: route-in 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@keyframes scope-sweep {
+  from {
+    background-position: -60% 0;
+  }
+  to {
+    background-position: 160% 0;
+  }
+}
+
+@keyframes route-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @keyframes stamp-in {
@@ -317,7 +338,9 @@ a {
   .redact {
     transition: none;
   }
-  .stamp-in {
+  .stamp-in,
+  .skeleton,
+  .route-in {
     animation: none;
   }
 }

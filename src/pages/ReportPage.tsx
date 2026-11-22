@@ -31,7 +31,7 @@ function DocBlock({ block }: { block: Block }) {
       return null; // rendered as the document title
     case "h2":
       return (
-        <h2 className="mt-9 border-b border-camel pb-1 font-display text-[15px] font-extrabold uppercase tracking-[0.14em]" style={{ fontStretch: "85%" }}>
+        <h2 className="mt-9 border-b border-silver pb-1 font-display text-[15px] font-extrabold uppercase tracking-[0.14em]" style={{ fontStretch: "85%" }}>
           {block.text}
         </h2>
       );
@@ -40,7 +40,7 @@ function DocBlock({ block }: { block: Block }) {
         <dl className="mono mt-3 grid grid-cols-[7rem_minmax(0,1fr)] gap-y-1 text-[13.5px]">
           {block.rows.map(([k, v]) => (
             <div key={k} className="contents">
-              <dt className="uppercase text-camel">{k}</dt>
+              <dt className="uppercase text-silver">{k}</dt>
               <dd className="break-all">{v}</dd>
             </div>
           ))}
@@ -75,7 +75,7 @@ function DocBlock({ block }: { block: Block }) {
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-camel/15">
+            <tbody className="divide-y divide-silver/15">
               {block.rows.map((row, r) => (
                 <tr key={r}>
                   {row.map((c, i) => (
@@ -140,10 +140,10 @@ function ReportView({ scanId }: { scanId: string }) {
         />
       </div>
 
-      <article className="print-surface mx-auto max-w-[58rem] border border-camel/25 bg-navy-raised">
+      <article className="print-surface mx-auto max-w-[58rem] border border-silver/25 bg-ink-raised">
         <ClassificationBand>Potential exposure // Validate before action</ClassificationBand>
         <div className="relative px-6 py-9 md:px-12 md:py-12">
-          <Stamp lines={["Filed", `SS-${scanId.slice(0, 8)}`]} tone="camel" rotate={-5} className="absolute right-4 top-5 w-32 md:right-10 md:top-8 md:w-40" />
+          <Stamp lines={["Filed", `SS-${scanId.slice(0, 8)}`]} tone="silver" rotate={-5} className="absolute right-4 top-5 w-32 md:right-10 md:top-8 md:w-40" />
           {/* "ShadowScope Report — acme-demo.com": the subject goes on its own unbreakable mono line */}
           <h1 className="pr-28 md:pr-44">
             <span className="display block text-[2.4rem] font-extrabold uppercase leading-none">
@@ -153,7 +153,7 @@ function ReportView({ scanId }: { scanId: string }) {
               <span className="mono mt-2 block whitespace-nowrap text-[1.05rem] font-bold">SUBJECT: {title.text.split(" — ")[1]}</span>
             ) : null}
           </h1>
-          <div className="mt-6 border-t-2 border-camel pt-1">
+          <div className="mt-6 border-t-2 border-silver pt-1">
             {blocks.map((b, i) => (
               <DocBlock key={i} block={b} />
             ))}

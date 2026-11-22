@@ -24,7 +24,7 @@ export function AccountMenu() {
   const adminLink = admin.data ? (
     <Link
       to="/admin"
-      className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-fg-soft transition-colors hover:text-kiwi"
+      className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-fg-soft transition-colors hover:text-lime"
     >
       <UserCog size={14} aria-hidden="true" /> Admin
     </Link>
@@ -54,16 +54,16 @@ export function AccountMenu() {
         {current.user.email}
       </span>
       {adminLink}
-      {account.data?.status === "pending_review" && <span role="status" className="text-sm text-camel">Account under review</span>}
+      {account.data?.status === "pending_review" && <span role="status" className="text-sm text-silver">Account under review</span>}
       <Link
         to="/account/security"
-        className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-fg-soft transition-colors hover:text-kiwi"
+        className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-fg-soft transition-colors hover:text-lime"
       >
         <ShieldCheck size={14} aria-hidden="true" /> Security
       </Link>
       <button
         onClick={signOut}
-        className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-fg-soft transition-colors hover:text-kiwi"
+        className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-fg-soft transition-colors hover:text-lime"
       >
         <LogOut size={14} aria-hidden="true" /> Sign out
       </button>

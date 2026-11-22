@@ -11,7 +11,7 @@ export const severityLabels: Record<Severity, string> = {
 };
 
 // Color rides the edge (badge border + swatch); the label text stays neutral so severity never depends on hue alone.
-// Severity hues are semantic, not palette: Electric Kiwi is never a severity, it marks the single top action.
+// Severity hues are semantic, not palette: Lime is never a severity, it marks the single top action.
 export const severityClasses: Record<Severity, string> = {
   critical: "border-severity-critical text-fg",
   high: "border-severity-high text-fg",

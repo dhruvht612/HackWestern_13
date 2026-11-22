@@ -17,7 +17,7 @@ export function VerificationPanel({ project }: { project: Project }) {
   const error = (issue.error || check.error) as Error | null;
 
   return (
-    <section className="border-2 border-camel p-5" aria-labelledby="verify-heading">
+    <section className="border-2 border-silver p-5" aria-labelledby="verify-heading">
       <h2 id="verify-heading" className="display text-xl font-extrabold">
         {project.verification_status === "expired" ? "Re-verify domain control" : "Verify domain control"}
       </h2>
@@ -27,18 +27,18 @@ export function VerificationPanel({ project }: { project: Project }) {
       </p>
 
       {challenge?.record_value ? (
-        <dl className="mono mt-4 grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 gap-y-2 border border-camel/30 p-4 text-[13px]">
-          <dt className="text-camel">TYPE</dt>
+        <dl className="mono mt-4 grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 gap-y-2 border border-silver/30 p-4 text-[13px]">
+          <dt className="text-silver">TYPE</dt>
           <dd>TXT</dd>
-          <dt className="text-camel">NAME</dt>
+          <dt className="text-silver">NAME</dt>
           <dd className="break-all">{challenge.record_name}</dd>
-          <dt className="text-camel">VALUE</dt>
+          <dt className="text-silver">VALUE</dt>
           <dd className="flex items-start gap-2">
             <span className="break-all">{challenge.record_value}</span>
             <button
               type="button"
               onClick={() => navigator.clipboard?.writeText(challenge.record_value ?? "")}
-              className="shrink-0 text-fg-soft hover:text-kiwi"
+              className="shrink-0 text-fg-soft hover:text-lime"
               aria-label="Copy TXT value"
             >
               <Copy size={14} />

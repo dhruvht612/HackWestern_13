@@ -4,7 +4,7 @@ import type { AnalysisFinding } from "@/lib/types";
 export function AIAnalystCard({ analysis }: { analysis?: AnalysisFinding | null }) {
   if (!analysis) {
     return (
-      <div className="border border-dashed border-camel/35 p-5 text-sm text-fg-soft">
+      <div className="border border-dashed border-silver/35 p-5 text-sm text-fg-soft">
         No analyst memo on file for this finding. Memos are written for the highest-priority findings first.
       </div>
     );
@@ -18,13 +18,13 @@ export function AIAnalystCard({ analysis }: { analysis?: AnalysisFinding | null 
   ];
 
   return (
-    <div className="border border-camel/25">
-      <dl className="mono grid grid-cols-[4.5rem_1fr] gap-x-3 gap-y-1 border-b border-camel/20 px-5 py-3 text-[13px]">
-        <dt className="text-camel">FROM:</dt>
+    <div className="border border-silver/25">
+      <dl className="mono grid grid-cols-[4.5rem_1fr] gap-x-3 gap-y-1 border-b border-silver/20 px-5 py-3 text-[13px]">
+        <dt className="text-silver">FROM:</dt>
         <dd>AI analyst (Gemini)</dd>
-        <dt className="text-camel">RE:</dt>
+        <dt className="text-silver">RE:</dt>
         <dd className="flex flex-wrap items-center gap-2">
-          <span className={analysis.suggested_priority === "P0" ? "bg-kiwi px-1.5 font-bold text-navy" : "border border-camel px-1.5 font-bold"}>
+          <span className={analysis.suggested_priority === "P0" ? "bg-lime px-1.5 font-bold text-ink" : "border border-silver px-1.5 font-bold"}>
             {analysis.suggested_priority}
           </span>
           <span>confidence {analysis.confidence}</span>
@@ -39,7 +39,7 @@ export function AIAnalystCard({ analysis }: { analysis?: AnalysisFinding | null 
         ))}
         <div className="flex flex-wrap gap-1.5 pt-1">
           {analysis.evidence_refs.map((ref) => (
-            <span key={ref} className="mono border border-camel/25 px-1.5 py-0.5 text-[13px] text-fg-soft">
+            <span key={ref} className="mono border border-silver/25 px-1.5 py-0.5 text-[13px] text-fg-soft">
               {ref}
             </span>
           ))}

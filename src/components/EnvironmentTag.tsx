@@ -2,9 +2,9 @@ import { cn } from "@/lib/utils";
 
 // Environment is told by line, not hue, so it never competes with severity color.
 const styles: Record<string, string> = {
-  prod: "border-camel bg-camel text-navy",
-  staging: "border-camel text-fg",
-  dev: "border-dashed border-camel text-fg",
+  prod: "border-silver bg-silver text-ink",
+  staging: "border-silver text-fg",
+  dev: "border-dashed border-silver text-fg",
   unknown: "border-dotted border-fg-faint text-fg-soft",
 };
 

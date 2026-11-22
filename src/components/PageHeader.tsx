@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 export function PageHeader({ title, description, actions }: { title: string; description: string; actions?: ReactNode }) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-4 border-b-2 border-camel pb-4">
+    <div className="flex flex-wrap items-end justify-between gap-4 border-b-2 border-silver pb-4">
       <div>
         <h1 className="display text-[2rem] font-extrabold leading-none text-fg">{title}</h1>
         <p className="mt-2 max-w-[70ch] text-sm text-fg-soft">{description}</p>

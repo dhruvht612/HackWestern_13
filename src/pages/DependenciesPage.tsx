@@ -90,7 +90,7 @@ export function DependenciesPage() {
         {...getRootProps()}
         className={cn(
           "flex cursor-pointer flex-col items-center justify-center border-2 border-dashed p-8 text-center transition-colors",
-          isDragActive ? "border-camel bg-camel/20" : "border-camel/35 hover:border-camel hover:bg-camel/10",
+          isDragActive ? "border-silver bg-silver/20" : "border-silver/35 hover:border-silver hover:bg-silver/10",
         )}
       >
         <input {...getInputProps()} />

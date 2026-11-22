@@ -8,6 +8,7 @@ import { AdminNotice } from "@/components/admin/AdminControls";
 import { ReasonForm } from "@/components/admin/ReasonForm";
 import { adminApi } from "@/lib/adminApi";
 import { useAdminList } from "@/lib/adminQueries";
+import { EmptyState } from "@/components/EmptyState";
 import { useAdmin } from "@/lib/adminSession";
 import { formatDate } from "@/lib/utils";
 
@@ -72,7 +73,10 @@ export function BlocklistPage() {
                   ]}
                 />
               ) : (
-                <p>No blocked patterns.</p>
+                <EmptyState
+                  title="Blocklist empty"
+                  description="Add an exact or suffix pattern to refuse claims for domains that must never be scanned, such as government or banking domains."
+                />
               )}
             </div>
             <DetailPanel
@@ -98,7 +102,7 @@ export function BlocklistPage() {
         )}
       </AdminState>
       {me.role === "operator" && (
-        <section className="max-w-2xl space-y-4 border-t-2 border-camel pt-5">
+        <section className="max-w-2xl space-y-4 border-t-2 border-silver pt-5">
           <h2 className="text-xl font-semibold">Add pattern</h2>
           <fieldset disabled={adding} className="min-w-0 space-y-4">
             <label className="block">

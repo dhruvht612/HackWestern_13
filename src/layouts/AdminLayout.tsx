@@ -1,8 +1,9 @@
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Ban, ClipboardCheck, Globe, LayoutGrid, MessageSquare, ScrollText, Siren, Sparkles, Users } from "lucide-react";
 import { AccountMenu } from "@/components/AccountMenu";
 import { ClassificationBand } from "@/components/ClassificationBand";
+import { Logo } from "@/components/Logo";
 import { useAdmin } from "@/lib/adminSession";
 import { adminOverviewQuery } from "@/lib/adminQueries";
 import { apiConfig } from "@/lib/api";
@@ -22,6 +23,7 @@ const navItems = [
 
 export function AdminLayout() {
   const me = useAdmin();
+  const { pathname } = useLocation();
   const overview = useQuery(adminOverviewQuery);
   const pendingCount = overview.data?.pending_reviews;
 
@@ -29,7 +31,7 @@ export function AdminLayout() {
     <div className="grain min-h-screen text-fg">
       <ClassificationBand>ShadowScope Security Control Center // Every action is logged</ClassificationBand>
       {apiConfig.USE_MOCKS ? (
-        <div className="border-b-2 border-dashed border-camel/60 bg-navy-deep px-4 py-1.5 text-center text-[13px] font-semibold text-camel">
+        <div className="border-b-2 border-dashed border-silver/60 bg-ink-deep px-4 py-1.5 text-center text-[13px] font-semibold text-silver">
           Sample data. These users, domains, and events are made up for the demo.
         </div>
       ) : null}
@@ -37,13 +39,8 @@ export function AdminLayout() {
       <div className="mx-auto max-w-[1440px] px-3 pb-10 md:px-6">
         <header className="flex flex-wrap items-center justify-between gap-3 py-4">
           <div className="flex flex-wrap items-center gap-3">
-            <Link
-              to="/projects"
-              className="display text-[1.35rem] font-extrabold uppercase tracking-[0.02em]"
-            >
-              ShadowScope
-            </Link>
-            <span className="border-[1.5px] border-camel px-2 py-0.5 text-[11px] font-bold uppercase tracking-[0.09em] text-camel">
+            <Logo to="/projects" />
+            <span className="border-[1.5px] border-silver px-2 py-0.5 text-[11px] font-bold uppercase tracking-[0.09em] text-silver">
               Security Control Center
             </span>
             <span className="mono text-[13px] text-fg-soft">
@@ -52,7 +49,7 @@ export function AdminLayout() {
             </span>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <Link to="/projects" className="text-[13px] font-semibold text-fg-soft hover:text-kiwi">
+            <Link to="/projects" className="text-[13px] font-semibold text-fg-soft hover:text-lime">
               Back to projects
             </Link>
             <AccountMenu />
@@ -88,7 +85,9 @@ export function AdminLayout() {
         </nav>
 
         <main className="sheet relative min-h-[70vh] p-4 sm:p-6 lg:p-8">
-          <Outlet context={me} />
+          <div key={pathname} className="route-in">
+            <Outlet context={me} />
+          </div>
         </main>
       </div>
     </div>

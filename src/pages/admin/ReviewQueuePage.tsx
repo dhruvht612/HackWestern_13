@@ -5,7 +5,8 @@ import { DataTable } from "@/components/DataTable";
 import { DetailPanel } from "@/components/DetailPanel";
 import { SeverityBadge } from "@/components/SeverityBadge";
 import { AdminState } from "@/components/admin/AdminState";
-import { AdminFilter, AdminNotice } from "@/components/admin/AdminControls";
+import { AdminFilter, AdminNotice, AdviceChip, When } from "@/components/admin/AdminControls";
+import { EmptyState } from "@/components/EmptyState";
 import { ReasonForm } from "@/components/admin/ReasonForm";
 import { adminApi } from "@/lib/adminApi";
 import { useAdminList } from "@/lib/adminQueries";
@@ -77,7 +78,11 @@ export function ReviewQueuePage() {
         ]}
       />
       <AdminNotice message={message} />
-      {conflict && <p role="alert">{conflict}</p>}
+      {conflict && (
+        <p role="alert" className="border-2 border-severity-critical p-3 text-sm">
+          {conflict} The queue has been refreshed.
+        </p>
+      )}
       <AdminState query={query}>
         {() => (
           <div
@@ -100,40 +105,41 @@ export function ReviewQueuePage() {
                       render: (r) => (
                         <>
                           <button
-                            className="mono block max-w-64 truncate text-left underline hover:text-kiwi"
+                            className="mono block max-w-64 truncate text-left underline hover:text-lime"
                             onClick={() => setSelected(r.id)}
                           >
                             {r.root_domain ?? r.user_email ?? r.user_id}
                           </button>
-                          <span className="text-xs">
+                          <span className="block max-w-64 truncate text-xs text-fg-soft">
                             {r.kind} · {r.status}
+                            {r.kind === "domain" && r.user_email ? ` · ${r.user_email}` : ""}
                           </span>
                         </>
                       ),
                     },
                     {
-                      key: "requester",
-                      header: "Requester",
-                      render: (r) => (
-                        <span className="block max-w-48 truncate">{r.user_email ?? r.user_id}</span>
-                      ),
-                    },
-                    {
                       key: "advice",
                       header: "Advice",
-                      render: (r) => (
-                        <p className="min-w-48 max-w-80">
-                          {r.ai_verdict
-                            ? `${r.ai_verdict.fallback_used ? "Rules only" : "Gemini recommends"}: ${r.ai_verdict.recommendation.replaceAll("_", " ")} (${r.ai_verdict.confidence}). ${r.ai_verdict.summary}`
-                            : "No recommendation"}
-                        </p>
-                      ),
+                      render: (r) =>
+                        r.ai_verdict ? (
+                          <div className="min-w-48 max-w-80">
+                            <AdviceChip verdict={r.ai_verdict} />
+                            <p className="mt-1.5 line-clamp-2 text-[13px] leading-snug text-fg-soft" title={r.ai_verdict.summary}>
+                              {r.ai_verdict.summary}
+                            </p>
+                          </div>
+                        ) : (
+                          <span className="text-[13px] text-fg-faint">Advice pending</span>
+                        ),
                     },
-                    { key: "date", header: "Requested", render: (r) => formatDate(r.created_at) },
+                    { key: "date", header: "Requested", render: (r) => <When iso={r.created_at} /> },
                   ]}
                 />
               ) : (
-                <p>No reviews match this filter.</p>
+                <EmptyState
+                  title="Nothing waiting"
+                  description="Sign-ups and domain claims the risk rules flag land here for a human decision. Nothing matches this filter right now."
+                />
               )}
             </div>
             <DetailPanel
@@ -143,12 +149,12 @@ export function ReviewQueuePage() {
             >
               {item && (
                 <div className="space-y-5 break-words">
-                  <dl className="space-y-3">
+                  <dl className="divide-y divide-silver/15 border-y-2 border-silver">
                     {item.signals.map((s) => (
-                      <div key={s.id} id={`${item.id}-${s.id}`}>
-                        <dt className="font-semibold">{s.label}</dt>
-                        <dd>{s.value}</dd>
-                        <dd className="mono text-xs text-fg-soft">{s.id}</dd>
+                      <div key={s.id} id={`${item.id}-${s.id}`} className="scroll-mt-4 py-2.5 target:bg-silver/10">
+                        <dt className="field-label">{s.label}</dt>
+                        <dd className="mt-0.5 text-sm text-fg">{s.value}</dd>
+                        <dd className="mono text-xs text-fg-faint">{s.id}</dd>
                       </div>
                     ))}
                   </dl>
@@ -166,13 +172,10 @@ export function ReviewQueuePage() {
                     </section>
                   ) : null}
                   {verdict ? (
-                    <section className="space-y-2 border-y border-camel/30 py-4">
-                      <h4 className="font-semibold">
-                        {verdict.fallback_used ? "Rules-only fallback" : "Gemini recommends"}:{" "}
-                        {verdict.recommendation.replaceAll("_", " ")}
-                      </h4>
-                      <p>{verdict.confidence} confidence · Advice only</p>
-                      <p>{verdict.summary}</p>
+                    <section className="space-y-2 border-y border-silver/30 py-4">
+                      <h4 className="field-label">{verdict.fallback_used ? "Rules-only advice" : "Gemini's advice"} · not a decision</h4>
+                      <AdviceChip verdict={verdict} />
+                      <p className="text-sm leading-relaxed">{verdict.summary}</p>
                       <ul>
                         {verdict.key_signals.map((s) => (
                           <li key={s}>
@@ -197,7 +200,7 @@ export function ReviewQueuePage() {
                       </p>
                     </section>
                   ) : (
-                    <p>No AI advice available.</p>
+                    <p className="text-sm text-fg-soft">No AI advice yet. The signals above are the evidence; decide on those.</p>
                   )}
                   {item.status !== "pending" ? (
                     <p>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, RotateCcw } from "lucide-react";
 import { fixtures } from "@/mocks/fixtures";
@@ -8,6 +8,8 @@ import { ClassificationBand } from "@/components/ClassificationBand";
 import { EnvironmentTag } from "@/components/EnvironmentTag";
 import { SeverityBadge } from "@/components/SeverityBadge";
 import { Stamp } from "@/components/Stamp";
+import { Logo, ScopeMark } from "@/components/Logo";
+import { ScopeCorners, ScopeFrame } from "@/components/ScopeFrame";
 import { cn } from "@/lib/utils";
 import type { Severity } from "@/lib/types";
 
@@ -70,7 +72,7 @@ function useDeclassify(ref: RefObject<HTMLElement | null>) {
 /** Inline value under redaction tape. Text stays in the DOM for screen readers. */
 function R({ step, revealed, children }: { step: number; revealed: number; children: ReactNode }) {
   return (
-    <span className="redact" data-open={revealed > step}>
+    <span className="redact" data-open={revealed > step} data-step={step}>
       {children}
     </span>
   );
@@ -79,7 +81,7 @@ function R({ step, revealed, children }: { step: number; revealed: number; child
 /** A whole row under one strip of tape. */
 function RowRedact({ step, revealed, children, className }: { step: number; revealed: number; children: ReactNode; className?: string }) {
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn("relative", className)} data-step={step}>
       {children}
       <span
         aria-hidden="true"
@@ -90,9 +92,53 @@ function RowRedact({ step, revealed, children, className }: { step: number; reve
   );
 }
 
+type Box = { x: number; y: number; w: number; h: number };
+
+/**
+ * The scope: corner brackets that frame each redaction as its tape peels, then
+ * settle on the P0 once the file is declassified. Measured against the unrotated wrapper, so it
+ * frames the slightly tilted sheet like a lens held in front of it, not ink on the page.
+ */
+function useScopeBox(ref: RefObject<HTMLElement | null>, step: number) {
+  const [box, setBox] = useState<Box | null>(null);
+  useLayoutEffect(() => {
+    const root = ref.current;
+    if (!root) return;
+    const measure = () => {
+      const base = root.getBoundingClientRect();
+      let l = Infinity, t = Infinity, r = -Infinity, b = -Infinity;
+      root.querySelectorAll(`[data-step="${step}"]`).forEach((el) => {
+        for (const rc of el.getClientRects()) {
+          l = Math.min(l, rc.left); t = Math.min(t, rc.top); r = Math.max(r, rc.right); b = Math.max(b, rc.bottom);
+        }
+      });
+      const pad = 7;
+      setBox(l === Infinity ? null : { x: l - base.left - pad, y: t - base.top - pad, w: r - l + pad * 2, h: b - t + pad * 2 });
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(root);
+    return () => ro.disconnect();
+  }, [ref, step]);
+  return box;
+}
+
+function Scope({ box }: { box: Box | null }) {
+  if (!box) return null;
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute left-0 top-0 z-10 transition-[transform,width,height] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
+      style={{ transform: `translate(${box.x}px, ${box.y}px)`, width: box.w, height: box.h }}
+    >
+      <ScopeCorners />
+    </div>
+  );
+}
+
 function SheetHeading({ children }: { children: ReactNode }) {
   return (
-    <h3 className="mb-2 mt-6 border-b border-camel/30 pb-1 font-display text-[13px] font-extrabold uppercase tracking-[0.16em] text-camel" style={{ fontStretch: "85%" }}>
+    <h3 className="mb-2 mt-6 border-b border-silver/30 pb-1 font-display text-[13px] font-extrabold uppercase tracking-[0.16em] text-silver" style={{ fontStretch: "85%" }}>
       {children}
     </h3>
   );
@@ -101,14 +147,17 @@ function SheetHeading({ children }: { children: ReactNode }) {
 function CaseSheet() {
   const ref = useRef<HTMLDivElement>(null);
   const { revealed, stamped, replay } = useDeclassify(ref);
+  // frame the item whose tape is peeling now; once everything is open, hold on the P0 (the last step)
+  const scope = useScopeBox(ref, Math.min(Math.max(revealed - 1, 0), STEPS - 1));
   const p0 = analysis.findings.find((f) => f.suggested_priority === "P0");
 
   return (
     <div ref={ref} className="relative">
-      {/* the camel folder the sheet is filed in */}
-      <div aria-hidden="true" className="absolute -inset-x-3 -bottom-5 -top-8 rotate-[-1.6deg] bg-camel shadow-sheet sm:-inset-x-5">
+      <Scope box={scope} />
+      {/* the silver folder the sheet is filed in */}
+      <div aria-hidden="true" className="absolute -inset-x-3 -bottom-5 -top-8 rotate-[-1.6deg] bg-silver shadow-sheet sm:-inset-x-5">
         <span
-          className="absolute -top-6 left-6 flex h-6 items-center bg-camel px-5 font-display text-[11px] font-extrabold uppercase tracking-[0.16em] text-navy"
+          className="absolute -top-6 left-6 flex h-6 items-center bg-silver px-5 font-display text-[11px] font-extrabold uppercase tracking-[0.16em] text-ink"
           style={{ clipPath: "polygon(10px 0, calc(100% - 10px) 0, 100% 100%, 0 100%)", fontStretch: "85%" }}
         >
           {project.root_domain}
@@ -118,7 +167,7 @@ function CaseSheet() {
         className="sheet relative px-5 pb-7 pt-5 sm:px-8 lg:rotate-[0.6deg]"
         aria-label={`Case file on ${project.root_domain}`}
       >
-        <header className="flex items-start justify-between gap-4 border-b-2 border-camel pb-3">
+        <header className="flex items-start justify-between gap-4 border-b-2 border-silver pb-3">
           <div>
             <div className="display text-[2rem] font-extrabold uppercase leading-none">Case file</div>
             <div className="mono mt-1 flex flex-wrap items-center gap-x-3 text-[13px] text-fg-soft">
@@ -126,21 +175,21 @@ function CaseSheet() {
               <button
                 type="button"
                 onClick={replay}
-                className="inline-flex items-center gap-1 underline decoration-camel/30 underline-offset-4 transition-colors hover:text-fg hover:decoration-camel"
+                className="inline-flex items-center gap-1 underline decoration-silver/30 underline-offset-4 transition-colors hover:text-fg hover:decoration-silver"
               >
                 <RotateCcw size={12} aria-hidden="true" /> redact &amp; replay
               </button>
             </div>
           </div>
-          <Stamp lines={["Collected", "Passively"]} tone="camel" rotate={5} className="-mr-2 -mt-1 w-32 sm:w-36" />
+          <Stamp lines={["Collected", "Passively"]} tone="silver" rotate={5} className="-mr-2 -mt-1 w-32 sm:w-36" />
         </header>
 
         <dl className="mono mt-4 grid grid-cols-[6.5rem_minmax(0,1fr)] gap-y-1.5 text-[13.5px] leading-snug sm:grid-cols-[7.5rem_minmax(0,1fr)]">
-          <dt className="text-camel">SUBJECT</dt>
+          <dt className="text-silver">SUBJECT</dt>
           <dd><R step={0} revealed={revealed}>{project.root_domain}</R></dd>
-          <dt className="text-camel">COLLECTED</dt>
+          <dt className="text-silver">COLLECTED</dt>
           <dd><R step={1} revealed={revealed}>{scan.started_at.slice(0, 10)} {hhmm(scan.started_at)}–{hhmm(scan.completed_at)}Z · {scanSeconds} s</R></dd>
-          <dt className="text-camel">SOURCES</dt>
+          <dt className="text-silver">SOURCES</dt>
           <dd><R step={2} revealed={revealed}>CT logs · DNS · HTTP/TLS metadata</R></dd>
         </dl>
 
@@ -203,7 +252,7 @@ type ExhibitLine = { code: ReactNode; note?: { severity: Severity; text: string 
 
 function Missing() {
   return (
-    <span className="ml-1 inline-block h-[1.05em] w-20 translate-y-[0.15em] border border-dashed border-camel/60 align-baseline">
+    <span className="ml-1 inline-block h-[1.05em] w-20 translate-y-[0.15em] border border-dashed border-silver/60 align-baseline">
       <span className="sr-only">absent</span>
     </span>
   );
@@ -237,7 +286,7 @@ function AnnotatedExhibit() {
               </code>
               {line.note ? (
                 <>
-                  <span aria-hidden="true" className="mt-[0.8em] hidden min-w-6 flex-1 border-b border-dotted border-camel/60 md:block" />
+                  <span aria-hidden="true" className="mt-[0.8em] hidden min-w-6 flex-1 border-b border-dotted border-silver/60 md:block" />
                   <span className="flex w-full items-start gap-2 pl-4 font-sans text-[13px] leading-snug text-fg md:w-[15.5rem] md:shrink-0 md:pl-0">
                     <SeverityBadge severity={line.note.severity} className="mt-px px-1.5 text-[11px]" />
                     <span>{line.note.text}</span>
@@ -248,7 +297,7 @@ function AnnotatedExhibit() {
           ),
         )}
       </div>
-      <figcaption className="mt-6 border-t border-camel/20 pt-3 text-[13px] text-fg-soft">
+      <figcaption className="mt-6 border-t border-silver/20 pt-3 text-[13px] text-fg-soft">
         Response headers and certificate metadata collected from <span className="mono">staging.acme-demo.com</span>. Demo data.
       </figcaption>
     </figure>
@@ -294,9 +343,9 @@ const chains: Chain[] = [
   },
 ];
 
-// The P0 path is the live connection (kiwi); the rest stay faded camel infrastructure until hovered.
-const inkLine = (lead: boolean) => (lead ? "bg-kiwi" : "bg-camel/30 group-hover:bg-camel");
-const inkBorder = (lead: boolean) => (lead ? "border-camel" : "border-camel/30 group-hover:border-camel");
+// The P0 path is the live connection (lime); the rest stay faded silver infrastructure until hovered.
+const inkLine = (lead: boolean) => (lead ? "bg-lime" : "bg-silver/30 group-hover:bg-silver");
+const inkBorder = (lead: boolean) => (lead ? "border-silver" : "border-silver/30 group-hover:border-silver");
 
 function Connector({ lead }: { lead: boolean }) {
   return (
@@ -313,6 +362,7 @@ function Connector({ lead }: { lead: boolean }) {
 function ChainRow({ chain, lead }: { chain: Chain; lead: boolean }) {
   return (
     <li className="group py-6 first:pt-0 last:pb-0">
+      <MaybeScope on={lead}>
       <div className="flex flex-col lg:flex-row lg:items-stretch">
         <div className={cn("flex items-center self-start border-[1.5px] border-dashed px-3 py-2 transition-colors lg:self-center", inkBorder(lead))}>
           <span className="field-label">Internet</span>
@@ -322,7 +372,7 @@ function ChainRow({ chain, lead }: { chain: Chain; lead: boolean }) {
             <Connector lead={lead} />
             <div
               className={cn(
-                "min-w-0 border-[1.5px] bg-navy-raised px-3 py-2 transition-colors lg:w-[11.5rem] lg:shrink-0",
+                "min-w-0 border-[1.5px] bg-ink-raised px-3 py-2 transition-colors lg:w-[11.5rem] lg:shrink-0",
                 node.severity === "critical" ? "border-severity-critical" : inkBorder(lead),
               )}
             >
@@ -356,8 +406,13 @@ function ChainRow({ chain, lead }: { chain: Chain; lead: boolean }) {
       <p className="mt-2 pl-6 text-[13px] text-fg-soft lg:pl-0">
         Fix: <span className="font-semibold text-fg">{chain.fix}</span>
       </p>
+      </MaybeScope>
     </li>
   );
+}
+
+function MaybeScope({ on, children }: { on: boolean; children: ReactNode }) {
+  return on ? <ScopeFrame>{children}</ScopeFrame> : <>{children}</>;
 }
 
 /* ---------- Exhibit C: the analyst memo ---------- */
@@ -367,19 +422,19 @@ function Memo() {
   return (
     <article className="sheet px-5 py-7 sm:px-10 sm:py-10" aria-label="Analyst memorandum">
       <div className="display text-[2rem] font-extrabold uppercase leading-none tracking-[0.04em]">Memorandum</div>
-      <dl className="mono mt-5 grid grid-cols-[4.5rem_minmax(0,1fr)] gap-y-1 border-b-2 border-camel pb-4 text-[13.5px]">
-        <dt className="text-camel">TO:</dt>
+      <dl className="mono mt-5 grid grid-cols-[4.5rem_minmax(0,1fr)] gap-y-1 border-b-2 border-silver pb-4 text-[13.5px]">
+        <dt className="text-silver">TO:</dt>
         <dd>Engineering, {project.root_domain}</dd>
-        <dt className="text-camel">FROM:</dt>
+        <dt className="text-silver">FROM:</dt>
         <dd>ShadowScope analyst (Gemini)</dd>
-        <dt className="text-camel">DATE:</dt>
+        <dt className="text-silver">DATE:</dt>
         <dd>{date}</dd>
-        <dt className="text-camel">RE:</dt>
+        <dt className="text-silver">RE:</dt>
         <dd className="font-bold">What to fix first</dd>
       </dl>
       <p className="mt-5 max-w-[68ch] text-[15px] leading-relaxed text-fg">{analysis.executive_summary}</p>
 
-      <ol className="mt-6 divide-y divide-camel/15 border-y border-camel/15">
+      <ol className="mt-6 divide-y divide-silver/15 border-y border-silver/15">
         {analysis.findings.map((f) => {
           const p0 = f.suggested_priority === "P0";
           return (
@@ -387,7 +442,7 @@ function Memo() {
               <span
                 className={cn(
                   "h-fit self-start px-1.5 py-0.5 text-center font-mono text-[13px] font-bold",
-                  p0 ? "bg-kiwi text-navy" : "border-[1.5px] border-camel text-fg",
+                  p0 ? "bg-lime text-ink" : "border-[1.5px] border-silver text-fg",
                 )}
               >
                 {f.suggested_priority}
@@ -525,36 +580,24 @@ const footerSections: FooterSection[] = [
   },
 ];
 
-function Wordmark() {
-  return (
-    <Link to="/" className="flex items-center gap-2.5 text-fg">
-      <svg viewBox="0 0 32 32" className="h-7 w-7" aria-hidden="true">
-        <path className="fill-camel" d="M2 8.5h10l2.5-3H30v22H2z" />
-        <path className="fill-navy" d="M6 14h20v3H6zm0 6h13v3H6z" />
-      </svg>
-      <span className="display text-[1.35rem] font-extrabold uppercase tracking-[0.02em]">ShadowScope</span>
-    </Link>
-  );
-}
-
 function FooterLinks({ title, links }: FooterSection) {
   return (
     <div>
-      <h3 className="field-label mb-4 border-b border-camel/30 pb-2">{title}</h3>
+      <h3 className="field-label mb-4 border-b border-silver/30 pb-2">{title}</h3>
       <ul className="space-y-2.5">
         {links.map(({ label, href }) => (
           <li key={`${href}-${label}`}>
             {href.startsWith("#") ? (
               <a
                 href={href}
-                className="text-[13px] text-fg-soft transition-colors hover:text-kiwi hover:underline"
+                className="text-[13px] text-fg-soft transition-colors hover:text-lime hover:underline"
               >
                 {label}
               </a>
             ) : (
               <Link
                 to={href}
-                className="text-[13px] text-fg-soft transition-colors hover:text-kiwi hover:underline"
+                className="text-[13px] text-fg-soft transition-colors hover:text-lime hover:underline"
               >
                 {label}
               </Link>
@@ -566,35 +609,26 @@ function FooterLinks({ title, links }: FooterSection) {
   );
 }
 
-function SectionLabel({ children }: { children: ReactNode }) {
-  return (
-    <span className="field-label inline-flex items-center gap-2">
-      <span className="signal-dot" aria-hidden="true" />
-      {children}
-    </span>
-  );
-}
-
 export function LandingPage() {
   return (
     <div className="grain min-h-screen overflow-x-clip text-fg">
       <ClassificationBand>Passive recon only // AI-powered intelligence // Demo data: acme-demo.com</ClassificationBand>
 
       <header className="mx-auto flex max-w-[1320px] items-center justify-between gap-4 px-4 py-5 md:px-8">
-        <Wordmark />
+        <Logo to="/" />
         <div className="flex items-center gap-4 sm:gap-6">
           <nav aria-label="Page sections" className="hidden items-center gap-7 lg:flex">
             {navLinks.map(([href, label]) => (
-              <a key={href} href={href} className="text-sm font-semibold text-fg-soft transition-colors hover:text-kiwi">
+              <a key={href} href={href} className="text-sm font-semibold text-fg-soft transition-colors hover:text-lime">
                 {label}
               </a>
             ))}
           </nav>
           <nav aria-label="Account" className="hidden items-center gap-4 sm:flex">
-            <Link to="/signin" className="text-sm font-semibold text-fg-soft transition-colors hover:text-kiwi">
+            <Link to="/signin" className="text-sm font-semibold text-fg-soft transition-colors hover:text-lime">
               Sign in
             </Link>
-            <Link to="/signup" className="text-sm font-semibold text-fg-soft transition-colors hover:text-kiwi">
+            <Link to="/signup" className="text-sm font-semibold text-fg-soft transition-colors hover:text-lime">
               Create account
             </Link>
           </nav>
@@ -608,8 +642,7 @@ export function LandingPage() {
         {/* Hero: the file itself */}
         <section className="mx-auto grid max-w-[1320px] items-center gap-12 px-4 pb-24 pt-6 md:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)] lg:gap-16 lg:pb-28 lg:pt-10">
           <div>
-            <SectionLabel>AI-Powered Cybersecurity Intelligence</SectionLabel>
-            <h1 className="display mt-5 max-w-[11ch] text-[clamp(3.1rem,7.4vw,5.6rem)] font-extrabold leading-[0.9] tracking-[-0.02em] [text-wrap:balance]">
+            <h1 className="display max-w-[11ch] text-[clamp(3.1rem,7.4vw,5.6rem)] font-extrabold leading-[0.9] tracking-[-0.02em] [text-wrap:balance]">
               See Beyond the Surface.
             </h1>
             <p className="mt-7 max-w-[34rem] text-[1.05rem] leading-relaxed text-fg-soft">
@@ -632,24 +665,29 @@ export function LandingPage() {
         </section>
 
         {/* How ShadowScope Works */}
-        <section id="how-it-works" className="scroll-mt-4 border-t-2 border-camel">
+        <section id="how-it-works" className="scroll-mt-4 border-t-2 border-silver">
           <div className="mx-auto max-w-[1320px] px-4 py-20 md:px-8 lg:py-28">
-            <SectionLabel>Four steps, from domain to action</SectionLabel>
-            <h2 className="display mt-4 max-w-[18ch] text-[clamp(2.3rem,4.6vw,3.9rem)] font-extrabold leading-[0.92] [text-wrap:balance]">
+            <h2 className="display max-w-[18ch] text-[clamp(2.3rem,4.6vw,3.9rem)] font-extrabold leading-[0.92] [text-wrap:balance]">
               How ShadowScope Works
             </h2>
             <p className="mt-6 max-w-[52ch] text-[1.05rem] leading-relaxed text-fg-soft">
               No security background needed. Verify what you own, see what an outsider could see, and get a short,
               evidence-backed list of what to do next.
             </p>
-            <ol className="mt-12 grid gap-px border border-camel/30 bg-camel/20 sm:grid-cols-2 lg:grid-cols-4">
-              {steps.map((s) => (
-                <li key={s.n} className="bg-navy-raised p-5 sm:p-6">
-                  <span className="mono text-[13px] font-bold text-kiwi">{s.n}</span>
-                  <h3 className="display mt-3 border-b border-camel/30 pb-2 text-xl font-extrabold uppercase">
-                    {s.title}
-                  </h3>
-                  <p className="mt-3 text-[14px] leading-relaxed text-fg-soft">{s.body}</p>
+            <ol className="relative mt-14 grid gap-10 lg:grid-cols-4 lg:gap-10">
+              {/* the line every step sits on: out of the shadow, into the scope */}
+              <span
+                aria-hidden="true"
+                className="absolute bottom-4 left-[13px] top-4 w-0.5 bg-gradient-to-b from-silver/20 to-silver lg:bottom-auto lg:left-4 lg:right-4 lg:top-[13px] lg:h-0.5 lg:w-auto lg:bg-gradient-to-r"
+              />
+              {steps.map((s, i) => (
+                <li key={s.n} className="relative pl-12 lg:pl-0 lg:pt-14">
+                  <span aria-hidden="true" className="absolute left-0 top-0">
+                    <ScopeMark className={cn("h-7 w-7", i < steps.length - 1 && "opacity-50")} />
+                  </span>
+                  <span className="mono text-[13px] font-bold text-silver">{s.n}</span>
+                  <h3 className="display mt-1 text-xl font-extrabold uppercase">{s.title}</h3>
+                  <p className="mt-2 max-w-[34ch] text-[14px] leading-relaxed text-fg-soft">{s.body}</p>
                 </li>
               ))}
             </ol>
@@ -657,12 +695,11 @@ export function LandingPage() {
         </section>
 
         {/* Key Features */}
-        <section id="features" className="scroll-mt-4 border-t-2 border-camel">
+        <section id="features" className="scroll-mt-4 border-t-2 border-silver">
           <div className="mx-auto max-w-[1320px] px-4 py-20 md:px-8 lg:py-28">
             <div className="flex flex-wrap items-end justify-between gap-6">
               <div>
-                <SectionLabel>Capabilities on file</SectionLabel>
-                <h2 className="display mt-4 max-w-[14ch] text-[clamp(2.3rem,4.6vw,3.9rem)] font-extrabold leading-[0.92] [text-wrap:balance]">
+                <h2 className="display max-w-[14ch] text-[clamp(2.3rem,4.6vw,3.9rem)] font-extrabold leading-[0.92] [text-wrap:balance]">
                   Key Features
                 </h2>
               </div>
@@ -670,27 +707,25 @@ export function LandingPage() {
                 These capabilities are part of the working demo. Each one stays tied to the evidence behind it.
               </p>
             </div>
-            <ul className="mt-12 grid gap-px border border-camel/30 bg-camel/20 sm:grid-cols-2 lg:grid-cols-3">
-              {features.map((f, i) => (
-                <li key={f.title} className="bg-navy-raised p-5 sm:p-6">
-                  <div className="field-label flex items-center justify-between">
-                    <span>Capability {String(i + 1).padStart(2, "0")}</span>
-                    <span className="signal-dot" aria-hidden="true" />
-                  </div>
-                  <h3 className="display mt-3 text-[1.15rem] font-extrabold uppercase leading-snug">{f.title}</h3>
-                  <p className="mt-2 text-[14px] leading-relaxed text-fg-soft">{f.body}</p>
-                </li>
+            <dl className="mt-12 border-t-2 border-silver">
+              {features.map((f) => (
+                <div
+                  key={f.title}
+                  className="grid gap-x-12 gap-y-1.5 border-b border-silver/25 py-5 transition-colors hover:bg-silver/[0.04] md:grid-cols-[minmax(0,19rem)_minmax(0,1fr)] md:py-6"
+                >
+                  <dt className="display text-[1.15rem] font-extrabold uppercase leading-snug">{f.title}</dt>
+                  <dd className="max-w-[62ch] text-[14.5px] leading-relaxed text-fg-soft">{f.body}</dd>
+                </div>
               ))}
-            </ul>
+            </dl>
           </div>
         </section>
 
         {/* Powered by Google Gemini */}
-        <section id="gemini" className="scroll-mt-4 border-t-2 border-camel">
+        <section id="gemini" className="scroll-mt-4 border-t-2 border-silver">
           <div className="mx-auto grid max-w-[1320px] gap-12 px-4 py-20 md:px-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:py-28">
             <div>
-              <SectionLabel>Powered by Google Gemini</SectionLabel>
-              <h2 className="display mt-4 text-[clamp(2.3rem,4.6vw,3.9rem)] font-extrabold leading-[0.92] [text-wrap:balance]">
+              <h2 className="display text-[clamp(2.3rem,4.6vw,3.9rem)] font-extrabold leading-[0.92] [text-wrap:balance]">
                 An analyst that shows its sources.
               </h2>
               <p className="mt-6 max-w-[42ch] text-[1.05rem] leading-relaxed text-fg-soft">
@@ -703,7 +738,7 @@ export function LandingPage() {
               </p>
             </div>
             <div className="sheet trace-line p-5 sm:p-8">
-              <dl className="divide-y divide-camel/15 border-y-2 border-camel">
+              <dl className="divide-y divide-silver/15 border-y-2 border-silver">
                 {[
                   ["In", "Headers, certificates, hosts, advisories, and manifests collected for the project"],
                   ["Model", "Google Gemini reads only that collected evidence"],
@@ -723,7 +758,7 @@ export function LandingPage() {
         </section>
 
         {/* Exhibit A — Discover */}
-        <section id="discover" className="scroll-mt-4 border-t-2 border-camel">
+        <section id="discover" className="scroll-mt-4 border-t-2 border-silver">
           <div className="mx-auto grid max-w-[1320px] gap-12 px-4 py-20 md:px-8 lg:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)] lg:py-28">
             <div>
               <h2 className="display text-[clamp(2.3rem,4.6vw,3.9rem)] font-extrabold leading-[0.92] [text-wrap:balance]">
@@ -733,13 +768,13 @@ export function LandingPage() {
                 Your infrastructure talks before anyone knocks. Certificate logs list every name you’ve issued a certificate
                 for, DNS resolves them, and every response header admits what’s running.
               </p>
-              <dl className="mt-9 border-t-2 border-camel">
+              <dl className="mt-9 border-t-2 border-silver">
                 {[
                   ["Certificate Transparency", `${assets.length} hostnames`],
                   ["DNS", `${assets.length} resolved · 203.0.113.0/24`],
                   ["HTTP + TLS metadata", `${ruleFindings} rule findings`],
                 ].map(([k, v]) => (
-                  <div key={k} className="flex items-baseline justify-between gap-4 border-b border-camel/30 py-3">
+                  <div key={k} className="flex items-baseline justify-between gap-4 border-b border-silver/30 py-3">
                     <dt className="text-sm font-semibold">{k}</dt>
                     <dd className="mono tabular text-[13.5px] text-fg-soft">{v}</dd>
                   </div>
@@ -751,7 +786,7 @@ export function LandingPage() {
         </section>
 
         {/* Exhibit B — Correlate */}
-        <section id="correlate" className="scroll-mt-4 border-t-2 border-camel">
+        <section id="correlate" className="scroll-mt-4 border-t-2 border-silver">
           <div className="mx-auto max-w-[1320px] px-4 py-20 md:px-8 lg:py-28">
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-end lg:gap-16">
               <h2 className="display text-[clamp(2.3rem,4.6vw,3.9rem)] font-extrabold leading-[0.92] [text-wrap:balance]">
@@ -763,14 +798,14 @@ export function LandingPage() {
               </p>
             </div>
             <div className="sheet mt-12 px-5 py-8 sm:px-8 sm:py-10">
-              <ol aria-label="Exposure paths" className="divide-y divide-camel/15">
+              <ol aria-label="Exposure paths" className="divide-y divide-silver/15">
                 {chains.map((c, i) => (
                   <ChainRow key={c.id} chain={c} lead={i === 0} />
                 ))}
               </ol>
-              <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-camel/20 pt-4 text-[13px] text-fg-soft">
+              <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-silver/20 pt-4 text-[13px] text-fg-soft">
                 <span>Potential exposure paths, not confirmed attack chains. Ranked by priority.</span>
-                <Link to={`${DEMO}/graph`} className="inline-flex items-center gap-1.5 font-semibold text-fg underline underline-offset-4 hover:text-kiwi">
+                <Link to={`${DEMO}/graph`} className="inline-flex items-center gap-1.5 font-semibold text-fg underline underline-offset-4 hover:text-lime">
                   See every path in the demo <ArrowRight size={14} aria-hidden="true" />
                 </Link>
               </div>
@@ -779,7 +814,7 @@ export function LandingPage() {
         </section>
 
         {/* Exhibit C — Prioritize */}
-        <section id="prioritize" className="scroll-mt-4 border-t-2 border-camel">
+        <section id="prioritize" className="scroll-mt-4 border-t-2 border-silver">
           <div className="mx-auto grid max-w-[1320px] gap-12 px-4 py-20 md:px-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] lg:py-28">
             <div className="order-2 lg:order-1">
               <Memo />
@@ -800,21 +835,19 @@ export function LandingPage() {
         </section>
 
         {/* Why ShadowScope */}
-        <section id="why" className="scroll-mt-4 border-t-2 border-camel">
+        <section id="why" className="scroll-mt-4 border-t-2 border-silver">
           <div className="mx-auto max-w-[1320px] px-4 py-20 md:px-8 lg:py-28">
-            <SectionLabel>Why ShadowScope?</SectionLabel>
-            <h2 className="display mt-4 max-w-[18ch] text-[clamp(2.3rem,4.6vw,3.9rem)] font-extrabold leading-[0.92] [text-wrap:balance]">
+            <h2 className="display max-w-[18ch] text-[clamp(2.3rem,4.6vw,3.9rem)] font-extrabold leading-[0.92] [text-wrap:balance]">
               Clarity is the feature.
             </h2>
             <p className="mt-6 max-w-[52ch] text-[1.05rem] leading-relaxed text-fg-soft">
               ShadowScope is built for people who need to act on security findings, not just collect them. Our mission is
               making cybersecurity smarter, simpler, and more accessible through AI-powered security intelligence.
             </p>
-            <div className="mt-12 grid gap-x-10 gap-y-8 border-t-2 border-camel sm:grid-cols-2">
-              {reasons.map((r, i) => (
-                <div key={r.title} className="border-b border-camel/30 pb-6">
-                  <span className="mono text-[13px] font-bold text-kiwi">0{i + 1}</span>
-                  <h3 className="display mt-2 text-xl font-extrabold uppercase">{r.title}</h3>
+            <div className="mt-12 grid gap-x-10 border-t-2 border-silver sm:grid-cols-2">
+              {reasons.map((r) => (
+                <div key={r.title} className="border-b border-silver/30 pb-6 pt-6">
+                  <h3 className="display text-xl font-extrabold uppercase">{r.title}</h3>
                   <p className="mt-2 text-[14px] leading-relaxed text-fg-soft">{r.body}</p>
                 </div>
               ))}
@@ -822,32 +855,32 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* Rules of engagement: the quiet deep-navy passage */}
-        <section id="scope" className="scroll-mt-0 border-y border-camel/25 bg-navy-deep text-fg">
+        {/* Rules of engagement: the quiet deep-ink passage */}
+        <section id="scope" className="scroll-mt-0 border-y border-silver/25 bg-ink-deep text-fg">
           <div className="mx-auto max-w-[1320px] px-4 py-20 md:px-8 lg:py-28">
             <h2 className="display max-w-[20ch] text-[clamp(2.3rem,4.6vw,3.9rem)] font-extrabold leading-[0.92] [text-wrap:balance]">
               Passive by design. Authorized by rule.
             </h2>
             <div className="mt-12 grid gap-12 md:grid-cols-2 md:gap-16">
               <div>
-                <h3 className="border-b border-camel/40 pb-2 font-display text-sm font-extrabold uppercase tracking-[0.18em] text-camel" style={{ fontStretch: "85%" }}>
+                <h3 className="border-b border-silver/40 pb-2 font-display text-sm font-extrabold uppercase tracking-[0.18em] text-silver" style={{ fontStretch: "85%" }}>
                   It reads
                 </h3>
                 <ul className="mt-2">
                   {reads.map((r) => (
-                    <li key={r} className="flex items-center gap-3 border-b border-camel/15 py-3 text-[1.05rem]">
-                      <span className="text-camel"><Box checked /></span> {r}
+                    <li key={r} className="flex items-center gap-3 border-b border-silver/15 py-3 text-[1.05rem]">
+                      <span className="text-silver"><Box checked /></span> {r}
                     </li>
                   ))}
                 </ul>
               </div>
               <div>
-                <h3 className="border-b border-camel/40 pb-2 font-display text-sm font-extrabold uppercase tracking-[0.18em] text-camel" style={{ fontStretch: "85%" }}>
+                <h3 className="border-b border-silver/40 pb-2 font-display text-sm font-extrabold uppercase tracking-[0.18em] text-silver" style={{ fontStretch: "85%" }}>
                   It never does
                 </h3>
                 <ul className="mt-2">
                   {never.map((r) => (
-                    <li key={r} className="flex items-center gap-3 border-b border-camel/15 py-3 text-[1.05rem] text-fg-soft">
+                    <li key={r} className="flex items-center gap-3 border-b border-silver/15 py-3 text-[1.05rem] text-fg-soft">
                       <span className="text-fg-faint"><Box checked={false} /></span> {r}
                     </li>
                   ))}
@@ -862,9 +895,9 @@ export function LandingPage() {
         </section>
 
         {/* Final call to action */}
-        <section id="get-started" className="mx-auto max-w-[1320px] px-4 py-24 md:px-8 lg:py-32">
-          <SectionLabel>See Beyond the Surface.</SectionLabel>
-          <h2 className="display mt-4 max-w-[16ch] text-[clamp(2.6rem,6vw,5rem)] font-extrabold leading-[0.9] [text-wrap:balance]">
+        <section id="get-started" className="relative mx-auto max-w-[1320px] px-4 py-24 md:px-8 lg:py-32">
+          <ScopeMark className="pointer-events-none absolute right-8 top-1/2 hidden h-[24rem] w-[24rem] -translate-y-1/2 opacity-[0.14] lg:block" />
+          <h2 className="display max-w-[16ch] text-[clamp(2.6rem,6vw,5rem)] font-extrabold leading-[0.9] [text-wrap:balance]">
             Know what’s exposed before someone else does.
           </h2>
           <p className="mt-6 max-w-[52ch] text-[1.05rem] leading-relaxed text-fg-soft">
@@ -882,11 +915,11 @@ export function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t-2 border-camel">
+      <footer className="border-t-2 border-silver">
         <div className="mx-auto max-w-[1320px] px-4 py-14 md:px-8">
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(3,1fr)] lg:gap-12">
             <div>
-              <Wordmark />
+              <Logo to="/" />
               <p className="mt-4 max-w-[34ch] text-[13px] leading-relaxed text-fg-soft">
                 See Beyond the Surface. AI-powered cybersecurity intelligence, built at HackWestern 13. acme-demo.com,
                 203.0.113.0/24, and every scan shown here are synthetic demo data.

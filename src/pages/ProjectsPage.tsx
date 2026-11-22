@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { AccountMenu } from "@/components/AccountMenu";
 import { ClassificationBand } from "@/components/ClassificationBand";
+import { Logo } from "@/components/Logo";
 import { EmptyState } from "@/components/EmptyState";
 import { PageSkeleton } from "@/components/LoadingSkeleton";
 import { useProjects } from "@/hooks/useProjects";
@@ -16,13 +17,11 @@ export function ProjectsPage() {
       <ClassificationBand>Passive recon only // Authorized targets</ClassificationBand>
       <div className="mx-auto max-w-4xl px-4 py-8">
         <header className="flex flex-wrap items-center justify-between gap-3">
-          <Link to="/" className="display text-[1.35rem] font-extrabold uppercase">
-            ShadowScope
-          </Link>
+          <Logo to="/" />
           <AccountMenu />
         </header>
         <div className="sheet mt-6 p-5 sm:p-8">
-          <div className="flex flex-wrap items-end justify-between gap-4 border-b-2 border-camel pb-4">
+          <div className="flex flex-wrap items-end justify-between gap-4 border-b-2 border-silver pb-4">
             <div>
               <h1 className="display text-[2rem] font-extrabold leading-none">Your files</h1>
               <p className="mt-2 text-sm text-fg-soft">One project per root domain you're authorized to assess.</p>
@@ -48,10 +47,10 @@ export function ProjectsPage() {
               />
             </div>
           ) : (
-            <ul className="mt-2 divide-y divide-camel/15">
+            <ul className="mt-2 divide-y divide-silver/15">
               {projects.data.map((p) => (
                 <li key={p.id}>
-                  <Link to={`/projects/${p.id}`} className="grid gap-1 px-2 py-4 transition-colors hover:bg-camel/10 sm:grid-cols-[1fr_auto] sm:items-center">
+                  <Link to={`/projects/${p.id}`} className="grid gap-1 px-2 py-4 transition-colors hover:bg-silver/10 sm:grid-cols-[1fr_auto] sm:items-center">
                     <span>
                       <span className="block font-semibold">{p.name}</span>
                       <span className="mono text-[13px] text-fg-soft">{p.root_domain}</span>

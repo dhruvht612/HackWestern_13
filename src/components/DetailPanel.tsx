@@ -16,10 +16,10 @@ export function DetailPanel({
   if (!open) return null;
   return (
     <aside
-      className="sheet sticky top-4 h-fit max-h-[calc(100vh-7rem)] overflow-auto border border-camel/25 p-5"
+      className="sheet sticky top-4 h-fit max-h-[calc(100vh-7rem)] overflow-auto border border-silver/25 p-5"
       aria-label={title}
     >
-      <div className="mb-4 flex items-start justify-between gap-3 border-b-2 border-camel pb-3">
+      <div className="mb-4 flex items-start justify-between gap-3 border-b-2 border-silver pb-3">
         <h3 className="min-w-0 break-words text-lg font-semibold leading-snug">{title}</h3>
         <button
           onClick={onClose}
