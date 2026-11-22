@@ -93,6 +93,7 @@ export const json = (method: string, body?: unknown): RequestInit => ({ method, 
 const demoProject = (): Project => ({
   ...clone<Project>(fixtures.project),
   verification_status: "verified",
+  authorization: "approved",
   verified_at: fixtures.project.created_at,
   latest_scan_id: DEMO_SCAN_ID,
 });
@@ -102,7 +103,8 @@ export const api = {
   signUp: (email: string, password: string) => request<SignUpResult>("/auth/signup", json("POST", { email, password })),
   signIn: (email: string, password: string) => request<AuthSession>("/auth/signin", json("POST", { email, password })),
   signOut: () => request<void>("/auth/signout", { method: "POST" }).catch(() => undefined),
-  me: () => request<AuthUser>("/auth/me"),
+  me: (): Promise<AuthUser> =>
+    USE_MOCKS ? delay().then(() => ({ id: "demo-user", email: null, status: "active", aal: "aal1" as const })) : request<AuthUser>("/auth/me"),
 
   // --- two-factor
   async mfaFactors(): Promise<MfaFactor[]> {

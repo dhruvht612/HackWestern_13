@@ -1,4 +1,4 @@
-# AttackSurface — Product Requirements
+# ShadowScope — Product Requirements
 
 **Status:** v1 built and validated on a live domain (HackWestern 13) · **Last updated:** 2026-11-21
 Related: [PRODUCT.md](PRODUCT.md) (product truth) · [DESIGN.md](DESIGN.md) (visual system) · [ARCHITECTURE.md](ARCHITECTURE.md) · [AI-AGENT.md](AI-AGENT.md) · [shared/api-contract.md](shared/api-contract.md)
@@ -9,7 +9,7 @@ Teams don't know what an outsider can see of their infrastructure. Subdomains le
 
 ## 2. Product
 
-AttackSurface builds the file an attacker would keep on you, then tells you what to fix first. Given a root domain the user has proven they control, it runs one pipeline:
+ShadowScope builds the file an attacker would keep on you, then tells you what to fix first. Given a root domain the user has proven they control, it runs one pipeline:
 
 1. **Discover:** passively map exposed assets from Certificate Transparency logs, DNS, and HTTP/TLS metadata.
 2. **Correlate:** link each exposed host to the vulnerable dependencies running behind it, so findings form exposure paths rather than two lists.
@@ -39,7 +39,7 @@ AttackSurface builds the file an attacker would keep on you, then tells you what
 
 ## 5. User stories
 
-1. As a visitor, I can understand what AttackSurface does from the landing page and open a demo without signing up.
+1. As a visitor, I can understand what ShadowScope does from the landing page and open a demo without signing up.
 2. As a user, I can sign up and sign in with email and password; my projects are visible only to me.
 3. As a user, I can create a project by naming it and entering a root domain.
 4. As a user, I can prove I control the domain by adding a DNS TXT record, and scanning stays locked until I do.

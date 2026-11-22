@@ -31,7 +31,7 @@ def _stamp() -> str:
 
 
 class _Resp:
-    def __init__(self, data: list[dict[str, Any]]) -> None:
+    def __init__(self, data: Any) -> None:
         self.data = data
 
 
@@ -78,6 +78,10 @@ class _Query:
 
     def lte(self, col: str, val: Any) -> _Query:
         self.filters.append(lambda r: r.get(col) is not None and str(r[col]) <= str(val))
+        return self
+
+    def gte(self, col: str, val: Any) -> _Query:
+        self.filters.append(lambda r: r.get(col) is not None and str(r[col]) >= str(val))
         return self
 
     def lt(self, col: str, val: Any) -> _Query:
@@ -142,7 +146,8 @@ class _RpcCall:
 
     def execute(self) -> _Resp:
         self.db.rpc_calls.append((self.name, copy.deepcopy(self.params)))
-        return _Resp([self.db.rpc_handlers[self.name](self.params)])
+        result = self.db.rpc_handlers[self.name](self.params)
+        return _Resp([result] if self.name == "admin_set_user_status" else result)
 
 
 class FakeSupabase:

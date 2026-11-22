@@ -1,4 +1,4 @@
-# AttackSurface API
+# ShadowScope API
 
 FastAPI backend in `backend/attacksurface/`, managed with [uv](https://docs.astral.sh/uv/). Python 3.12.
 
@@ -43,4 +43,12 @@ The admin portal (see `../ADMIN-PANEL.md`) needs its schema and one operator bef
    insert into admin_users (user_id, role) select id, 'operator' from auth.users where email = '<operator email>';
    ```
 4. Sign in as that account and set up two-factor at `/account/security`. With `APP_ENV=production`,
-   admin routes refuse sessions without two-factor (`ADMIN_REQUIRE_MFA`).
+   admin routes always require two-factor.
+5. Start the worker with `uv run --locked python -m attacksurface.worker` from `backend/`. Keep one
+   worker running to process account bans and review advice, update its heartbeat, and prune
+   security events after 90 days. Audit entries have separate retention.
+
+Review routing requires a current DNS proof before an operator can approve a domain for scanning.
+Set `REVIEW_ALL_DOMAINS=true` to send every newly routed verified domain to manual review.
+DNS rechecks compare against the hash from the last verified challenge. A legacy project with no
+stored hash needs a new owner-issued challenge before an operator can recheck it.

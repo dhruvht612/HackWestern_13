@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import time
+from ipaddress import ip_address
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
@@ -14,6 +15,7 @@ from attacksurface.jwt import CurrentUser, get_bearer_token, get_current_user
 from attacksurface.mfa import GoTrueMfa, MfaRejected, MfaUnavailable, get_mfa
 from attacksurface.netinfo import client_ip
 from attacksurface.ratelimit import limiter
+from attacksurface.risk_signals import signup_signals
 from attacksurface.schemas import (
     AuthSession,
     AuthUser,
@@ -51,18 +53,35 @@ def _limit(request: Request, action: str, per_min: int) -> None:
 def sign_up(payload: SignUpModel, request: Request, auth: Any = Depends(get_auth_client), db: Any = Depends(get_db)) -> SignUpResult:  # noqa: B008
     _limit(request, "signup", 5)
     try:
-        res = auth.auth.sign_up({"email": payload.email, "password": payload.password})
+        res = auth.auth.sign_up({
+            "email": payload.email, "password": payload.password,
+            "options": {"data": {"shadowscope_assess_signup": True}},
+        })
     except AuthApiError as exc:
         raise HTTPException(status_code=400, detail=exc.message or "Sign-up failed") from None
     except AuthError:
         raise HTTPException(status_code=502, detail="Authentication service unavailable") from None
     if res.user is None:
         raise HTTPException(status_code=400, detail="Sign-up failed")
-    user = AuthUser(id=str(res.user.id), email=res.user.email)
-    events.record(db, "signup", user_id=user.id, ip=client_ip(request), subject=events.email_domain(payload.email))
+    raw_ip = client_ip(request)
+    try:
+        caller = str(ip_address(raw_ip)) if raw_ip else None
+    except ValueError:
+        caller = None
+    account_id = str(res.user.id)
+    _, signals = signup_signals(db, res.user.email, caller)
+    pending = db.rpc("route_signup", {"p_user": account_id, "p_ip": caller, "p_signals": signals}).execute().data
+    status = "pending_review" if pending else "active"
+    user = AuthUser(id=account_id, email=res.user.email, status=status)
+    events.record(db, "signup", user_id=user.id, ip=raw_ip, subject=events.email_domain(payload.email))
+    if pending:
+        events.record(db, "review_queued", user_id=user.id, ip=caller, detail={"kind": "user"})
     if res.session is None:  # project requires email confirmation
         return SignUpResult(user=user, message="Check your email to confirm the account, then sign in.")
-    return SignUpResult(user=user, session=_session_out(res.session, res.user), message="Account created.")
+    session = _session_out(res.session, res.user)
+    session.user = user
+    message = "Account created. Scan access is awaiting review." if pending else "Account created."
+    return SignUpResult(user=user, session=session, message=message)
 
 
 @router.post("/signin", response_model=AuthSession)

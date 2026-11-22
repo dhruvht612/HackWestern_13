@@ -283,7 +283,7 @@
 - Test: `backend/tests/test_auth.py`
 
 **Interfaces:**
-- Produces `class GoTrueMfa` with `list_factors(token) -> list[dict]` (from `GET {supabase_url}/auth/v1/user` → `factors`), `enroll(token) -> dict` (`POST /auth/v1/factors` `{"factor_type": "totp", "friendly_name": "AttackSurface"}`), `challenge(token, factor_id) -> str` (`POST /auth/v1/factors/{id}/challenge` → `id`), and `verify(token, factor_id, challenge_id, code) -> dict` (`POST /auth/v1/factors/{id}/verify` → session JSON).
+- Produces `class GoTrueMfa` with `list_factors(token) -> list[dict]` (from `GET {supabase_url}/auth/v1/user` → `factors`), `enroll(token) -> dict` (`POST /auth/v1/factors` `{"factor_type": "totp", "friendly_name": "ShadowScope"}`), `challenge(token, factor_id) -> str` (`POST /auth/v1/factors/{id}/challenge` → `id`), and `verify(token, factor_id, challenge_id, code) -> dict` (`POST /auth/v1/factors/{id}/verify` → session JSON).
   - Every request sends headers `apikey: SUPABASE_ANON_KEY`, `Authorization: Bearer <token>`, and a 10 s timeout.
   - GoTrue HTTP 4xx raises `MfaRejected`; transport errors and 5xx raise `MfaUnavailable`.
 - Produces the dependencies `get_mfa() -> GoTrueMfa` (tests override) and `get_bearer_token(credentials) -> str`.

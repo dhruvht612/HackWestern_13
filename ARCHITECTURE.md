@@ -1,4 +1,4 @@
-# AttackSurface — Architecture
+# ShadowScope — Architecture
 
 **Last updated:** 2026-11-21 · Related: [PRD.md](PRD.md) · [AI-AGENT.md](AI-AGENT.md) · [DESIGN.md](DESIGN.md) · [shared/api-contract.md](shared/api-contract.md)
 

@@ -23,7 +23,7 @@ export function ReasonForm({
   const [reason, setReason] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
-  const valid = reason.trim().length >= MIN;
+  const valid = reason.trim().length >= MIN && reason.trim().length <= MAX;
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();

@@ -30,7 +30,7 @@ def test_backend_imports_without_credentials(client) -> None:
 def test_admin_require_mfa_defaults() -> None:
     assert settings_from_env({"APP_ENV": "production"}).admin_require_mfa is True
     assert settings_from_env({"APP_ENV": "development"}).admin_require_mfa is False
-    assert settings_from_env({"APP_ENV": "production", "ADMIN_REQUIRE_MFA": "false"}).admin_require_mfa is False
+    assert settings_from_env({"APP_ENV": "production", "ADMIN_REQUIRE_MFA": "false"}).admin_require_mfa is True
 
 
 def test_trusted_proxy_count() -> None:

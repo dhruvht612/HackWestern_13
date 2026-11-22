@@ -7,15 +7,17 @@ import { api, apiConfig } from "@/lib/api";
 import { session, useSession } from "@/lib/session";
 import { cn } from "@/lib/utils";
 
-export function SignInPage() {
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+export function SignInPage({ mode: requestedMode }: { mode?: "signin" | "signup" }) {
+  const [params] = useSearchParams();
+  const initialMode =
+    requestedMode === "signup" || params.get("mode") === "signup" ? "signup" : "signin";
+  const [mode, setMode] = useState<"signin" | "signup">(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const navigate = useNavigate();
-  const [params] = useSearchParams();
   const next = params.get("next")?.startsWith("/") ? params.get("next")! : "/projects";
   const current = useSession();
 
@@ -54,6 +56,15 @@ export function SignInPage() {
         <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-fg-soft hover:text-fg hover:underline">
           <ArrowLeft size={15} aria-hidden="true" /> Back
         </Link>
+
+        <div className="mt-6 flex items-center gap-2.5">
+          <svg viewBox="0 0 32 32" className="h-7 w-7" aria-hidden="true">
+            <path className="fill-camel" d="M2 8.5h10l2.5-3H30v22H2z" />
+            <path className="fill-navy" d="M6 14h20v3H6zm0 6h13v3H6z" />
+          </svg>
+          <span className="display text-[1.35rem] font-extrabold uppercase tracking-[0.02em]">ShadowScope</span>
+        </div>
+        <p className="mono mt-1 text-[13px] text-camel">See Beyond the Surface.</p>
 
         <div className="mt-4 flex gap-0.5 px-1" role="tablist" aria-label="Account">
           {(["signin", "signup"] as const).map((m) => (

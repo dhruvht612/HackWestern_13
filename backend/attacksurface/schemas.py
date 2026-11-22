@@ -5,6 +5,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
+DomainAuthorization = Literal["not_routed", "auto_cleared", "pending_review", "approved", "rejected", "revoked"]
 Severity = Literal["critical", "high", "medium", "low", "info"]
 Environment = Literal["prod", "staging", "dev", "unknown"]
 AssetStatus = Literal["resolved", "unresolved"]
@@ -74,12 +75,14 @@ class Project(BaseModel):
     authorization_confirmed: bool
     created_at: datetime
     verification_status: VerificationStatus = "unverified"
+    authorization: DomainAuthorization = "not_routed"
     verified_at: datetime | None = None
     latest_scan_id: str | None = None
 
 
 class VerificationChallenge(BaseModel):
     status: VerificationStatus
+    authorization: DomainAuthorization = "not_routed"
     record_type: Literal["TXT"] = "TXT"
     record_name: str
     record_value: str | None = None  # only returned when a new challenge is issued
@@ -275,6 +278,138 @@ class UserStatusChange(BaseModel):
     user_id: str
     status: Literal["active", "suspended"]
     previous_status: str | None = None
+
+
+class AdminPage[T](BaseModel):
+    items: list[T]
+    next_cursor: str | None
+
+
+class AdminUserRow(BaseModel):
+    id: str
+    email: str | None
+    status: Literal["active", "pending_review", "suspended"]
+    risk_level: Literal["low", "medium", "high"]
+    risk_reasons: list[str]
+    created_at: datetime
+    last_seen: datetime | None
+    projects: int
+
+
+class AdminSecurityEvent(BaseModel):
+    id: int
+    type: str
+    user_id: str | None
+    user_email: str | None
+    ip: str | None
+    subject: str | None
+    detail: dict[str, Any]
+    created_at: datetime
+
+
+class AdminAuditEntry(BaseModel):
+    id: int
+    actor_id: str | None
+    actor_email: str | None
+    action: str
+    target_type: str
+    target_id: str
+    reason: str | None
+    created_at: datetime
+
+
+class AdminDailyBrief(BaseModel):
+    text: str
+    source: Literal["gemini", "template"]
+
+
+class AdminOverview(BaseModel):
+    users: int
+    verified_domains: int
+    pending_reviews: int
+    scans_24h: int
+    scan_failures_24h: int
+    blocklist_hits_24h: int
+    ai_fallback_rate: float | None
+    worker_last_seen: datetime | None
+    daily_brief: AdminDailyBrief
+
+
+class ReviewDecision(ReasonModel):
+    decision: Literal["approve", "reject"]
+
+
+class ReviewSignal(BaseModel):
+    id: str
+    label: str
+    value: str
+
+
+class ReviewAdvice(BaseModel):
+    recommendation: Literal["approve", "reject", "needs_more_info"]
+    confidence: Literal["low", "medium", "high"]
+    summary: str = Field(max_length=500)
+    key_signals: list[str] = Field(max_length=10)
+    missing_information: list[str] = Field(max_length=5)
+
+
+class ReviewVerdict(ReviewAdvice):
+    model: str | None
+    fallback_used: bool
+
+
+class AdminReview(BaseModel):
+    id: str
+    kind: Literal["user", "domain"]
+    status: Literal["pending", "approved", "rejected"]
+    risk_level: Literal["medium", "high"]
+    user_id: str
+    user_email: str | None
+    project_id: str | None
+    root_domain: str | None
+    signals: list[ReviewSignal]
+    ai_verdict: ReviewVerdict | None
+    created_at: datetime
+    decided_by: str | None
+    decided_at: datetime | None
+    decision_reason: str | None
+
+
+class AdminReviewDetail(AdminReview):
+    recent_events: list[AdminSecurityEvent]
+
+
+class AdminDomain(BaseModel):
+    project_id: str
+    root_domain: str
+    owner_id: str | None
+    owner_email: str | None
+    dns_proof: VerificationStatus
+    authorization: DomainAuthorization
+    verified_at: datetime | None
+    risk_level: Literal["low", "medium", "high"] | None
+
+
+class AdminUserDetail(AdminUserRow):
+    claims: list[AdminDomain]
+    recent_events: list[AdminSecurityEvent]
+
+
+class DnsRecheck(BaseModel):
+    found: bool
+    checked_at: datetime
+
+
+class BlockPattern(ReasonModel):
+    pattern: str = Field(min_length=1, max_length=254)
+    match: Literal["exact", "suffix"]
+
+
+class AdminBlock(BaseModel):
+    pattern: str
+    match: Literal["exact", "suffix"]
+    reason: str
+    created_at: datetime
 
 
 # --- two-factor --------------------------------------------------------------------------

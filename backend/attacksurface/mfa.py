@@ -45,7 +45,7 @@ class GoTrueMfa:
         return self._call("GET", "/user", token).get("factors") or []
 
     def enroll(self, token: str) -> dict:
-        return self._call("POST", "/factors", token, {"factor_type": "totp", "friendly_name": "AttackSurface"})
+        return self._call("POST", "/factors", token, {"factor_type": "totp", "friendly_name": "ShadowScope"})
 
     def unenroll(self, token: str, factor_id: str) -> None:
         self._call("DELETE", f"/factors/{factor_id}", token)

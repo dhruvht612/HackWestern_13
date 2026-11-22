@@ -46,6 +46,7 @@ export interface Project {
   authorization_confirmed: boolean;
   created_at: string;
   verification_status: VerificationStatus;
+  authorization?: DomainAuthorization;
   verified_at: string | null;
   latest_scan_id: string | null;
 }
@@ -58,6 +59,7 @@ export interface ProjectCreate {
 
 export interface VerificationChallenge {
   status: VerificationStatus;
+  authorization?: DomainAuthorization;
   record_type: "TXT";
   record_name: string;
   record_value: string | null;
@@ -271,12 +273,13 @@ export interface AdminUserRow {
   projects: number;
 }
 
-export type DomainAuthorization = "not_routed" | "auto_cleared" | "pending_review" | "approved" | "rejected" | "revoked";
+export type DomainAuthorization =
+  "not_routed" | "auto_cleared" | "pending_review" | "approved" | "rejected" | "revoked";
 
 export interface AdminDomain {
   project_id: string;
   root_domain: string;
-  owner_id: string;
+  owner_id: string | null;
   owner_email: string | null;
   dns_proof: "unverified" | "pending" | "verified" | "expired";
   authorization: DomainAuthorization;
@@ -311,4 +314,43 @@ export interface AuditEntry {
   target_id: string;
   reason: string | null;
   created_at: string;
+}
+
+export interface AdminUserDetail extends AdminUserRow {
+  claims: AdminDomain[];
+  recent_events: SecurityEvent[];
+}
+
+export interface AdminReviewDetail extends ReviewItem {
+  recent_events: SecurityEvent[];
+}
+
+export interface AdminAiMetrics {
+  active_model: string | null;
+  prompt_version: string;
+  purposes: {
+    purpose: string;
+    requests: number;
+    fallbacks: number;
+    input_tokens: number | null;
+    output_tokens: number | null;
+    estimated_cost: number | null;
+    p50_ms: number | null;
+    p95_ms: number | null;
+  }[];
+  errors: { category: string; count: number }[];
+  reanalyses: number;
+}
+
+export interface AdminCopilotAnswer {
+  available: boolean;
+  answer: string;
+  references: string[];
+  stats: {
+    users: number;
+    verified_domains: number;
+    pending_reviews: number;
+    scans_24h: number;
+    blocklist_hits_24h: number;
+  } | null;
 }

@@ -27,6 +27,75 @@ def test_non_admin_forbidden(client, db, suspend_rpc) -> None:
     assert r.status_code == 403 and db.rpc_calls == []
 
 
+@pytest.mark.parametrize("endpoint", ["users", "events", "audit", "overview"])
+def test_admin_reads_require_active_admin(client, db, endpoint) -> None:
+    assert client.get(f"/admin/{endpoint}").status_code == 401
+    assert client.get(f"/admin/{endpoint}", headers=headers()).status_code == 403
+    make_admin(db, role="viewer")
+    db.table("user_status").update({"status": "pending_review"}).eq("user_id", USER_A).execute()
+    assert client.get(f"/admin/{endpoint}", headers=headers()).status_code == 403
+    assert db.rpc_calls == []
+
+
+def test_user_directory_filters_and_cursor(client, db) -> None:
+    make_admin(db, role="viewer")
+    stamp = "2026-11-21T21:30:00+00:00"
+    first = {"id": USER_A, "email": "operator@example.test", "status": "active", "risk_level": "low",
+             "risk_reasons": [], "projects": 1, "created_at": stamp, "last_seen": None}
+    second = {**first, "id": USER_B, "email": "viewer@example.test"}
+    db.rpc_handlers["admin_list_users"] = lambda p: [second] if p["p_after_id"] else [first, second]
+
+    params = {"limit": 1, "q": " @example.test ", "status": "active", "risk": "low"}
+    result = client.get("/admin/users", params=params, headers=headers())
+    assert result.status_code == 200
+    cursor = result.json()["next_cursor"]
+    assert [r["id"] for r in result.json()["items"]] == [USER_A]
+    result = client.get("/admin/users", params={**params, "cursor": cursor}, headers=headers())
+    assert result.status_code == 200
+    assert result.json()["next_cursor"] is None
+    assert [r["id"] for r in result.json()["items"]] == [USER_B]
+    assert db.rpc_calls[-1] == ("admin_list_users", {
+        "p_q": "@example.test", "p_status": "active", "p_risk": "low", "p_limit": 2,
+        "p_after_at": stamp, "p_after_id": USER_A,
+    })
+    assert client.get("/admin/users", params={"cursor": "invalid"}, headers=headers()).status_code == 422
+    assert client.get("/admin/users", params={"limit": 101}, headers=headers()).status_code == 422
+    assert len(db.rpc_calls) == 2
+
+
+def test_feeds_accept_filters_and_omit_private_audit_fields(client, db) -> None:
+    make_admin(db, role="viewer")
+    stamp = "2026-11-21T21:30:00+00:00"
+    audit = {"id": 4, "actor_id": USER_A, "actor_email": "operator@example.test", "action": "user.suspend",
+             "target_type": "user", "target_id": USER_B, "reason": "Policy violation", "created_at": stamp,
+             "ip": "192.0.2.1", "detail": {"from": "active"}}
+    event = {"id": 8, "type": "signup", "user_id": USER_B, "user_email": "viewer@example.test",
+             "ip": "192.0.2.1", "subject": "example.test", "detail": {}, "created_at": stamp}
+    db.rpc_handlers["admin_list_audit"] = lambda _: [audit, {**audit, "id": 3}]
+    db.rpc_handlers["admin_list_events"] = lambda _: [event]
+    result = client.get("/admin/audit", params={"action": "user.", "cursor": "5", "limit": 1}, headers=headers())
+    assert result.status_code == 200
+    assert result.json()["next_cursor"] == "4"
+    assert "ip" not in result.json()["items"][0] and "detail" not in result.json()["items"][0]
+    assert db.rpc_calls[-1] == ("admin_list_audit", {"p_action": "user.", "p_after_id": 5, "p_limit": 2})
+    result = client.get("/admin/events", params={"type": "signup"}, headers=headers())
+    assert result.status_code == 200 and result.json()["items"][0]["user_email"] == "viewer@example.test"
+    assert db.rpc_calls[-1] == ("admin_list_events", {"p_type": "signup", "p_after_id": None, "p_limit": 51})
+
+
+def test_overview_uses_database_counts_and_template_brief(client, db) -> None:
+    make_admin(db, role="viewer")
+    counts = {"users": 2, "verified_domains": 1, "pending_reviews": 3, "scans_24h": 6,
+              "scan_failures_24h": 1, "blocklist_hits_24h": 0, "ai_fallback_rate": None}
+    db.rpc_handlers["admin_overview_counts"] = lambda _: [counts]
+    result = client.get("/admin/overview", headers=headers())
+    assert result.status_code == 200
+    assert result.json()["pending_reviews"] == 3
+    assert result.json()["ai_fallback_rate"] is None
+    assert result.json()["daily_brief"]["source"] == "template"
+    assert "6 scans" in result.json()["daily_brief"]["text"]
+
+
 def test_viewer_cannot_mutate(client, db, suspend_rpc) -> None:
     make_admin(db, role="viewer")
     me = client.get("/admin/me", headers=headers())

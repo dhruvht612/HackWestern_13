@@ -114,7 +114,7 @@ function ReportView({ scanId }: { scanId: string }) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `attacksurface-report-${scanId}.md`;
+    a.download = `shadowscope-report-${scanId}.md`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -143,11 +143,11 @@ function ReportView({ scanId }: { scanId: string }) {
       <article className="print-surface mx-auto max-w-[58rem] border border-camel/25 bg-navy-raised">
         <ClassificationBand>Potential exposure // Validate before action</ClassificationBand>
         <div className="relative px-6 py-9 md:px-12 md:py-12">
-          <Stamp lines={["Filed", `AS-${scanId.slice(0, 8)}`]} tone="camel" rotate={-5} className="absolute right-4 top-5 w-32 md:right-10 md:top-8 md:w-40" />
-          {/* "AttackSurface Report — acme-demo.com": the subject goes on its own unbreakable mono line */}
+          <Stamp lines={["Filed", `SS-${scanId.slice(0, 8)}`]} tone="camel" rotate={-5} className="absolute right-4 top-5 w-32 md:right-10 md:top-8 md:w-40" />
+          {/* "ShadowScope Report — acme-demo.com": the subject goes on its own unbreakable mono line */}
           <h1 className="pr-28 md:pr-44">
             <span className="display block text-[2.4rem] font-extrabold uppercase leading-none">
-              {(title?.kind === "h1" ? title.text : "AttackSurface report").split(" — ")[0]}
+              {(title?.kind === "h1" ? title.text : "ShadowScope report").split(" — ")[0]}
             </span>
             {title?.kind === "h1" && title.text.includes(" — ") ? (
               <span className="mono mt-2 block whitespace-nowrap text-[1.05rem] font-bold">SUBJECT: {title.text.split(" — ")[1]}</span>

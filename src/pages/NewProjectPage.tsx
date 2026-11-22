@@ -40,7 +40,7 @@ export function NewProjectPage() {
           <div className="border-b-2 border-camel pb-4">
             <h1 className="display text-[2.4rem] font-extrabold leading-none">Open a new file</h1>
             <p className="mt-3 text-sm leading-relaxed text-fg-soft">
-              Add a root domain you’re authorized to assess. AttackSurface maps what’s exposed using passive signals only.
+              Add a root domain you’re authorized to assess. ShadowScope maps what’s exposed using passive signals only.
             </p>
           </div>
 

@@ -53,7 +53,7 @@ export function SecurityPage() {
       <div className="mx-auto max-w-2xl px-4 py-8">
         <header className="flex flex-wrap items-center justify-between gap-3">
           <Link to="/projects" className="display text-[1.35rem] font-extrabold uppercase">
-            AttackSurface
+            ShadowScope
           </Link>
           <AccountMenu />
         </header>

@@ -1,10 +1,18 @@
 # Admin Portal Phase 4 (Admin UI) Implementation Plan
 
+## Continuation status — 2026-11-21
+
+Claude completed Task 1 in `dd47e47` and left Task 2 partially implemented in the working tree. Codex continued that work: Tasks 2–7 are now implemented, including all seven routes, shared loading/error states, operator/viewer controls, self-action restrictions, reason forms, and query invalidation after mutations. Changes remain uncommitted for review; the original checkboxes below are the historical plan, not current completion status.
+
+Validation: production build, ESLint, and TypeScript checks pass. Scripted Chromium checks cover rejection and audit propagation, short-reason validation, suspension, self protection, DNS recheck, revocation, blocklist add/remove, event filtering, viewer restrictions, concurrent-decision refetch with a persistent message, unavailable API responses, and revoked permissions. All seven screens and the review detail panel were checked at 375px with no page overflow; the mobile screenshot was visually inspected. Local browser scripts/screenshots are in ignored `.playwright-mcp/`.
+
+The portal now has real endpoints for Review queue, Users, Domains, Overview, Abuse feed, Blocklist, and Audit log, plus Gemini Operations and the read-only Copilot. Review decisions and domain or blocklist changes share a transaction with their audit entries. The worker applies scan authorization, produces review advice, publishes a heartbeat, and prunes old security events. Test the migration and bootstrap the operator before running the portal on a Supabase project. Demo data stays confined to demo mode.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** The admin portal screens: a guarded `/admin` area with Review Queue, Users, Domains, Overview, Abuse Feed, Blocklist, and Audit Log. They work fully in demo mode on labelled sample data, and call the real `/admin/*` API in real mode.
 
-**Architecture:** One typed contract (`src/lib/types.ts`, pinned to ADMIN-PANEL.md §9) feeds `api.admin.*` methods. In demo mode those methods serve `shared/fixtures/admin/*.json` through an in-memory copy, so approve, reject, and suspend visibly change state for the demo. In real mode they call FastAPI. `/admin/me` and suspend/unsuspend exist today; the other endpoints arrive in Phase 3 and show an honest "not available yet" until then. `RequireAdmin` gates the routes in the UI; FastAPI stays the authority. One shared `ReasonForm` handles every mutation.
+**Architecture:** The typed contract in `src/lib/types.ts` feeds the `adminApi` client. In demo mode it serves an in-memory copy of `shared/fixtures/admin/*.json`. In real mode it calls FastAPI. `RequireAdmin` gates routes in the UI, and FastAPI enforces roles and MFA on every request. A shared `ReasonForm` handles changes that require an audit reason.
 
 **Tech Stack:** React 19, React Router 7, TanStack Query 5, Tailwind (DESIGN.md tokens), lucide-react, existing components (`DataTable`, `DetailPanel`, `EvidenceBlock`, `SeverityBadge`, `PageHeader`, `EmptyState`, `PageSkeleton`).
 

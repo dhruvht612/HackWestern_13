@@ -14,9 +14,10 @@ from datetime import timedelta
 from typing import Any
 
 from attacksurface.ai.analyst import run_analysis
+from attacksurface.ai.reviewer import review_next
 from attacksurface.database import get_db
 from attacksurface.scanner import run_scan
-from attacksurface.store import add_event, now_utc
+from attacksurface.store import add_event, first, now_utc
 
 log = logging.getLogger("attacksurface.worker")
 STALE_AFTER = timedelta(minutes=20)
@@ -36,7 +37,7 @@ def fail_stale_jobs(db: Any) -> None:
     """A job left 'running' by a crashed worker is marked failed rather than hanging forever."""
     cutoff = (now_utc() - STALE_AFTER).isoformat()
     for scan in db.table("scans").select("id").eq("status", "running").lt("updated_at", cutoff).execute().data:
-        db.table("scans").update({"status": "failed", "error": "Worker stopped before the scan finished", "updated_at": now_utc().isoformat()}).eq("id", scan["id"]).execute()
+        db.table("scans").update({"status": "failed", "error": "Worker stopped before the scan finished", "updated_at": now_utc().isoformat()}).eq("id", scan["id"]).eq("status", "running").execute()
         add_event(db, scan["id"], "Scan failed: the worker stopped before it finished. Start a new scan.", "error")
     db.table("analyses").update({"status": "failed", "error": "Worker stopped before the analysis finished"}).eq("status", "running").lt("updated_at", cutoff).execute()
 
@@ -63,7 +64,9 @@ def process_outbox(db: Any, apply: Callable[[str, str], None] | None = None) -> 
         return False
     row = rows[0]
     try:
-        (apply or _apply_auth_action(db))(row["user_id"], row["action"])
+        account = first(db.table("user_status").select("status").eq("user_id", row["user_id"]).limit(1).execute())
+        if account is not None and (row["action"] == "ban") == (account["status"] == "suspended"):
+            (apply or _apply_auth_action(db))(row["user_id"], row["action"])
     except Exception as exc:  # noqa: BLE001 - recorded on the row and retried
         attempts = row["attempts"] + 1
         db.table("auth_outbox").update({
@@ -74,7 +77,7 @@ def process_outbox(db: Any, apply: Callable[[str, str], None] | None = None) -> 
         }).eq("id", row["id"]).execute()
         log.warning("auth outbox %s %s failed (attempt %s): %s", row["action"], row["user_id"], attempts, exc)
         return True
-    db.table("auth_outbox").update({"status": "done", "done_at": now_utc().isoformat()}).eq("id", row["id"]).execute()
+    db.table("auth_outbox").update({"status": "done", "done_at": now_utc().isoformat(), "last_error": None}).eq("id", row["id"]).execute()
     return True
 
 
@@ -90,7 +93,7 @@ def run_once(db: Any) -> bool:
     if analysis:
         run_analysis(db, analysis[0]["id"])
         return True
-    return False
+    return review_next(db)
 
 
 def main(poll_seconds: float = 3.0) -> None:
@@ -98,8 +101,16 @@ def main(poll_seconds: float = 3.0) -> None:
     db = get_db()
     fail_stale_jobs(db)
     log.info("worker started")
+    next_heartbeat = next_prune = 0.0
     while True:
         try:
+            tick = time.monotonic()
+            if tick >= next_heartbeat:
+                db.table("worker_health").upsert({"singleton": True, "last_seen": now_utc().isoformat()}, on_conflict="singleton").execute()
+                next_heartbeat = tick + 15
+            if tick >= next_prune:
+                db.table("security_events").delete().lt("created_at", (now_utc() - timedelta(days=90)).isoformat()).execute()
+                next_prune = tick + 86400
             if not run_once(db):
                 time.sleep(poll_seconds)
         except Exception:

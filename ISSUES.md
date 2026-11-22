@@ -1,6 +1,6 @@
 # Issues log
 
-Every issue, fault, and error hit while building and testing AttackSurface (HackWestern 13, 2026-11-21): the symptom, the cause, and how it was resolved.
+Every issue, fault, and error hit while building and testing ShadowScope (HackWestern 13, 2026-11-21): the symptom, the cause, and how it was resolved.
 
 **Status:** **Fixed** = code change · **Config** = environment or setup, no code · **Open** = still to do · **Expected** = working as designed
 

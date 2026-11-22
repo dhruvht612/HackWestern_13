@@ -1,6 +1,12 @@
-# AttackSurface
+# ShadowScope
 
-AttackSurface builds the file an attacker would keep on you: it passively maps what a domain exposes, links exposed hosts to the vulnerable dependencies behind them, and ranks what to fix first.
+**See Beyond the Surface.**
+
+ShadowScope is an AI-powered cybersecurity platform that helps businesses discover exposed online assets, identify potential security risks, and understand what to fix first using Google Gemini AI.
+
+**Mission:** Making cybersecurity smarter, simpler, and more accessible through AI-powered security intelligence.
+
+**Category:** AI-Powered Cybersecurity Intelligence. Built at HackWestern 13.
 
 **Docs:** [PRD.md](PRD.md) · [ARCHITECTURE.md](ARCHITECTURE.md) · [AI-AGENT.md](AI-AGENT.md) · [DESIGN.md](DESIGN.md) · [backend/README.md](backend/README.md)
 
@@ -56,6 +62,8 @@ cd backend && uv run python -m attacksurface.worker   # production-style worker 
 ```
 
 **Demo mode:** `VITE_USE_MOCKS=true npm run dev` serves the labelled `acme-demo.com` fixtures with no backend and no sign-in.
+
+**Admin portal:** visit `/admin` in demo mode to explore the portal with labelled sample data. Reloading resets demo changes. For real accounts and claims, apply the schema, complete [admin bootstrap](backend/README.md#admin-bootstrap), and start the worker. The worker processes review advice, reconciles Supabase Auth bans, and publishes its heartbeat. Gemini credentials are optional. The review queue uses rules-only advice when Gemini is unavailable.
 
 ## Test
 

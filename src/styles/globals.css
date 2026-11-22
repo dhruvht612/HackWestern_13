@@ -225,6 +225,56 @@ a {
     @apply border-b-2 border-camel text-left text-[11px] font-semibold uppercase tracking-[0.09em] text-camel;
   }
 
+  /* A quiet live signal: one kiwi dot, transform/opacity only. */
+  .signal-dot {
+    @apply inline-block h-1.5 w-1.5 bg-kiwi;
+    animation: signal-pulse 2.4s ease-in-out infinite;
+  }
+
+  /* A slow trace across a rule, like a scanner settling on a result. */
+  .trace-line {
+    position: relative;
+  }
+  .trace-line::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, rgb(var(--rgb-accent) / 0.9), rgb(var(--rgb-accent) / 0));
+    transform-origin: left center;
+    animation: trace 5s ease-in-out infinite;
+  }
+  @keyframes signal-pulse {
+    0%,
+    100% {
+      opacity: 0.35;
+      transform: scale(0.8);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.15);
+    }
+  }
+  @keyframes trace {
+    0%,
+    100% {
+      transform: scaleX(0.12);
+      opacity: 0.4;
+    }
+    50% {
+      transform: scaleX(1);
+      opacity: 0.9;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .signal-dot,
+    .trace-line::after {
+      animation: none;
+    }
+  }
+
   /* Inline redaction: one bar per wrapped line, peeled left to right when data-open flips. */
   .redact {
     background-image: linear-gradient(var(--color-secondary), var(--color-secondary));

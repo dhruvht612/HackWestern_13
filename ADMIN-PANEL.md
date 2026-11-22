@@ -1,4 +1,4 @@
-# AttackSurface Admin Portal — Design and Build Plan
+# ShadowScope Admin Portal — Design and Build Plan
 
 **Status:** proposed, revised for implementation · **Original plan:** 2026-11-21 · **Revised:** 2026-11-21
 Related: [PRD.md](PRD.md) · [ARCHITECTURE.md](ARCHITECTURE.md) · [AI-AGENT.md](AI-AGENT.md) · [ISSUES.md](ISSUES.md) · [DESIGN.md](DESIGN.md)
@@ -9,7 +9,7 @@ This revision keeps the risk-based administration concept and adds mandatory dom
 
 ## 1. Purpose and scope
 
-AttackSurface provides authorized external attack-surface discovery and evidence-grounded security analysis. The admin portal adds oversight, so operators can investigate suspicious accounts and domain claims, intervene safely, and audit every decision.
+ShadowScope provides authorized external attack-surface discovery and evidence-grounded security analysis. The admin portal adds oversight, so operators can investigate suspicious accounts and domain claims, intervene safely, and audit every decision.
 
 **Two jobs:**
 1. **Control access and authorization:** user status, DNS domain-control verification, a risk review queue, a domain blocklist, suspensions, and append-only audit records.
@@ -276,7 +276,7 @@ All `/admin/*` routes use `require_admin`; every mutation needs `operator` and a
 - `GET /auth/me` returns account status.
 - The verification response separates `dns_proof` (`unverified / pending / verified / expired`) from `authorization` (`not_routed / auto_cleared / pending_review / approved / rejected / revoked`).
 - `POST /projects/{id}/scans` returns 403 with a user-safe reason.
-- MFA routes: `/auth/mfa/enroll`, `/auth/mfa/challenge`, `/auth/mfa/verify`.
+- MFA routes: `/auth/mfa/factors`, `/auth/mfa/enroll`, `/auth/mfa/verify` (verify creates the GoTrue challenge and verifies it in one call, so there is no separate challenge route).
 - Errors never reveal another user's information.
 
 ## 10. Frontend
@@ -297,7 +297,7 @@ All `/admin/*` routes use `require_admin`; every mutation needs `operator` and a
 Also: an **MFA enrolment** screen (QR code + code entry), needed in Phase 1.
 
 ```
-┌ AttackSurface · Admin ──────────────────────────────── operator · MFA ✓ ┐
+┌ ShadowScope · Admin ──────────────────────────────── operator · MFA ✓ ┐
 │ Review (3)  Users  Domains  Overview  Abuse  Blocklist  Audit  Gemini  AI │
 ├──────────────────────────────────────────────────────────────────────────┤
 │ ⚠ HIGH  domain  examplebank.test     test-account-02      2 min ago      │

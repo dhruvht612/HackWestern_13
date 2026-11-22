@@ -40,7 +40,7 @@ def build_report(db: Any, scan_id: str) -> str:
     findings.sort(key=lambda f: (SEVERITY_ORDER.index(f["severity"]), f["title"]))
 
     lines = [
-        f"# AttackSurface Security Assessment — {project['root_domain']}",
+        f"# ShadowScope Security Assessment — {project['root_domain']}",
         "",
         f"**Project:** {project['name']}",
         f"**Scan:** {scan_id}",

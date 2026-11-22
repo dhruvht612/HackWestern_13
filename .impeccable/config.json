@@ -19,7 +19,7 @@
         "rule": "design-system-font-size",
         "value": "1.35rem",
         "createdAt": "2026-11-21T18:26:47.439Z",
-        "reason": "agent decision: AttackSurface wordmark size, a brand mark not a type role"
+        "reason": "agent decision: ShadowScope wordmark size, a brand mark not a type role"
       },
       {
         "rule": "design-system-color",

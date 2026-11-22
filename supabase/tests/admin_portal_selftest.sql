@@ -114,4 +114,159 @@ begin
   raise notice 'PASS: backfill approves legacy DNS-verified projects once, with an audit row';
 end $$;
 
+do $$
+declare
+  older uuid := '00000000-0000-4000-8000-000000000001';
+  newer uuid := '00000000-0000-4000-8000-000000000002';
+  joined timestamptz := now();
+  recent_event bigint;
+  actor_email text;
+  new_audit_id bigint;
+  p uuid;
+  before_counts record;
+  after_counts record;
+  fn text;
+begin
+  select * into before_counts from admin_overview_counts(now() - interval '90 days');
+  insert into auth.users (id, email, aud, role, created_at)
+  values (older, older::text || '@admin-read-selftest.example', 'authenticated', 'authenticated', joined),
+         (newer, newer::text || '@admin-read-selftest.example', 'authenticated', 'authenticated', joined);
+
+  insert into projects (name, root_domain, owner_user_id, verified_at)
+  values ('read test', 'read-test.example', newer, now()) returning id into p;
+  insert into scans (project_id, status) values (p, 'failed');
+  insert into review_items (kind, user_id, risk_level, signals) values ('user', newer, 'medium', '[]');
+
+  if (select array_agg(id) from admin_list_users('ADMIN-READ-SELFTEST.EXAMPLE', 'active', 'low', 1, null, null))
+       is distinct from array[newer]
+     or (select array_agg(id) from admin_list_users('admin-read-selftest.example', 'active', 'low', 1, joined, newer))
+       is distinct from array[older]
+     or (select projects from admin_list_users(newer::text, null, null, 1, null, null)) is distinct from 1::bigint then
+    raise exception 'FAIL: directory filtering, cursor tie-break, or project count';
+  end if;
+  raise notice 'PASS: directory filters and pages users with equal join times';
+
+  insert into security_events (type, user_id) values ('selftest_read', older);
+  insert into security_events (type, user_id) values ('selftest_read', newer) returning id into recent_event;
+  insert into security_events (type, user_id) values ('blocklist_hit', newer);
+  if (select user_id from admin_list_events('selftest_read', 1, null)) is distinct from newer
+     or (select user_email from admin_list_events('selftest_read', 1, recent_event))
+       is distinct from older::text || '@admin-read-selftest.example' then
+    raise exception 'FAIL: events filter, cursor, or user lookup';
+  end if;
+
+  insert into admin_audit_log (actor_id, action, target_type, target_id)
+  values (newer, 'selftest.read', 'user', older::text) returning id into new_audit_id;
+  select a.actor_email into actor_email from admin_list_audit('selftest.', 1, new_audit_id + 1) a;
+  if actor_email is distinct from newer::text || '@admin-read-selftest.example' then
+    raise exception 'FAIL: audit prefix, cursor, or actor lookup';
+  end if;
+  raise notice 'PASS: event and audit feeds apply filters and resolve emails';
+
+  select * into after_counts from admin_overview_counts(now() - interval '90 days');
+  if after_counts.users <> before_counts.users + 2
+     or after_counts.verified_domains <> before_counts.verified_domains + 1
+     or after_counts.pending_reviews <> before_counts.pending_reviews + 1
+     or after_counts.scans_24h <> before_counts.scans_24h + 1
+     or after_counts.scan_failures_24h <> before_counts.scan_failures_24h + 1
+     or after_counts.blocklist_hits_24h <> before_counts.blocklist_hits_24h + 1 then
+    raise exception 'FAIL: overview aggregates';
+  end if;
+  raise notice 'PASS: overview counts reflect stored data';
+
+  foreach fn in array array[
+    'admin_list_users(text,text,text,int,timestamptz,uuid)', 'admin_list_events(text,int,bigint)',
+    'admin_list_audit(text,int,bigint)', 'admin_overview_counts(timestamptz)'
+  ] loop
+    if has_function_privilege('anon', fn, 'execute')
+       or has_function_privilege('authenticated', fn, 'execute')
+       or not has_function_privilege('service_role', fn, 'execute') then
+      raise exception 'FAIL: read RPC grants for %', fn;
+    end if;
+  end loop;
+  raise notice 'PASS: admin read RPCs are restricted to the backend service role';
+end $$;
+
+do $$
+declare
+  op uuid := gen_random_uuid();
+  owner_id uuid := gen_random_uuid();
+  v_project uuid;
+  review_id uuid;
+  scan_id uuid;
+  proof jsonb;
+begin
+  insert into auth.users (id, email, aud, role)
+  values (op, 'review-operator-' || op::text || '@example.invalid', 'authenticated', 'authenticated'),
+         (owner_id, 'review-owner-' || owner_id::text || '@example.invalid', 'authenticated', 'authenticated');
+  insert into admin_users (user_id, role) values (op, 'operator'), (owner_id, 'operator');
+  insert into projects (name, root_domain, owner_user_id, verification_token_hash, verification_expires_at)
+  values ('review self-test', 'review-selftest.example', owner_id, 'mock-hash', now() + interval '1 hour')
+  returning id into v_project;
+
+  proof := record_domain_proof(v_project, 'mock-hash', 'high', '[{"id":"signal:dns_proof","label":"DNS proof","value":"passed"}]');
+  if proof->>'review_status' <> 'pending_review' or proof->>'queued' <> 'true' then
+    raise exception 'FAIL: proof should create a high-risk review';
+  end if;
+  select r.id into strict review_id from review_items r where r.project_id = v_project;
+  begin
+    perform queue_authorized_scan(v_project, owner_id);
+    raise exception 'FAIL: pending claim queued a scan';
+  exception when others then
+    if sqlerrm <> 'scan_denied' then raise; end if;
+  end;
+  begin
+    perform admin_decide_review(review_id, owner_id, 'approve', 'self-review test', null);
+    raise exception 'FAIL: self-review accepted';
+  exception when others then
+    if sqlerrm <> 'self_action' then raise; end if;
+  end;
+
+  update review_items set analysis_started_at = now() where id = review_id;
+  if not finish_admin_review(review_id, now(), '{"fallback_used":true}', '{"fallback_used":true,"error_category":"self_test"}') then
+    raise exception 'FAIL: reviewer could not save advice';
+  end if;
+  if (select status from review_items where id = review_id) <> 'pending' then
+    raise exception 'FAIL: saving advice changed the decision';
+  end if;
+  perform admin_decide_review(review_id, op, 'approve', 'independent review passed', null);
+  begin
+    perform admin_decide_review(review_id, op, 'reject', 'duplicate reviewer attempt', null);
+    raise exception 'FAIL: a duplicate decision succeeded';
+  exception when others then
+    if sqlerrm <> 'already_decided' then raise; end if;
+  end;
+  if (select count(*) from admin_audit_log where target_id = v_project::text and action = 'review.approve') <> 1 then
+    raise exception 'FAIL: approval and audit did not commit together';
+  end if;
+
+  scan_id := queue_authorized_scan(v_project, owner_id);
+  begin
+    perform queue_authorized_scan(v_project, owner_id);
+    raise exception 'FAIL: two active scans were allowed';
+  exception when others then
+    if sqlerrm <> 'scan_active' then raise; end if;
+  end;
+  perform admin_revoke_domain(v_project, op, 'authorization withdrawn', null);
+  if (select status from scans where id = scan_id) <> 'cancelled' then
+    raise exception 'FAIL: revocation did not cancel queued scan';
+  end if;
+  begin
+    perform queue_authorized_scan(v_project, owner_id);
+    raise exception 'FAIL: revoked claim queued a scan';
+  exception when others then
+    if sqlerrm <> 'scan_denied' then raise; end if;
+  end;
+  perform admin_blocklist_change('blocked-selftest.example', 'suffix', op, 'blocklist test', null);
+  perform admin_blocklist_change('blocked-selftest.example', null, op, 'remove blocklist test', null);
+  if (select count(*) from admin_audit_log where actor_id = op and action like 'blocklist.%') <> 2 then
+    raise exception 'FAIL: blocklist changes lack audit entries';
+  end if;
+  if has_table_privilege('authenticated', 'admin_review_rows', 'select')
+     or has_function_privilege('anon', 'admin_decide_review(uuid,uuid,text,text,text)', 'execute') then
+    raise exception 'FAIL: browser has access to review internals';
+  end if;
+  raise notice 'PASS: DNS proof, review, advice, authorization, revocation, blocklist, and grants';
+end $$;
+
 rollback;
