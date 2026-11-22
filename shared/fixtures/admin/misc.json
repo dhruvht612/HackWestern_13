@@ -1,0 +1,32 @@
+{
+  "me": { "id": "00000000-0000-4000-8000-00000000a001", "email": "you@example.com", "role": "operator", "aal": "aal2", "mfa_required": true },
+  "overview": {
+    "users": 6,
+    "verified_domains": 5,
+    "pending_reviews": 3,
+    "scans_24h": 4,
+    "scan_failures_24h": 0,
+    "blocklist_hits_24h": 2,
+    "ai_fallback_rate": 0.25,
+    "worker_last_seen": "2026-11-21T21:09:30Z",
+    "daily_brief": {
+      "text": "Since yesterday: 3 new sign-ups and 3 items queued for review. One new account claimed five unrelated domains in an hour, including two brands; one of those hit the blocklist. No scans were denied. Gemini answered 3 of 4 reviews; one used the rules-only fallback.",
+      "source": "template"
+    }
+  },
+  "blocklist": {
+    "items": [
+      { "pattern": "bank.test", "match": "suffix", "reason": "Sample financial brand for the demo", "created_at": "2026-11-21T12:00:00Z" },
+      { "pattern": "gov.test", "match": "suffix", "reason": "Sample government namespace for the demo", "created_at": "2026-11-21T12:00:00Z" }
+    ],
+    "next_cursor": null
+  },
+  "audit": {
+    "items": [
+      { "id": 31, "actor_id": "00000000-0000-4000-8000-00000000a001", "actor_email": "you@example.com", "action": "review.reject", "target_type": "project", "target_id": "pr-paybrand", "reason": "No connection to the brand; part of a burst of claims.", "created_at": "2026-11-21T18:31:00Z" },
+      { "id": 30, "actor_id": "00000000-0000-4000-8000-00000000a001", "actor_email": "you@example.com", "action": "user.suspend", "target_type": "user", "target_id": "00000000-0000-4000-8000-00000000b005", "reason": "Claimed government domains from a throwaway address.", "created_at": "2026-11-21T16:25:00Z" },
+      { "id": 1, "actor_id": null, "actor_email": null, "action": "migration.approve_legacy_dns", "target_type": "project", "target_id": "pr-thakardhruv", "reason": "pre-portal DNS verification", "created_at": "2026-11-21T12:00:00Z" }
+    ],
+    "next_cursor": null
+  }
+}

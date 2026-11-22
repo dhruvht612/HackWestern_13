@@ -57,7 +57,7 @@ async function refreshSession(): Promise<boolean> {
   return refreshing;
 }
 
-async function request<T>(path: string, init: RequestInit = {}, retried = false): Promise<T> {
+export async function request<T>(path: string, init: RequestInit = {}, retried = false): Promise<T> {
   const token = session.get()?.access_token;
   const response = await fetch(`${API_URL}${path}`, {
     ...init,
@@ -88,7 +88,7 @@ async function request<T>(path: string, init: RequestInit = {}, retried = false)
   return (type.includes("text/markdown") || type.includes("text/plain") ? await response.text() : await response.json()) as T;
 }
 
-const json = (method: string, body?: unknown): RequestInit => ({ method, body: body === undefined ? undefined : JSON.stringify(body) });
+export const json = (method: string, body?: unknown): RequestInit => ({ method, body: body === undefined ? undefined : JSON.stringify(body) });
 
 const demoProject = (): Project => ({
   ...clone<Project>(fixtures.project),

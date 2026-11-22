@@ -1,0 +1,11 @@
+{
+  "items": [
+    { "project_id": "pr-thakardhruv", "root_domain": "thakardhruv.me", "owner_id": "00000000-0000-4000-8000-00000000a001", "owner_email": "you@example.com", "dns_proof": "verified", "authorization": "approved", "verified_at": "2026-11-22T00:54:37Z", "risk_level": "low" },
+    { "project_id": "pr-examplebank", "root_domain": "examplebank.test", "owner_id": "00000000-0000-4000-8000-00000000b002", "owner_email": "test-account-02@example.com", "dns_proof": "verified", "authorization": "pending_review", "verified_at": "2026-11-21T21:02:00Z", "risk_level": "high" },
+    { "project_id": "pr-agency", "root_domain": "agency.gov.test", "owner_id": "00000000-0000-4000-8000-00000000b004", "owner_email": "it-admin@agency.gov.test", "dns_proof": "verified", "authorization": "pending_review", "verified_at": "2026-11-21T19:57:00Z", "risk_level": "high" },
+    { "project_id": "pr-kiln", "root_domain": "studio-kiln.example", "owner_id": "00000000-0000-4000-8000-00000000b006", "owner_email": "maya@studio-kiln.example", "dns_proof": "verified", "authorization": "auto_cleared", "verified_at": "2026-11-19T11:20:00Z", "risk_level": "low" },
+    { "project_id": "pr-kiln-shop", "root_domain": "shop.kiln.example", "owner_id": "00000000-0000-4000-8000-00000000b006", "owner_email": "maya@studio-kiln.example", "dns_proof": "pending", "authorization": "not_routed", "verified_at": null, "risk_level": null },
+    { "project_id": "pr-spam", "root_domain": "random-target.example", "owner_id": "00000000-0000-4000-8000-00000000b005", "owner_email": "spam-bot-1@throwaway.example", "dns_proof": "expired", "authorization": "revoked", "verified_at": "2026-11-21T16:15:00Z", "risk_level": "high" }
+  ],
+  "next_cursor": null
+}

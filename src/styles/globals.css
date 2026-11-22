@@ -198,6 +198,10 @@ a {
   .btn-secondary {
     @apply btn border-2 border-camel text-fg hover:bg-camel/10 hover:text-fg;
   }
+  /* Destructive admin actions (reject, suspend, revoke): a critical 2px edge, never a fill. */
+  .btn-danger {
+    @apply btn border-2 border-severity-critical text-fg hover:bg-severity-critical/15;
+  }
 
   /* Folder tab, die-cut. Active tabs carry a kiwi indicator on their top edge. */
   .tab {

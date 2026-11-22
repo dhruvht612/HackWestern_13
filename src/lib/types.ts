@@ -196,3 +196,119 @@ export interface Graph {
 export interface Health {
   status: "ok";
 }
+
+// --- admin portal (contract: ADMIN-PANEL.md §9) ---------------------------------------------
+
+export type AdminRole = "viewer" | "operator";
+export type RiskLevel = "low" | "medium" | "high";
+
+export interface Page<T> {
+  items: T[];
+  next_cursor: string | null;
+}
+
+export interface AdminMe {
+  id: string;
+  email: string | null;
+  role: AdminRole;
+  aal: "aal1" | "aal2";
+  mfa_required: boolean;
+}
+
+export interface AdminOverview {
+  users: number;
+  verified_domains: number;
+  pending_reviews: number;
+  scans_24h: number;
+  scan_failures_24h: number;
+  blocklist_hits_24h: number;
+  ai_fallback_rate: number | null;
+  worker_last_seen: string | null;
+  daily_brief: { text: string; source: "gemini" | "template" };
+}
+
+export interface AiVerdict {
+  recommendation: "approve" | "reject" | "needs_more_info";
+  confidence: "low" | "medium" | "high";
+  summary: string;
+  key_signals: string[];
+  missing_information: string[];
+  model: string | null;
+  fallback_used: boolean;
+}
+
+export interface ReviewSignal {
+  id: string;
+  label: string;
+  value: string;
+}
+
+export interface ReviewItem {
+  id: string;
+  kind: "user" | "domain";
+  status: "pending" | "approved" | "rejected";
+  risk_level: "medium" | "high";
+  user_id: string;
+  user_email: string | null;
+  project_id: string | null;
+  root_domain: string | null;
+  signals: ReviewSignal[];
+  ai_verdict: AiVerdict | null;
+  created_at: string;
+  decided_by: string | null;
+  decided_at: string | null;
+  decision_reason: string | null;
+}
+
+export interface AdminUserRow {
+  id: string;
+  email: string | null;
+  status: "active" | "pending_review" | "suspended";
+  risk_level: RiskLevel;
+  risk_reasons: string[];
+  created_at: string;
+  last_seen: string | null;
+  projects: number;
+}
+
+export type DomainAuthorization = "not_routed" | "auto_cleared" | "pending_review" | "approved" | "rejected" | "revoked";
+
+export interface AdminDomain {
+  project_id: string;
+  root_domain: string;
+  owner_id: string;
+  owner_email: string | null;
+  dns_proof: "unverified" | "pending" | "verified" | "expired";
+  authorization: DomainAuthorization;
+  verified_at: string | null;
+  risk_level: RiskLevel | null;
+}
+
+export interface SecurityEvent {
+  id: number;
+  type: string;
+  user_id: string | null;
+  user_email: string | null;
+  ip: string | null;
+  subject: string | null;
+  detail: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface BlocklistEntry {
+  pattern: string;
+  match: "exact" | "suffix";
+  reason: string;
+  created_at: string;
+}
+
+export interface AuditEntry {
+  id: number;
+  actor_id: string | null;
+  actor_email: string | null;
+  action: string;
+  target_type: string;
+  target_id: string;
+  reason: string | null;
+  created_at: string;
+}
