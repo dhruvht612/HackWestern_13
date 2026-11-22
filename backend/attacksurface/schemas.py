@@ -275,3 +275,24 @@ class UserStatusChange(BaseModel):
     user_id: str
     status: Literal["active", "suspended"]
     previous_status: str | None = None
+
+
+# --- two-factor --------------------------------------------------------------------------
+
+
+class MfaFactor(BaseModel):
+    id: str
+    status: str
+    factor_type: str
+
+
+class MfaEnrollment(BaseModel):
+    factor_id: str
+    qr_code: str
+    secret: str
+    uri: str
+
+
+class MfaVerifyModel(BaseModel):
+    factor_id: str = Field(min_length=1, max_length=100)
+    code: str = Field(pattern=r"^\d{6}$")

@@ -68,6 +68,14 @@ _bearer = HTTPBearer(auto_error=False)
 _UNAUTHENTICATED = {"WWW-Authenticate": "Bearer"}
 
 
+def get_bearer_token(credentials: HTTPAuthorizationCredentials | None = Depends(_bearer)) -> str:  # noqa: B008
+    """The raw access token, for calls Supabase must make as the user (two-factor).
+    Use alongside get_current_user, which verifies it."""
+    if credentials is None or credentials.scheme.lower() != "bearer":
+        raise HTTPException(status_code=401, detail="Not authenticated", headers=_UNAUTHENTICATED)
+    return credentials.credentials
+
+
 def get_current_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),  # noqa: B008
     db: Any = Depends(get_db),  # noqa: B008
