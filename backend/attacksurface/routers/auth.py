@@ -7,8 +7,10 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from supabase_auth.errors import AuthApiError, AuthError
 
-from attacksurface.database import new_auth_client
+from attacksurface import events
+from attacksurface.database import get_db, new_auth_client
 from attacksurface.jwt import CurrentUser, get_current_user
+from attacksurface.netinfo import client_ip
 from attacksurface.ratelimit import limiter
 from attacksurface.schemas import (
     AuthSession,
@@ -41,7 +43,7 @@ def _limit(request: Request, action: str, per_min: int) -> None:
 
 
 @router.post("/signup", response_model=SignUpResult, status_code=201)
-def sign_up(payload: SignUpModel, request: Request, auth: Any = Depends(get_auth_client)) -> SignUpResult:  # noqa: B008
+def sign_up(payload: SignUpModel, request: Request, auth: Any = Depends(get_auth_client), db: Any = Depends(get_db)) -> SignUpResult:  # noqa: B008
     _limit(request, "signup", 5)
     try:
         res = auth.auth.sign_up({"email": payload.email, "password": payload.password})
@@ -52,18 +54,20 @@ def sign_up(payload: SignUpModel, request: Request, auth: Any = Depends(get_auth
     if res.user is None:
         raise HTTPException(status_code=400, detail="Sign-up failed")
     user = AuthUser(id=str(res.user.id), email=res.user.email)
+    events.record(db, "signup", user_id=user.id, ip=client_ip(request), subject=events.email_domain(payload.email))
     if res.session is None:  # project requires email confirmation
         return SignUpResult(user=user, message="Check your email to confirm the account, then sign in.")
     return SignUpResult(user=user, session=_session_out(res.session, res.user), message="Account created.")
 
 
 @router.post("/signin", response_model=AuthSession)
-def sign_in(payload: SignInModel, request: Request, auth: Any = Depends(get_auth_client)) -> AuthSession:  # noqa: B008
+def sign_in(payload: SignInModel, request: Request, auth: Any = Depends(get_auth_client), db: Any = Depends(get_db)) -> AuthSession:  # noqa: B008
     _limit(request, "signin", 10)
     try:
         res = auth.auth.sign_in_with_password({"email": payload.email, "password": payload.password})
     except AuthApiError:
         # One message for unknown email and wrong password.
+        events.record(db, "signin_failed", ip=client_ip(request), subject=events.email_domain(payload.email))
         raise HTTPException(status_code=401, detail="Invalid email or password") from None
     except AuthError:
         raise HTTPException(status_code=502, detail="Authentication service unavailable") from None
