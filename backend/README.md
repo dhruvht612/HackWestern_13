@@ -28,3 +28,19 @@ Supabase return 503 until it is configured.
 | `graph.py`, `reports.py` | Graph and Markdown report built from stored rows |
 | `worker.py` | Polls queued scans/analyses from the database |
 | `routers/` | `auth`, `projects` (+ verification, scans), `scans`, `dependencies`, `analysis`, `reports` |
+
+## Admin bootstrap
+
+The admin portal (see `../ADMIN-PANEL.md`) needs its schema and one operator before it does anything.
+
+1. Re-apply `supabase/schema.sql` in the Supabase SQL editor. It is idempotent: existing data is
+   kept, existing users get a `user_status` row, and projects already DNS-verified are approved
+   (with an audit row each).
+2. Run `supabase/tests/admin_portal_selftest.sql` in the SQL editor. Every block prints `PASS:`
+   and the script ends with `ROLLBACK`, leaving nothing behind. Any `FAIL:` stops it.
+3. Make the first operator (an account that already signed up):
+   ```sql
+   insert into admin_users (user_id, role) select id, 'operator' from auth.users where email = '<operator email>';
+   ```
+4. Sign in as that account and set up two-factor at `/account/security`. With `APP_ENV=production`,
+   admin routes refuse sessions without two-factor (`ADMIN_REQUIRE_MFA`).
