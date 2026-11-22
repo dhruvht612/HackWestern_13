@@ -6,6 +6,8 @@ from collections import defaultdict, deque
 
 from fastapi import HTTPException
 
+from attacksurface.config import settings
+
 
 class RateLimiter:
     """Sliding-window limiter keyed by caller + action.
@@ -14,11 +16,13 @@ class RateLimiter:
     to Redis / a Postgres counter when deploying more than one.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, scale: int = 1) -> None:
+        self._scale = scale
         self._hits: dict[str, deque[float]] = defaultdict(deque)
         self._lock = threading.Lock()
 
     def check(self, key: str, limit: int, window: float = 60.0) -> None:
+        limit *= self._scale
         now = time.monotonic()
         with self._lock:
             hits = self._hits[key]
@@ -38,4 +42,4 @@ class RateLimiter:
             self._hits.clear()
 
 
-limiter = RateLimiter()
+limiter = RateLimiter(settings.rate_limit_scale)

@@ -10,6 +10,7 @@ os.environ.update({
     "GEMINI_API_KEY": "",
     "RUN_JOBS_INLINE": "false",
     "SCAN_RATE_LIMIT_PER_MIN": "5",
+    "RATE_LIMIT_SCALE": "1",
 })
 
 import time  # noqa: E402

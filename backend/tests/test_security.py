@@ -53,3 +53,11 @@ def test_rate_limiter_window() -> None:
         limiter.check("k", 3)
     assert exc.value.status_code == 429 and "Retry-After" in exc.value.headers
     limiter.check("other", 3)  # keys are independent
+
+
+def test_rate_limiter_scale() -> None:
+    limiter = RateLimiter(scale=2)
+    for _ in range(6):
+        limiter.check("k", 3)
+    with pytest.raises(HTTPException):
+        limiter.check("k", 3)

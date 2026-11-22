@@ -52,8 +52,12 @@ async def resolve_host(hostname: str, timeout: float = 5.0) -> DnsResult:
 
 
 async def lookup_txt(name: str, timeout: float = 5.0) -> list[str]:
+    # Ownership checks ask public resolvers: local/campus DNS often caches an NXDOMAIN from
+    # before the record was added and keeps returning it long after the record exists.
+    resolver = _resolver(timeout)
+    resolver.nameservers = ["1.1.1.1", "8.8.8.8"]
     try:
-        answer = await _resolver(timeout).resolve(name, "TXT")
+        answer = await resolver.resolve(name, "TXT")
     except (dns.resolver.NXDOMAIN, *_RECOVERABLE):
         return []
     return [b"".join(r.strings).decode("utf-8", "replace") for r in answer]
