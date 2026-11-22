@@ -92,4 +92,4 @@ def sign_out(_: CurrentUser = Depends(get_current_user)) -> Response:  # noqa: B
 
 @router.get("/me", response_model=AuthUser)
 def me(user: CurrentUser = Depends(get_current_user)) -> AuthUser:  # noqa: B008
-    return AuthUser(id=user.id, email=user.email)
+    return AuthUser(id=user.id, email=user.email, status=user.status, aal=user.aal)

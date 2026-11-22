@@ -132,9 +132,25 @@ class _Query:
         return _Resp(copy.deepcopy(matched))
 
 
+class _RpcCall:
+    def __init__(self, db: FakeSupabase, name: str, params: dict[str, Any]) -> None:
+        self.db, self.name, self.params = db, name, params
+
+    def execute(self) -> _Resp:
+        self.db.rpc_calls.append((self.name, copy.deepcopy(self.params)))
+        return _Resp([self.db.rpc_handlers[self.name](self.params)])
+
+
 class FakeSupabase:
     def __init__(self) -> None:
         self.tables: dict[str, list[dict[str, Any]]] = {}
+        # Postgres functions are stubbed per test: name -> handler(params) returning the result
+        # (or raising postgrest.exceptions.APIError, the way a RAISE EXCEPTION surfaces).
+        self.rpc_handlers: dict[str, Any] = {}
+        self.rpc_calls: list[tuple[str, dict[str, Any]]] = []
 
     def table(self, name: str) -> _Query:
         return _Query(self, name)
+
+    def rpc(self, name: str, params: dict[str, Any]) -> _RpcCall:
+        return _RpcCall(self, name, params)

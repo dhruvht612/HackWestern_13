@@ -40,6 +40,8 @@ class RefreshModel(BaseModel):
 class AuthUser(BaseModel):
     id: str
     email: str | None = None
+    status: str = "active"
+    aal: str = "aal1"
 
 
 class AuthSession(BaseModel):

@@ -86,3 +86,40 @@ def test_rejects_wrong_signature(client) -> None:
 ])
 def test_protected_routes_need_auth(client, method, path) -> None:
     assert getattr(client, method)(path).status_code == 401
+
+
+def _set_status(db, user_id: str, status: str) -> None:
+    db.table("user_status").update({"status": status}).eq("user_id", user_id).execute()
+
+
+def test_me_reports_status_and_aal(client) -> None:
+    r = client.get("/auth/me", headers={"Authorization": f"Bearer {make_token(aal='aal2')}"})
+    assert r.status_code == 200
+    assert r.json()["status"] == "active" and r.json()["aal"] == "aal2"
+    assert client.get("/auth/me", headers=headers()).json()["aal"] == "aal1"
+
+
+def test_suspended_user_blocked_everywhere(client, db) -> None:
+    _set_status(db, USER_A, "suspended")
+    for path in ("/auth/me", "/projects"):
+        r = client.get(path, headers=headers())
+        assert r.status_code == 403 and r.json()["detail"] == "This account is suspended."
+
+
+def test_missing_status_row_fails_closed(client) -> None:
+    stranger = "cccccccc-cccc-4ccc-8ccc-cccccccccccc"
+    r = client.get("/projects", headers=headers(stranger))
+    assert r.status_code == 403 and r.json()["detail"] == "Account setup incomplete. Contact support."
+
+
+def test_status_lookup_error_fails_closed(client, db, monkeypatch) -> None:
+    real_table = db.table
+
+    def broken(name: str):
+        if name == "user_status":
+            raise RuntimeError("database down")
+        return real_table(name)
+
+    monkeypatch.setattr(db, "table", broken)
+    r = client.get("/projects", headers=headers())
+    assert r.status_code == 403 and r.json()["detail"] == "Account status unavailable."

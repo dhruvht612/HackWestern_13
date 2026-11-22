@@ -46,7 +46,13 @@ def headers(sub: str = USER_A) -> dict[str, str]:
 
 @pytest.fixture
 def db() -> FakeSupabase:
-    return FakeSupabase()
+    fake = FakeSupabase()
+    # The auth.users trigger creates these in a real database.
+    fake.table("user_status").insert([
+        {"user_id": USER_A, "status": "active", "risk_level": "low"},
+        {"user_id": USER_B, "status": "active", "risk_level": "low"},
+    ]).execute()
+    return fake
 
 
 @pytest.fixture
