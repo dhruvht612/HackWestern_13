@@ -42,6 +42,12 @@ The admin portal (see `../ADMIN-PANEL.md`) needs its schema and one operator bef
    ```sql
    insert into admin_users (user_id, role) select id, 'operator' from auth.users where email = '<operator email>';
    ```
+   Every new account starts `pending_review` with a placeholder review until the API's sign-up risk
+   check clears it. If the operator account was created in the Supabase dashboard instead of through
+   the app, clear it the same way:
+   ```sql
+   select route_signup(id, null, '[]'::jsonb) from auth.users where email = '<operator email>';
+   ```
 4. Sign in as that account and set up two-factor at `/account/security`. With `APP_ENV=production`,
    admin routes always require two-factor.
 5. Start the worker with `uv run --locked python -m attacksurface.worker` from `backend/`. Keep one

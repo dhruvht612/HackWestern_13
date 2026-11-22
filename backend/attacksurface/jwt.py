@@ -76,10 +76,7 @@ def get_bearer_token(credentials: HTTPAuthorizationCredentials | None = Depends(
     return credentials.credentials
 
 
-def get_current_user(
-    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),  # noqa: B008
-    db: Any = Depends(get_db),  # noqa: B008
-) -> CurrentUser:
+def _verified_claims(credentials: HTTPAuthorizationCredentials | None) -> dict[str, Any]:
     if credentials is None or credentials.scheme.lower() != "bearer":
         raise HTTPException(status_code=401, detail="Not authenticated", headers=_UNAUTHENTICATED)
     try:
@@ -89,6 +86,20 @@ def get_current_user(
         raise HTTPException(status_code=401, detail="Invalid or expired token", headers=_UNAUTHENTICATED) from None
     if claims.get("role", AUDIENCE) != AUDIENCE:
         raise HTTPException(status_code=403, detail="Forbidden")
+    return claims
+
+
+def get_token_user(credentials: HTTPAuthorizationCredentials | None = Depends(_bearer)) -> CurrentUser:  # noqa: B008
+    """A valid token, without the account-status check. Only for sign-out, which suspended users need."""
+    claims = _verified_claims(credentials)
+    return CurrentUser(id=str(claims["sub"]), email=claims.get("email"), aal=str(claims.get("aal") or "aal1"))
+
+
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),  # noqa: B008
+    db: Any = Depends(get_db),  # noqa: B008
+) -> CurrentUser:
+    claims = _verified_claims(credentials)
     user_id = str(claims["sub"])
     status = _account_status(db, user_id)
     return CurrentUser(id=user_id, email=claims.get("email"), aal=str(claims.get("aal") or "aal1"), status=status)

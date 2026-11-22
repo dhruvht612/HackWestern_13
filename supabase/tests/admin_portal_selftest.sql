@@ -19,9 +19,24 @@ begin
          (target, 'selftest-target@example.invalid', 'authenticated', 'authenticated');
 
   -- admin_selftest_trigger ------------------------------------------------------------------
+  select count(*) into n from user_status
+  where user_id in (op, target) and status = 'pending_review' and status_reason = 'signup_unassessed';
+  if n <> 2 then raise exception 'FAIL: trigger: expected 2 unassessed user_status rows, got %', n; end if;
+  select count(*) into n from review_items
+  where user_id in (op, target) and status = 'pending' and signals @> '[{"id":"signal:signup_unassessed"}]';
+  if n <> 2 then raise exception 'FAIL: trigger: expected 2 placeholder reviews, got %', n; end if;
+  raise notice 'PASS: trigger leaves every new account pending, with a review item';
+
+  -- admin_selftest_route_signup: a clean assessment activates and clears the placeholder ------
+  if route_signup(op, null, '[]') or route_signup(target, null, '[]') then
+    raise exception 'FAIL: route_signup: a clean signup was queued';
+  end if;
   select count(*) into n from user_status where user_id in (op, target) and status = 'active';
-  if n <> 2 then raise exception 'FAIL: trigger: expected 2 active user_status rows, got %', n; end if;
-  raise notice 'PASS: trigger creates user_status rows';
+  if n <> 2 then raise exception 'FAIL: route_signup: expected 2 active rows, got %', n; end if;
+  if exists (select 1 from review_items where user_id in (op, target)) then
+    raise exception 'FAIL: route_signup: placeholder review left behind';
+  end if;
+  raise notice 'PASS: route_signup activates clean signups and removes the placeholder';
 
   insert into admin_users (user_id, role) values (op, 'operator');
 
@@ -131,6 +146,8 @@ begin
   insert into auth.users (id, email, aud, role, created_at)
   values (older, older::text || '@admin-read-selftest.example', 'authenticated', 'authenticated', joined),
          (newer, newer::text || '@admin-read-selftest.example', 'authenticated', 'authenticated', joined);
+  perform route_signup(older, null, '[]');
+  perform route_signup(newer, null, '[]');
 
   insert into projects (name, root_domain, owner_user_id, verified_at)
   values ('read test', 'read-test.example', newer, now()) returning id into p;
@@ -199,6 +216,8 @@ begin
   insert into auth.users (id, email, aud, role)
   values (op, 'review-operator-' || op::text || '@example.invalid', 'authenticated', 'authenticated'),
          (owner_id, 'review-owner-' || owner_id::text || '@example.invalid', 'authenticated', 'authenticated');
+  perform route_signup(op, null, '[]');
+  perform route_signup(owner_id, null, '[]');
   insert into admin_users (user_id, role) values (op, 'operator'), (owner_id, 'operator');
   insert into projects (name, root_domain, owner_user_id, verification_token_hash, verification_expires_at)
   values ('review self-test', 'review-selftest.example', owner_id, 'mock-hash', now() + interval '1 hour')

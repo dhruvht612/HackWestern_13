@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import time
 from ipaddress import ip_address
 from typing import Any
@@ -11,7 +12,12 @@ from supabase_auth.errors import AuthApiError, AuthError
 
 from attacksurface import events
 from attacksurface.database import get_db, new_auth_client
-from attacksurface.jwt import CurrentUser, get_bearer_token, get_current_user
+from attacksurface.jwt import (
+    CurrentUser,
+    get_bearer_token,
+    get_current_user,
+    get_token_user,
+)
 from attacksurface.mfa import GoTrueMfa, MfaRejected, MfaUnavailable, get_mfa
 from attacksurface.netinfo import client_ip
 from attacksurface.ratelimit import limiter
@@ -29,6 +35,7 @@ from attacksurface.schemas import (
 )
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+log = logging.getLogger(__name__)
 
 
 def get_auth_client() -> Any:
@@ -46,17 +53,14 @@ def _session_out(session: Any, user: Any) -> AuthSession:
 
 
 def _limit(request: Request, action: str, per_min: int) -> None:
-    limiter.check(f"{action}:{request.client.host if request.client else 'unknown'}", per_min)
+    limiter.check(f"{action}:{client_ip(request) or 'unknown'}", per_min)
 
 
 @router.post("/signup", response_model=SignUpResult, status_code=201)
 def sign_up(payload: SignUpModel, request: Request, auth: Any = Depends(get_auth_client), db: Any = Depends(get_db)) -> SignUpResult:  # noqa: B008
     _limit(request, "signup", 5)
     try:
-        res = auth.auth.sign_up({
-            "email": payload.email, "password": payload.password,
-            "options": {"data": {"shadowscope_assess_signup": True}},
-        })
+        res = auth.auth.sign_up({"email": payload.email, "password": payload.password})
     except AuthApiError as exc:
         raise HTTPException(status_code=400, detail=exc.message or "Sign-up failed") from None
     except AuthError:
@@ -69,11 +73,17 @@ def sign_up(payload: SignUpModel, request: Request, auth: Any = Depends(get_auth
     except ValueError:
         caller = None
     account_id = str(res.user.id)
-    _, signals = signup_signals(db, res.user.email, caller)
-    pending = db.rpc("route_signup", {"p_user": account_id, "p_ip": caller, "p_signals": signals}).execute().data
+    try:
+        _, signals = signup_signals(db, res.user.email, caller)
+        pending = bool(db.rpc("route_signup", {"p_user": account_id, "p_ip": caller, "p_signals": signals}).execute().data)
+    except Exception:
+        # The account exists already. The DB trigger left it pending_review with a review item,
+        # so an operator sees it; don't turn that into a 500 the user can't retry.
+        log.exception("signup risk check failed for %s", account_id)
+        pending = True
     status = "pending_review" if pending else "active"
     user = AuthUser(id=account_id, email=res.user.email, status=status)
-    events.record(db, "signup", user_id=user.id, ip=raw_ip, subject=events.email_domain(payload.email))
+    events.record(db, "signup", user_id=user.id, ip=caller, subject=events.email_domain(payload.email))
     if pending:
         events.record(db, "review_queued", user_id=user.id, ip=caller, detail={"kind": "user"})
     if res.session is None:  # project requires email confirmation
@@ -113,7 +123,7 @@ def refresh(payload: RefreshModel, request: Request, auth: Any = Depends(get_aut
 
 
 @router.post("/signout", status_code=204)
-def sign_out(_: CurrentUser = Depends(get_current_user)) -> Response:  # noqa: B008
+def sign_out(_: CurrentUser = Depends(get_token_user)) -> Response:  # noqa: B008
     # Tokens are stateless; the client discards them. Access tokens expire on Supabase's schedule.
     return Response(status_code=204)
 

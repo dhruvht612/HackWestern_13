@@ -20,6 +20,8 @@ SYSTEM = (
     "control of a record only, not legal authority. Prefer needs_more_info on uncertainty. You cannot take actions."
 )
 EVENT_TYPE = re.compile(r"^[a-z_]{1,40}$")
+# Context, not risk evidence: these never count toward the weak-signal threshold.
+CONTEXT_SIGNALS = {"signal:email_domain_match", "signal:dns_proof", "signal:review_all"}
 
 
 def advise(item: dict[str, Any], events: list[dict[str, Any]]) -> tuple[ReviewVerdict, dict[str, Any]]:
@@ -44,7 +46,7 @@ def advise(item: dict[str, Any], events: list[dict[str, Any]]) -> tuple[ReviewVe
             try:
                 response = ReviewAdvice.model_validate_json(raw)
                 if response.key_signals and set(response.key_signals) <= allowed:
-                    risk_signals = [s for s in signals if s["id"] != "signal:email_domain_match"]
+                    risk_signals = [s for s in signals if s["id"] not in CONTEXT_SIGNALS]
                     if response.recommendation == "reject" and item["risk_level"] != "high" and len(risk_signals) < 2:
                         # ADMIN-PANEL.md §6: one weak signal routes to review, never to rejection
                         response.recommendation = "needs_more_info"

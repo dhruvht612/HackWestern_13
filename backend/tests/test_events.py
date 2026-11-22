@@ -21,7 +21,8 @@ def test_signup_records_event(client, db) -> None:
     assert r.status_code == 201
     [event] = _events(db, "signup")
     assert event["subject"] == "example.com"  # the email domain only, never the full address
-    assert event["user_id"] == USER_A and event["ip"] == "testclient"
+    assert event["user_id"] == USER_A
+    assert event["ip"] is None  # "testclient" is not an IP; only parseable addresses are stored
 
 
 def test_failed_signin_records_event(client, db) -> None:

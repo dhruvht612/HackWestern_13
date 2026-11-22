@@ -20,8 +20,10 @@ class RateLimiter:
     def __init__(self, scale: int = 1) -> None:
         self._scale = scale
         self._hits: dict[str, deque[float]] = defaultdict(deque)
+        self._notified: dict[str, float] = {}  # last time on_limited fired, per key
         self._lock = threading.Lock()
-        # Called with the key whenever a request is refused (set in main.py to log an event).
+        # Called with the key on the first refusal per key per window (set in main.py to log an
+        # event), so a flood of refused requests costs one DB write, not one per request.
         self.on_limited: Callable[[str], None] | None = None
 
     def check(self, key: str, limit: int, window: float = 60.0) -> None:
@@ -34,8 +36,11 @@ class RateLimiter:
             retry = int(window - (now - hits[0])) + 1 if len(hits) >= limit else 0
             if not retry:
                 hits.append(now)
+            notify = bool(retry) and now - self._notified.get(key, float("-inf")) >= window
+            if notify:
+                self._notified[key] = now
         if retry:
-            if self.on_limited is not None:
+            if notify and self.on_limited is not None:
                 try:
                     self.on_limited(key)
                 except Exception:  # noqa: BLE001, S110 - a logging hook never changes the response
@@ -49,6 +54,7 @@ class RateLimiter:
     def reset(self) -> None:
         with self._lock:
             self._hits.clear()
+            self._notified.clear()
 
 
 limiter = RateLimiter(settings.rate_limit_scale)

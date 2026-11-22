@@ -360,13 +360,18 @@ grant select, insert, update on worker_health to service_role;
 -- security definer: the Auth service inserts into auth.users with a role that has no rights here.
 create or replace function handle_new_auth_user() returns trigger
 language plpgsql security definer set search_path = public as $$
-declare
-  needs_assessment boolean := coalesce(to_jsonb(new)->'raw_user_meta_data'->'shadowscope_assess_signup' = 'true'::jsonb, false);
 begin
+  -- Every new account starts unassessed and visible in the review queue, however it was created
+  -- (user metadata is client-controlled, so it can't opt an account out). The API's route_signup
+  -- clears this when the risk check finds nothing; if that call fails, or the account was made
+  -- outside the API, an operator decides.
   insert into public.user_status (user_id, status, risk_level, status_reason)
-  values (new.id, case when needs_assessment then 'pending_review' else 'active' end, 'low',
-          case when needs_assessment then 'signup_unassessed' else 'signup' end)
+  values (new.id, 'pending_review', 'medium', 'signup_unassessed')
   on conflict (user_id) do nothing;
+  if found then
+    insert into public.review_items (kind, user_id, risk_level, signals)
+    values ('user', new.id, 'medium', '[{"id":"signal:signup_unassessed","label":"Sign-up not risk-assessed","value":"yes"}]');
+  end if;
   return new;
 end $$;
 drop trigger if exists on_auth_user_created on auth.users;
@@ -561,6 +566,9 @@ begin
     status_reason = 'signup assessed', updated_at = now()
   where user_id = p_user and status_reason in ('signup', 'signup_unassessed') and status in ('active', 'pending_review');
   if not found then return false; end if;
+  -- The assessment replaces the trigger's placeholder review.
+  delete from review_items where user_id = p_user and kind = 'user' and status = 'pending'
+    and signals @> '[{"id":"signal:signup_unassessed"}]';
   if jsonb_array_length(p_signals) > 0 then
     insert into review_items(kind, user_id, risk_level, signals) values ('user', p_user, 'medium', p_signals);
     return true;

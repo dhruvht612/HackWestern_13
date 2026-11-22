@@ -347,10 +347,10 @@ def _set_status(user_id: str, status: str, body: ReasonModel, request: Request, 
 
 
 @router.post("/users/{user_id}/suspend", response_model=UserStatusChange)
-def suspend_user(user_id: str, body: ReasonModel, request: Request, admin: AdminUser = Depends(require_admin("operator")), db: Any = Depends(get_db)) -> UserStatusChange:  # noqa: B008
-    return _set_status(user_id, "suspended", body, request, admin, db)
+def suspend_user(user_id: UUID, body: ReasonModel, request: Request, admin: AdminUser = Depends(require_admin("operator")), db: Any = Depends(get_db)) -> UserStatusChange:  # noqa: B008
+    return _set_status(str(user_id), "suspended", body, request, admin, db)
 
 
 @router.post("/users/{user_id}/unsuspend", response_model=UserStatusChange)
-def unsuspend_user(user_id: str, body: ReasonModel, request: Request, admin: AdminUser = Depends(require_admin("operator")), db: Any = Depends(get_db)) -> UserStatusChange:  # noqa: B008
-    return _set_status(user_id, "active", body, request, admin, db)
+def unsuspend_user(user_id: UUID, body: ReasonModel, request: Request, admin: AdminUser = Depends(require_admin("operator")), db: Any = Depends(get_db)) -> UserStatusChange:  # noqa: B008
+    return _set_status(str(user_id), "active", body, request, admin, db)
