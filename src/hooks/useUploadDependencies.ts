@@ -2,11 +2,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 
 export function useUploadDependencies(projectId: string) {
-  const queryClient = useQueryClient();
+  const qc = useQueryClient();
   return useMutation({
-    mutationFn: (file: File) => api.uploadDependencies(projectId, file),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["dependencies", projectId] });
-    },
+    mutationFn: ({ file, deployedOn }: { file: File; deployedOn?: string }) => api.uploadDependencies(projectId, file, deployedOn),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["dependencies", projectId] }),
   });
 }

@@ -1,148 +1,83 @@
 # AttackSurface
 
-AttackSurface is an AI-powered external attack surface intelligence platform that turns publicly exposed assets and dependency vulnerabilities into prioritized, actionable security insights.
+AttackSurface builds the file an attacker would keep on you: it passively maps what a domain exposes, links exposed hosts to the vulnerable dependencies behind them, and ranks what to fix first.
 
-> Hackathon scaffold: discovery/intel/AI modules are stubbed. The API and frontend work end-to-end using realistic fixtures.
+**Docs:** [PRD.md](PRD.md) · [ARCHITECTURE.md](ARCHITECTURE.md) · [AI-AGENT.md](AI-AGENT.md) · [DESIGN.md](DESIGN.md) · [backend/README.md](backend/README.md)
 
-## Architecture
+## How it works
 
-```mermaid
-flowchart LR
-  subgraph Frontend[P3 Frontend - React/Vite]
-    UI[Dashboard / Assets / Findings / Graph / Report]
-    Query[TanStack Query hooks]
-    APIClient[Typed API client\nmock or live mode]
-  end
+1. Sign up / sign in (Supabase Auth).
+2. Create a project for a root domain and confirm you're authorized.
+3. Prove domain control with a DNS TXT record. Scans are blocked until it verifies.
+4. Start a scan. A worker collects Certificate Transparency names, DNS, and one `GET /` per in-scope public host on ports 80/443 (headers + TLS certificate), then runs deterministic rules.
+5. Upload `package-lock.json` (optionally mapped to the host it ships on); packages are matched against OSV.dev.
+6. Request analysis: Gemini writes a validated triage memo, or a deterministic fallback does when Gemini is unavailable.
+7. Read findings, the attack-path graph, and the Markdown report.
 
-  subgraph Backend[P1+P2 Backend - FastAPI]
-    R[Routers / API contract]
-    D[discovery/\nP1: CT, DNS, HTTP/TLS, rules]
-    I[intel/\nP2: deps, OSV, risk]
-    A[ai/\nP2: Gemini analysis]
-    F[shared/fixtures]
-  end
+No port scanning, brute forcing, crawling, or exploitation. Findings are potential exposure to validate.
 
-  subgraph Data[Data]
-    SB[(Supabase/Postgres)]
-  end
-
-  UI --> Query --> APIClient
-  APIClient -->|VITE_USE_MOCKS=true| F
-  APIClient -->|VITE_USE_MOCKS=false| R
-  R --> D
-  R --> I
-  R --> A
-  D --> SB
-  I --> SB
-  A --> SB
-```
-
-## Repo Structure
+## Repo layout
 
 ```text
-.
-├── src/                    # Frontend app (P3) - Vite + React + TypeScript
-│   ├── components/         # Reusable UI components
-│   ├── hooks/              # TanStack Query hooks per endpoint
-│   ├── layouts/            # AppLayout (sidebar + top bar)
-│   ├── lib/                # types, api client, query client, utils
-│   ├── pages/              # Route pages
-│   └── styles/             # globals.css, print.css
-├── backend/                # FastAPI app (P1 + P2)
-│   ├── app/
-│   │   ├── routers/        # projects, scans, dependencies, analysis, reports
-│   │   ├── discovery/      # P1: ct.py, dns.py, http_meta.py, rules.py
-│   │   ├── intel/          # P2: deps.py, osv.py, risk.py
-│   │   ├── ai/             # P2: gemini.py
-│   │   ├── schemas.py      # Pydantic models matching API contract
-│   │   └── main.py
-│   └── tests/
-├── shared/
-│   ├── fixtures/           # Realistic JSON fixtures per endpoint
-│   └── api-contract.md
-├── supabase/
-│   └── schema.sql
-├── .github/workflows/ci.yml
-├── .env.example
-├── Makefile
-└── vercel.json
+src/                  Frontend: React 19 + Vite + Tailwind (pages, hooks, lib/api.ts)
+backend/attacksurface FastAPI app (see backend/README.md)
+backend/tests         Pytest suite (no credentials, no network)
+supabase/schema.sql   Idempotent schema + RLS (also the upgrade path)
+shared/               API contract + demo fixtures (frontend demo mode only)
+scripts/              check-markdown.ts (report parser self-check)
 ```
 
 ## Setup
 
-### Prerequisites
-- Node.js 20+
-- Python 3.11+
-
-### 1) Install dependencies
+**Prerequisites:** Node 20+, Python 3.12, [uv](https://docs.astral.sh/uv/), a Supabase project.
 
 ```bash
-# Frontend (repo root)
 npm install
-
-# Backend
-python -m pip install -r backend/requirements.txt
+uv sync --project backend --all-groups     # add --system-certs behind a TLS-intercepting proxy
+cp .env.example .env                       # then fill it in
 ```
 
-### 2) Configure environment
+**Supabase**
+1. Project Settings → API: copy the URL, `anon` key, and `service_role` key into `.env`.
+2. Project Settings → JWT Keys: if user tokens are still signed with the legacy shared secret, copy it to `SUPABASE_JWT_SECRET`. Projects on asymmetric signing keys need nothing more (tokens are verified via JWKS).
+3. Authentication → Providers: enable Email. If "Confirm email" is on, users confirm before signing in.
+4. Apply the schema: paste `supabase/schema.sql` into the SQL editor, or `psql "$DATABASE_URL" -f supabase/schema.sql`. It is idempotent and additive (re-run it after pulling changes). Projects created before ownership existed need an owner: `update projects set owner_user_id = '<user uuid>' where owner_user_id is null;`
+
+**Gemini (optional):** set `GEMINI_API_KEY` (and `GEMINI_MODEL`). Without it, analysis uses the deterministic fallback and says so.
+
+## Run
 
 ```bash
-cp .env.example .env
-```
-
-Default mock mode works without backend secrets.
-
-### 3) Run
-
-```bash
-# Terminal 1 - backend
+make dev                                   # API :8000 + frontend :5173 (jobs run inline)
+# or separately:
 make backend
-# or: cd backend && python -m uvicorn app.main:app --reload --port 8000
-
-# Terminal 2 - frontend
 make frontend
-# or: npm run dev
+cd backend && uv run python -m attacksurface.worker   # production-style worker (set RUN_JOBS_INLINE=false on the API)
 ```
 
-- Frontend: http://localhost:5173
-- Backend: http://localhost:8000
-- API docs: http://localhost:8000/docs
+**Demo mode:** `VITE_USE_MOCKS=true npm run dev` serves the labelled `acme-demo.com` fixtures with no backend and no sign-in.
 
-## Mock Mode
-
-The frontend has a typed API client in `src/lib/api.ts`.
-
-- `VITE_USE_MOCKS=true` (default): returns fixture data from `shared/fixtures` with a small artificial delay. Every page works without the backend.
-- `VITE_USE_MOCKS=false`: calls `VITE_API_URL` (default `http://localhost:8000`). FastAPI stubs return the same fixture data, so the UI behaves the same end-to-end.
-
-## Ownership
-
-| Area | Owner | Path |
-|---|---|---|
-| Discovery backend | P1 | `backend/app/discovery/`, scan/discovery router integration |
-| Intelligence/AI backend | P2 | `backend/app/intel/`, `backend/app/ai/`, analysis/dependency logic |
-| Frontend | P3 | `src/`, frontend config, UI/UX, mock/live API client |
-| Shared contract | All | `shared/api-contract.md`, `shared/fixtures/`, `backend/app/schemas.py`, `src/lib/types.ts` |
-
-## API Contract
-
-See [`shared/api-contract.md`](./shared/api-contract.md). Backend stubs implement the contract and return fixtures on day one.
-
-## Safety and Scope Rules
-
-- **Authorized targets only**. Project creation requires `authorization_confirmed=true`; the API rejects unauthorized requests.
-- **Passive discovery only**. CT logs, DNS, and HTTP/TLS metadata. No brute-forcing, port scanning, or exploitation.
-- **Domain validation**. `root_domain` must be a registrable domain; IPs, wildcards, schemes, and paths are rejected.
-- **Potential exposure, not proof**. Graph and findings represent potential exposure paths and should be validated before action.
-- **Secrets**. Never commit real keys. Never put backend secrets in `VITE_` variables (exposed to browser).
-
-## Commands
+## Test
 
 ```bash
-npm run dev        # frontend dev server
-npm run build      # frontend production build
-npm run typecheck  # tsc --noEmit
-npm run lint       # eslint
-cd backend && python -m pytest -q
-cd backend && python -m ruff check .
+make test        # backend pytest + frontend typecheck
+make lint        # eslint + ruff
+node --experimental-strip-types scripts/check-markdown.ts
+npm run build
 ```
+
+CI (`.github/workflows/ci.yml`) runs lint, typecheck, and build for the frontend and ruff + pytest for the backend; it needs no secrets.
+
+## Deploy
+
+- **Frontend:** Vercel (`vercel.json` rewrites every path to `index.html`). Set `VITE_API_URL` to the API URL and `VITE_USE_MOCKS=false`.
+- **API:** any container/Python host: `uv run fastapi run attacksurface/main.py` in `backend/`, with `APP_ENV=production`, `RUN_JOBS_INLINE=false`, `CORS_ORIGINS` / `FRONTEND_URL` set to the deployed frontend.
+- **Worker:** a second process: `uv run python -m attacksurface.worker`.
+- The rate limiter is per process: run one API instance, or move it to a shared store.
+
+## Safety rules
+
+- Authorized targets only: attestation at project creation **and** DNS TXT proof of control before any scan. Verification lasts 90 days.
+- Scope is the verified root and its subdomains. Redirect targets and third-party infrastructure are never contacted.
+- Hosts resolving to any non-public address (private, loopback, link-local, metadata) are skipped. Connections are pinned to the validated IP.
+- Never put backend secrets in `VITE_*` variables.

@@ -1,67 +1,78 @@
-import time
+"""Verification of Supabase Auth access tokens.
+
+Supabase is the identity provider; this module only verifies the tokens it issues:
+- HS256 tokens (projects on the legacy shared secret) are checked with SUPABASE_JWT_SECRET.
+- RS256/ES256 tokens (projects on asymmetric signing keys) are checked against the project's
+  JWKS at ``{SUPABASE_URL}/auth/v1/.well-known/jwks.json``.
+Every token must carry a valid signature, ``exp``, ``sub``, ``aud == "authenticated"``, and
+``iss == {SUPABASE_URL}/auth/v1``.
+"""
+
+from __future__ import annotations
+
 from typing import Any
 
 import jwt
-from fastapi import HTTPException, Request
+from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from pydantic import BaseModel
 
 from attacksurface.config import settings
 
-JWT_ALGORITHM = "HS256"
+AUDIENCE = "authenticated"
+ASYMMETRIC_ALGS = {"RS256", "ES256"}
+
+_jwks_client: jwt.PyJWKClient | None = None
 
 
-def token_response(token: str):
-    return {"access_token": token}
+class CurrentUser(BaseModel):
+    id: str
+    email: str | None = None
 
 
-def sign_jwt(user_id: str) -> dict[str, str]:
-    payload = {"user_id": user_id, "expires": time.time() + 600}
-    token = jwt.encode(payload, settings.jwt_secret, algorithm=JWT_ALGORITHM)
+def _jwks() -> jwt.PyJWKClient:
+    global _jwks_client
+    if _jwks_client is None:
+        _jwks_client = jwt.PyJWKClient(f"{settings.supabase_issuer}/.well-known/jwks.json", lifespan=600)
+    return _jwks_client
 
-    return token_response(token)
+
+def decode_token(token: str) -> dict[str, Any]:
+    """Return verified claims or raise ``jwt.PyJWTError``."""
+    if not settings.supabase_url:
+        raise jwt.InvalidTokenError("SUPABASE_URL is not configured")
+    alg = jwt.get_unverified_header(token).get("alg")
+    if alg == "HS256":
+        if not settings.supabase_jwt_secret:
+            raise jwt.InvalidAlgorithmError("HS256 tokens need SUPABASE_JWT_SECRET")
+        key: Any = settings.supabase_jwt_secret
+    elif alg in ASYMMETRIC_ALGS:
+        key = _jwks().get_signing_key_from_jwt(token).key
+    else:
+        raise jwt.InvalidAlgorithmError(f"Unsupported token algorithm: {alg}")
+    return jwt.decode(
+        token,
+        key,
+        algorithms=[alg],
+        audience=AUDIENCE,
+        issuer=settings.supabase_issuer,
+        options={"require": ["exp", "sub", "aud", "iss"]},
+        leeway=30,
+    )
 
 
-def decode_jwt(token: str) -> dict[str, Any] | None:
+_bearer = HTTPBearer(auto_error=False)
+_UNAUTHENTICATED = {"WWW-Authenticate": "Bearer"}
+
+
+def get_current_user(credentials: HTTPAuthorizationCredentials | None = Depends(_bearer)) -> CurrentUser:  # noqa: B008
+    if credentials is None or credentials.scheme.lower() != "bearer":
+        raise HTTPException(status_code=401, detail="Not authenticated", headers=_UNAUTHENTICATED)
     try:
-        decoded_token = jwt.decode(
-            token, settings.jwt_secret, algorithms=[JWT_ALGORITHM]
-        )
-        return decoded_token if decoded_token["expires"] >= time.time() else None
-    except:
-        return {}
-
-
-class JWTBearer(HTTPBearer):
-    def __init__(self, auto_error: bool = True):
-        super(JWTBearer, self).__init__(auto_error=auto_error)
-
-    async def __call__(self, request: Request):  # ty: ignore[incompatible-method-override]
-
-        credentials: HTTPAuthorizationCredentials = await super(
-            JWTBearer, self
-        ).__call__(request)  # ty: ignore[invalid-assignment]
-
-        if credentials:
-            if not credentials.scheme == "Bearer":
-                raise HTTPException(
-                    status_code=403, detail="Invalid authentication scheme."
-                )
-            if not self.verify_jwt(credentials.credentials):
-                raise HTTPException(
-                    status_code=403, detail="Invalid token or expired token."
-                )
-            return credentials.credentials
-        else:
-            raise HTTPException(status_code=403, detail="Invalid authorization code.")
-
-    def verify_jwt(self, jwtoken: str) -> bool:
-        isTokenValid: bool = False
-
-        try:
-            payload = decode_jwt(jwtoken)
-        except:
-            payload = None
-        if payload:
-            isTokenValid = True
-
-        return isTokenValid
+        claims = decode_token(credentials.credentials)
+    except jwt.PyJWTError:
+        # Deliberately generic: don't tell the caller which check failed.
+        raise HTTPException(status_code=401, detail="Invalid or expired token", headers=_UNAUTHENTICATED) from None
+    if claims.get("role", AUDIENCE) != AUDIENCE:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    return CurrentUser(id=str(claims["sub"]), email=claims.get("email"))

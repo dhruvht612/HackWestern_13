@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Download, Printer } from "lucide-react";
-import { useReport } from "@/hooks/useReport";
-import { DEMO_SCAN_ID } from "@/lib/constants";
+import { useReport } from "@/hooks/useScanData";
+import { ScanGate } from "@/components/ScanGate";
 import { PageSkeleton } from "@/components/LoadingSkeleton";
 import { PageHeader } from "@/components/PageHeader";
 import { ClassificationBand } from "@/components/ClassificationBand";
@@ -93,7 +93,10 @@ function DocBlock({ block }: { block: Block }) {
 }
 
 export function ReportPage() {
-  const scanId = DEMO_SCAN_ID;
+  return <ScanGate>{(scanId) => <ReportView scanId={scanId} />}</ScanGate>;
+}
+
+function ReportView({ scanId }: { scanId: string }) {
   const report = useReport(scanId);
   const blocks = useMemo(() => (report.data ? parseMarkdown(report.data) : []), [report.data]);
 
