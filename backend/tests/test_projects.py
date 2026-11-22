@@ -97,3 +97,16 @@ def test_verified_project_can_queue_scan_once_and_rate_limit(client, monkeypatch
             s["status"] = "completed"
         codes.append(client.post(f"/projects/{p['id']}/scans", headers=headers()).status_code)
     assert codes.count(429) >= 1
+
+
+def test_api_docs_round_trip_and_ownership(client) -> None:
+    p = create(client)
+    assert client.get(f"/projects/{p['id']}/api_docs", headers=headers()).json() == {"file_contents": None}
+    body = {"file_contents": '{"openapi": "3.1.0"}'}
+    assert client.post(f"/projects/{p['id']}/api_docs", json=body, headers=headers()).json() == body
+    assert client.get(f"/projects/{p['id']}/api_docs", headers=headers()).json() == body
+    # another user can neither read nor overwrite it, and can't tell it exists
+    assert client.get(f"/projects/{p['id']}/api_docs", headers=headers(USER_B)).status_code == 404
+    assert client.post(f"/projects/{p['id']}/api_docs", json={"file_contents": "x"}, headers=headers(USER_B)).status_code == 404
+    assert client.get(f"/projects/{p['id']}/api_docs").status_code == 401
+    assert client.post(f"/projects/{p['id']}/api_docs", json={"file_contents": "x" * 1_000_001}, headers=headers()).status_code == 422

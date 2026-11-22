@@ -238,3 +238,9 @@ class Graph(BaseModel):
 
 class Health(BaseModel):
     status: Literal["ok"]
+
+
+class ClientApiDocs(BaseModel):
+    """An uploaded API description (e.g. an OpenAPI file) stored on the project."""
+
+    file_contents: str | None = Field(default=None, max_length=1_000_000)

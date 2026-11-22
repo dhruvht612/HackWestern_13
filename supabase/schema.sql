@@ -17,6 +17,7 @@ create table if not exists projects (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   root_domain text not null,
+  api_docs text null,
   authorization_confirmed boolean not null default false,
   created_at timestamptz not null default now(),
   constraint projects_root_domain_not_blank check (length(trim(root_domain)) > 0)
@@ -27,6 +28,7 @@ alter table projects add column if not exists verification_token_hash text;
 alter table projects add column if not exists verification_expires_at timestamptz;
 alter table projects add column if not exists verified_at timestamptz;
 alter table projects add column if not exists verification_method text;
+alter table projects add column if not exists api_docs text;  -- client API description (OpenAPI etc.)
 
 -- Scans -----------------------------------------------------------------------------------
 create table if not exists scans (

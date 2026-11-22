@@ -13,6 +13,7 @@ from attacksurface.discovery import dns as dns_lookup
 from attacksurface.jwt import CurrentUser, get_current_user
 from attacksurface.ratelimit import limiter
 from attacksurface.schemas import (
+    ClientApiDocs,
     Project,
     ProjectCreate,
     Scan,
@@ -109,6 +110,19 @@ async def check_verification(project_id: str, user: CurrentUser = Depends(get_cu
         return VerificationChallenge(status="verified", record_name=name, verified_at=now, message="Domain control verified. You can start a scan.")
     return VerificationChallenge(status=status, record_name=name, expires_at=project.get("verification_expires_at"), verified_at=project.get("verified_at"),
                                  message="The TXT record wasn't found yet. DNS changes can take a few minutes; check again shortly.")
+
+
+@router.get("/{project_id}/api_docs", response_model=ClientApiDocs)
+def get_api_docs(project_id: str, user: CurrentUser = Depends(get_current_user), db: Any = Depends(get_db)) -> ClientApiDocs:  # noqa: B008
+    project = get_owned_project(db, project_id, user)
+    return ClientApiDocs(file_contents=project.get("api_docs"))
+
+
+@router.post("/{project_id}/api_docs", response_model=ClientApiDocs)
+def post_api_docs(project_id: str, payload: ClientApiDocs, user: CurrentUser = Depends(get_current_user), db: Any = Depends(get_db)) -> ClientApiDocs:  # noqa: B008
+    project = get_owned_project(db, project_id, user)
+    db.table("projects").update({"api_docs": payload.file_contents, "updated_at": now_utc().isoformat()}).eq("id", project["id"]).execute()
+    return payload
 
 
 @router.get("/{project_id}/scans", response_model=list[Scan])
