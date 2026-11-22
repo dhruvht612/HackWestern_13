@@ -10,6 +10,8 @@ import type {
   Evidence,
   Finding,
   Graph,
+  MfaEnrollment,
+  MfaFactor,
   Project,
   ProjectCreate,
   Scan,
@@ -55,7 +57,7 @@ async function refreshSession(): Promise<boolean> {
   return refreshing;
 }
 
-async function request<T>(path: string, init: RequestInit = {}, retried = false): Promise<T> {
+export async function request<T>(path: string, init: RequestInit = {}, retried = false): Promise<T> {
   const token = session.get()?.access_token;
   const response = await fetch(`${API_URL}${path}`, {
     ...init,
@@ -86,11 +88,12 @@ async function request<T>(path: string, init: RequestInit = {}, retried = false)
   return (type.includes("text/markdown") || type.includes("text/plain") ? await response.text() : await response.json()) as T;
 }
 
-const json = (method: string, body?: unknown): RequestInit => ({ method, body: body === undefined ? undefined : JSON.stringify(body) });
+export const json = (method: string, body?: unknown): RequestInit => ({ method, body: body === undefined ? undefined : JSON.stringify(body) });
 
 const demoProject = (): Project => ({
   ...clone<Project>(fixtures.project),
   verification_status: "verified",
+  authorization: "approved",
   verified_at: fixtures.project.created_at,
   latest_scan_id: DEMO_SCAN_ID,
 });
@@ -100,7 +103,24 @@ export const api = {
   signUp: (email: string, password: string) => request<SignUpResult>("/auth/signup", json("POST", { email, password })),
   signIn: (email: string, password: string) => request<AuthSession>("/auth/signin", json("POST", { email, password })),
   signOut: () => request<void>("/auth/signout", { method: "POST" }).catch(() => undefined),
-  me: () => request<AuthUser>("/auth/me"),
+  me: (): Promise<AuthUser> =>
+    USE_MOCKS ? delay().then(() => ({ id: "demo-user", email: null, status: "active", aal: "aal1" as const })) : request<AuthUser>("/auth/me"),
+
+  // --- two-factor
+  async mfaFactors(): Promise<MfaFactor[]> {
+    if (USE_MOCKS) return [];
+    return request<MfaFactor[]>("/auth/mfa/factors");
+  },
+  async mfaEnroll(): Promise<MfaEnrollment> {
+    if (USE_MOCKS) throw new ApiError("Two-factor isn't available in demo mode", 400);
+    return request<MfaEnrollment>("/auth/mfa/enroll", { method: "POST" });
+  },
+  async mfaVerify(factorId: string, code: string): Promise<AuthSession> {
+    if (USE_MOCKS) throw new ApiError("Two-factor isn't available in demo mode", 400);
+    const next = await request<AuthSession>("/auth/mfa/verify", json("POST", { factor_id: factorId, code }));
+    session.set(next); // only reached on success: a wrong code leaves the current session as it was
+    return next;
+  },
 
   // --- projects
   async listProjects(): Promise<Project[]> {

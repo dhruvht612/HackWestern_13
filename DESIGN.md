@@ -1,5 +1,5 @@
 ---
-name: AttackSurface
+name: ShadowScope
 description: The file an attacker keeps on you, kept as a dark intelligence dossier.
 colors:
   abyss-navy: "#1A2236"
@@ -124,7 +124,7 @@ components:
     padding: "32px"
 ---
 
-# Design System: AttackSurface
+# Design System: ShadowScope
 
 ## Overview
 
@@ -255,7 +255,7 @@ Blunt, typed, square.
 ### Navigation
 - **Folder tabs (app):** die-cut trapezoids, 14px semibold with a 15px line icon. Active tab is raised navy, joins the sheet beneath it, and carries a 3px kiwi top edge. Inactive tabs are filled camel with navy text, easing to 80% camel on hover. 150ms color transition.
 - **Landing nav:** 14px semibold secondary-text links on the field, kiwi on hover; hidden below `md`.
-- **Wordmark:** a camel folder glyph with navy lines beside condensed uppercase "AttackSurface" at 800.
+- **Wordmark:** a camel folder glyph with navy lines beside condensed uppercase "ShadowScope" at 800.
 
 ### Ledger (signature)
 Tables are ledgers: a 2px camel head rule over 11px uppercase camel headers, camel hairline row dividers at 15%, tabular numerals, Courier Prime for hostnames and IDs. Clickable rows wash camel at 10 to 15% on hover; a selected row is ruled in kiwi above and below.

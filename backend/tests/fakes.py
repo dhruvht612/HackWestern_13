@@ -31,7 +31,7 @@ def _stamp() -> str:
 
 
 class _Resp:
-    def __init__(self, data: list[dict[str, Any]]) -> None:
+    def __init__(self, data: Any) -> None:
         self.data = data
 
 
@@ -74,6 +74,14 @@ class _Query:
     def is_(self, col: str, val: str) -> _Query:
         assert val == "null"
         self.filters.append(lambda r: r.get(col) is None)
+        return self
+
+    def lte(self, col: str, val: Any) -> _Query:
+        self.filters.append(lambda r: r.get(col) is not None and str(r[col]) <= str(val))
+        return self
+
+    def gte(self, col: str, val: Any) -> _Query:
+        self.filters.append(lambda r: r.get(col) is not None and str(r[col]) >= str(val))
         return self
 
     def lt(self, col: str, val: Any) -> _Query:
@@ -132,9 +140,26 @@ class _Query:
         return _Resp(copy.deepcopy(matched))
 
 
+class _RpcCall:
+    def __init__(self, db: FakeSupabase, name: str, params: dict[str, Any]) -> None:
+        self.db, self.name, self.params = db, name, params
+
+    def execute(self) -> _Resp:
+        self.db.rpc_calls.append((self.name, copy.deepcopy(self.params)))
+        result = self.db.rpc_handlers[self.name](self.params)
+        return _Resp([result] if self.name == "admin_set_user_status" else result)
+
+
 class FakeSupabase:
     def __init__(self) -> None:
         self.tables: dict[str, list[dict[str, Any]]] = {}
+        # Postgres functions are stubbed per test: name -> handler(params) returning the result
+        # (or raising postgrest.exceptions.APIError, the way a RAISE EXCEPTION surfaces).
+        self.rpc_handlers: dict[str, Any] = {}
+        self.rpc_calls: list[tuple[str, dict[str, Any]]] = []
 
     def table(self, name: str) -> _Query:
         return _Query(self, name)
+
+    def rpc(self, name: str, params: dict[str, Any]) -> _RpcCall:
+        return _RpcCall(self, name, params)

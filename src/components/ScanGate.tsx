@@ -2,15 +2,32 @@ import type { ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Play } from "lucide-react";
 import { useCreateScan } from "@/hooks/useCreateScan";
+import { useProject } from "@/hooks/useProject";
 import { useScan } from "@/hooks/useScan";
 import { useCurrentScan } from "@/hooks/useScanData";
 import { EmptyState } from "./EmptyState";
 import { PageSkeleton } from "./LoadingSkeleton";
 import { VerificationPanel } from "./VerificationPanel";
+import type { Project } from "@/lib/types";
+
+function scanAuthorized(project: Project | undefined) {
+  return project?.verification_status === "verified" && (project.authorization === "approved" || project.authorization === "auto_cleared");
+}
+
+const authorizationMessage = {
+  not_routed: "This domain does not have scan authorization.",
+  pending_review: "This domain is awaiting review. You can start a scan after an operator approves it.",
+  rejected: "Authorization for this domain was rejected.",
+  revoked: "Authorization for this domain was revoked.",
+  approved: "",
+  auto_cleared: "",
+};
 
 export function StartScanButton({ projectId, label = "Start a scan", className = "btn-primary" }: { projectId: string; label?: string; className?: string }) {
   const navigate = useNavigate();
   const create = useCreateScan(projectId);
+  const { data: project } = useProject(projectId);
+  if (!scanAuthorized(project)) return null;
   return (
     <span className="inline-flex flex-col items-start gap-2">
       <button
@@ -45,8 +62,12 @@ export function ScanGate({ children }: { children: (scanId: string) => ReactNode
     return <EmptyState title="File not found" description="This project doesn't exist, or it belongs to another account." action={<Link className="btn-secondary" to="/projects">All projects</Link>} />;
   }
   const p = project.data;
+  const canStart = scanAuthorized(p);
+  const authorization = p.authorization ?? "not_routed";
+  const blocked = !canStart && (p.verification_status === "verified" || authorization === "revoked" || authorization === "rejected");
+  const blockedNotice = <p role="status" className="border border-camel p-4 text-sm">{authorizationMessage[authorization]}</p>;
   if (!scanId) {
-    return p.verification_status !== "verified" ? (
+    return blocked ? blockedNotice : p.verification_status !== "verified" ? (
       <VerificationPanel project={p} />
     ) : (
       <EmptyState title="No scans yet" description={`Domain control is verified. Start a scan to discover what ${p.root_domain} exposes.`} action={<StartScanButton projectId={projectId} />} />
@@ -67,12 +88,13 @@ export function ScanGate({ children }: { children: (scanId: string) => ReactNode
       <EmptyState
         title={status === "failed" ? "The last scan failed" : "The last scan was cancelled"}
         description={scan.data?.error ? `${scan.data.error}. No results were recorded.` : "No results were recorded."}
-        action={p.verification_status === "verified" ? <StartScanButton projectId={projectId} label="Start a new scan" /> : <VerificationPanel project={p} />}
+        action={blocked ? blockedNotice : canStart ? <StartScanButton projectId={projectId} label="Start a new scan" /> : <VerificationPanel project={p} />}
       />
     );
   }
   return (
     <>
+      {blocked && blockedNotice}
       {status === "partial" ? (
         <p role="status" className="mb-6 border-2 border-severity-medium p-3 text-sm">
           This scan is <strong>partial</strong>: at least one data source failed, so the results below may be incomplete.{" "}

@@ -40,7 +40,7 @@ def _bool(value: str | None, default: bool) -> bool:
 class Settings(BaseModel):
     app_env: str = "development"
     debug: bool = False
-    app_name: str = "AttackSurface API"
+    app_name: str = "ShadowScope API"
 
     frontend_url: str = "http://localhost:5173"
     cors_origins: list[str] = ["http://localhost:5173"]
@@ -58,6 +58,11 @@ class Settings(BaseModel):
 
     # Multiplies every per-minute rate limit. Raise it for local testing only; keep 1 in production.
     rate_limit_scale: int = 1
+    # Admin routes require a two-factor (aal2) session. Defaults on in production.
+    admin_require_mfa: bool = False
+    review_all_domains: bool = False
+    # Reverse proxies in front of the API whose X-Forwarded-For entries are trusted (0 = ignore it).
+    trusted_proxy_count: int = 0
     scan_rate_limit_per_min: int = 5
     scan_max_concurrent_hosts: int = 3
     scan_http_timeout_seconds: float = 5.0
@@ -97,6 +102,9 @@ def settings_from_env(env: Mapping[str, str]) -> Settings:
         gemini_api_key=get("GEMINI_API_KEY") or "",
         gemini_model=get("GEMINI_MODEL") or "gemini-3.8-flash",
         rate_limit_scale=max(1, int(get("RATE_LIMIT_SCALE") or 1)),
+        admin_require_mfa=app_env == "production" or _bool(get("ADMIN_REQUIRE_MFA"), False),
+        review_all_domains=_bool(get("REVIEW_ALL_DOMAINS"), False),
+        trusted_proxy_count=max(0, int(get("TRUSTED_PROXY_COUNT") or 0)),
         scan_rate_limit_per_min=int(get("SCAN_RATE_LIMIT_PER_MIN") or 5),
         scan_max_concurrent_hosts=int(get("SCAN_MAX_CONCURRENT_HOSTS") or 3),
         scan_http_timeout_seconds=float(get("SCAN_HTTP_TIMEOUT_SECONDS") or 5),

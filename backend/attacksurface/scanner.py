@@ -20,7 +20,7 @@ from attacksurface.discovery.http_meta import HostObservation, collect_host
 from attacksurface.discovery.rules import classify_environment, evaluate_host
 from attacksurface.netsafety import UnsafeTarget, safe_destinations
 from attacksurface.reports import save_report
-from attacksurface.store import add_event, first, now_utc, verification_status
+from attacksurface.store import add_event, can_scan, first, now_utc, verification_status
 
 log = logging.getLogger(__name__)
 
@@ -38,8 +38,8 @@ class ScanCancelled(Exception):
 
 def _check_cancelled(db: Any, scan_id: str) -> None:
     row = first(db.table("scans").select("status").eq("id", scan_id).execute())
-    if row and row["status"] == "cancelled":
-        raise ScanCancelled
+    if not row or row["status"] != "running":
+        raise ScanCancelled("Scan is no longer running.")
 
 
 def _insert(db: Any, table: str, rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -59,13 +59,17 @@ async def run_scan(db: Any, scan_id: str, collectors: Collectors | None = None) 
     scan = claimed[0]
     try:
         return await _execute(db, scan, collectors)
-    except ScanCancelled:
-        add_event(db, scan_id, "Scan cancelled by user.", "warn")
+    except ScanCancelled as exc:
+        now = now_utc().isoformat()
+        db.table("scans").update({"status": "cancelled", "error": str(exc), "completed_at": now, "updated_at": now}).eq("id", scan_id).eq("status", "running").execute()
+        add_event(db, scan_id, f"Scan cancelled: {exc}", "warn")
         return "cancelled"
     except Exception as exc:  # the job must always end in a terminal state
         log.exception("scan %s failed", scan_id)
         message = f"{type(exc).__name__}: {exc}"[:500]
-        db.table("scans").update({"status": "failed", "error": message, "completed_at": now_utc().isoformat(), "updated_at": now_utc().isoformat()}).eq("id", scan_id).execute()
+        failed = db.table("scans").update({"status": "failed", "error": message, "completed_at": now_utc().isoformat(), "updated_at": now_utc().isoformat()}).eq("id", scan_id).eq("status", "running").execute().data
+        if not failed:
+            return "cancelled"
         add_event(db, scan_id, f"Scan failed: {message}", "error")
         return "failed"
 
@@ -73,8 +77,18 @@ async def run_scan(db: Any, scan_id: str, collectors: Collectors | None = None) 
 async def _execute(db: Any, scan: dict[str, Any], c: Collectors) -> str:
     scan_id = scan["id"]
     project = first(db.table("projects").select("*").eq("id", scan["project_id"]).execute())
-    if project is None or verification_status(project) != "verified":
-        raise PermissionError("Domain control is not verified for this project")
+    if project is None:
+        raise ScanCancelled("Project is unavailable.")
+    owner_id = project.get("owner_user_id")
+    if denial := can_scan(db, project, scan.get("created_by") or owner_id):
+        raise ScanCancelled(denial)
+
+    def check_before_request() -> None:
+        _check_cancelled(db, scan_id)
+        if verification_status(project) != "verified":
+            raise ScanCancelled("Domain verification expired.")
+
+    check_before_request()
     root = project["root_domain"]
     partial = False
     add_event(db, scan_id, f"Scan started for {root}. Scope: {root} and its subdomains. Passive discovery, then one GET / per host on ports 80 and 443.")
@@ -94,6 +108,7 @@ async def _execute(db: Any, scan: dict[str, Any], c: Collectors) -> str:
 
     async def resolve(name: str) -> DnsResult:
         async with dns_sem:
+            check_before_request()
             return await c.dns(name, settings.scan_http_timeout_seconds)
 
     dns_results = await asyncio.gather(*(resolve(h) for h in hostnames))
@@ -130,6 +145,7 @@ async def _execute(db: Any, scan: dict[str, Any], c: Collectors) -> str:
 
     async def inspect(hostname: str, ip: str) -> HostObservation | None:
         async with host_sem:
+            check_before_request()
             try:
                 return await asyncio.to_thread(c.host, hostname, ip, settings.scan_http_timeout_seconds)
             except Exception as exc:
@@ -198,10 +214,12 @@ async def _execute(db: Any, scan: dict[str, Any], c: Collectors) -> str:
     add_event(db, scan_id, f"Dependency intel: {matched} advisory matches across {len(deps)} uploaded packages.")
 
     _insert(db, "findings", finding_rows)
-    _check_cancelled(db, scan_id)
+    check_before_request()
 
     final = "partial" if partial else "completed"
-    db.table("scans").update({"status": final, "completed_at": now_utc().isoformat(), "updated_at": now_utc().isoformat()}).eq("id", scan_id).execute()
+    completed = db.table("scans").update({"status": final, "completed_at": now_utc().isoformat(), "updated_at": now_utc().isoformat()}).eq("id", scan_id).eq("status", "running").execute().data
+    if not completed:
+        raise ScanCancelled("Scan is no longer running.")
     add_event(db, scan_id, f"Scan {final} with {len(finding_rows)} findings." + (" Some sources failed; results may be incomplete." if partial else ""),
               "warn" if partial else "info")
     save_report(db, scan_id)

@@ -32,7 +32,7 @@ def parse_ct_entries(entries: Iterable[dict[str, Any]], root_domain: str, limit:
 async def fetch_ct_hostnames(root_domain: str, limit: int, client: httpx.AsyncClient | None = None) -> list[str]:
     """Query crt.sh for certificates under the root. Raises httpx errors on failure."""
     owns = client is None
-    client = client or httpx.AsyncClient(timeout=httpx.Timeout(25.0), headers={"User-Agent": "AttackSurface/0.1"})
+    client = client or httpx.AsyncClient(timeout=httpx.Timeout(25.0), headers={"User-Agent": "ShadowScope/0.1"})
     try:
         resp = await client.get(CRT_SH_URL, params={"q": f"%.{root_domain}", "output": "json"})
         resp.raise_for_status()

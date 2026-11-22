@@ -1,0 +1,117 @@
+{
+  "items": [
+    {
+      "id": "rv-01",
+      "kind": "domain",
+      "status": "pending",
+      "risk_level": "high",
+      "user_id": "00000000-0000-4000-8000-00000000b002",
+      "user_email": "test-account-02@example.com",
+      "project_id": "pr-examplebank",
+      "root_domain": "examplebank.test",
+      "signals": [
+        { "id": "signal:sensitive_brand", "label": "Curated sensitive brand", "value": "examplebank.test (financial)" },
+        { "id": "signal:claims_1h", "label": "Domain claims in the last hour", "value": "5" },
+        { "id": "signal:account_age", "label": "Account age", "value": "4 minutes" },
+        { "id": "signal:email_domain_match", "label": "Email domain matches claim", "value": "no (example.com)" },
+        { "id": "event:4812", "label": "verify_passed", "value": "TXT record matched at 21:02" }
+      ],
+      "ai_verdict": {
+        "recommendation": "needs_more_info",
+        "confidence": "medium",
+        "summary": "DNS proof passed, but a 4-minute-old account claimed five unrelated domains in an hour, one of them a financial brand.",
+        "key_signals": ["signal:claims_1h", "signal:sensitive_brand", "signal:account_age"],
+        "missing_information": ["Evidence of authority to claim the domains", "Why five unrelated domains were claimed at once"],
+        "model": "gemini-3.8-flash",
+        "fallback_used": false
+      },
+      "created_at": "2026-11-21T21:03:00Z",
+      "decided_by": null,
+      "decided_at": null,
+      "decision_reason": null
+    },
+    {
+      "id": "rv-02",
+      "kind": "user",
+      "status": "pending",
+      "risk_level": "medium",
+      "user_id": "00000000-0000-4000-8000-00000000b003",
+      "user_email": "j.doe@proton.example",
+      "project_id": null,
+      "root_domain": null,
+      "signals": [
+        { "id": "signal:ip_accounts_24h", "label": "Accounts from this IP in 24h", "value": "3 (campus network)" },
+        { "id": "signal:disposable_email", "label": "Disposable email provider", "value": "no (privacy provider)" },
+        { "id": "signal:failed_checks_1h", "label": "Failed DNS checks in the last hour", "value": "0" }
+      ],
+      "ai_verdict": {
+        "recommendation": "needs_more_info",
+        "confidence": "low",
+        "summary": "Only a shared-IP signal, which campus and office networks trigger routinely. Not evidence of abuse on its own.",
+        "key_signals": ["signal:ip_accounts_24h"],
+        "missing_information": ["Any activity beyond sign-up"],
+        "model": "gemini-3.8-flash",
+        "fallback_used": false
+      },
+      "created_at": "2026-11-21T20:41:00Z",
+      "decided_by": null,
+      "decided_at": null,
+      "decision_reason": null
+    },
+    {
+      "id": "rv-03",
+      "kind": "domain",
+      "status": "pending",
+      "risk_level": "high",
+      "user_id": "00000000-0000-4000-8000-00000000b004",
+      "user_email": "it-admin@agency.gov.test",
+      "project_id": "pr-agency",
+      "root_domain": "agency.gov.test",
+      "signals": [
+        { "id": "signal:sensitive_tld", "label": "Sensitive TLD", "value": "gov.test" },
+        { "id": "signal:email_domain_match", "label": "Email domain matches claim", "value": "yes (agency.gov.test)" },
+        { "id": "signal:claims_1h", "label": "Domain claims in the last hour", "value": "1" }
+      ],
+      "ai_verdict": {
+        "recommendation": "approve",
+        "confidence": "medium",
+        "summary": "Government-style domain, so it needs a human look, but the confirmed email is on the same domain and DNS proof passed.",
+        "key_signals": ["signal:email_domain_match", "signal:sensitive_tld"],
+        "missing_information": [],
+        "model": null,
+        "fallback_used": true
+      },
+      "created_at": "2026-11-21T19:58:00Z",
+      "decided_by": null,
+      "decided_at": null,
+      "decision_reason": null
+    },
+    {
+      "id": "rv-04",
+      "kind": "domain",
+      "status": "rejected",
+      "risk_level": "high",
+      "user_id": "00000000-0000-4000-8000-00000000b002",
+      "user_email": "test-account-02@example.com",
+      "project_id": "pr-paybrand",
+      "root_domain": "paybrand.test",
+      "signals": [
+        { "id": "signal:sensitive_brand", "label": "Curated sensitive brand", "value": "paybrand.test (payments)" }
+      ],
+      "ai_verdict": {
+        "recommendation": "reject",
+        "confidence": "high",
+        "summary": "Payment brand claimed by an account with no connection to it.",
+        "key_signals": ["signal:sensitive_brand"],
+        "missing_information": [],
+        "model": "gemini-3.8-flash",
+        "fallback_used": false
+      },
+      "created_at": "2026-11-21T18:20:00Z",
+      "decided_by": "00000000-0000-4000-8000-00000000a001",
+      "decided_at": "2026-11-21T18:31:00Z",
+      "decision_reason": "No connection to the brand; part of a burst of claims."
+    }
+  ],
+  "next_cursor": null
+}

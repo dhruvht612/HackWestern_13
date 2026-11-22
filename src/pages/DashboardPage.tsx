@@ -31,7 +31,7 @@ function AnalystMemo({ scanId, rootDomain }: { scanId: string; rootDomain: strin
   const request = useRequestAnalysis(scanId);
   const a = analysis.data;
   const running = request.isPending || a?.status === "queued" || a?.status === "running";
-  const from = a?.source === "gemini" ? `AttackSurface analyst (${a.model ?? "Gemini"})` : a?.source === "fallback" ? "Deterministic analyst (AI not used)" : "AttackSurface analyst";
+  const from = a?.source === "gemini" ? `ShadowScope analyst (${a.model ?? "Gemini"})` : a?.source === "fallback" ? "Deterministic analyst (AI not used)" : "ShadowScope analyst";
   return (
     <section className="border border-camel/25" aria-busy={running}>
       <dl className="mono grid grid-cols-[4.5rem_minmax(0,1fr)] gap-y-1 border-b-2 border-camel px-5 py-4 text-[13px] sm:px-7">

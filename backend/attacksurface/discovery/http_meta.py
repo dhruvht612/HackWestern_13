@@ -15,7 +15,7 @@ from datetime import UTC, datetime
 
 from cryptography import x509
 
-USER_AGENT = "AttackSurface/0.1 (passive metadata collection; authorized target)"
+USER_AGENT = "ShadowScope/0.1 (passive metadata collection; authorized target)"
 MAX_HEADER_BYTES = 64 * 1024
 
 

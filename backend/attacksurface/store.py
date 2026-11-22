@@ -65,6 +65,45 @@ def verification_status(project: dict[str, Any], now: datetime | None = None) ->
     return "unverified"
 
 
+def authorization_status(project: dict[str, Any]) -> str:
+    if project.get("authorization_revoked_at"):
+        return "revoked"
+    return project.get("review_status") if project.get("review_status") in {
+        "auto_cleared", "pending_review", "approved", "rejected",
+    } else "not_routed"
+
+
+def can_scan(db: Any, project: dict[str, Any], user_id: str | None) -> str | None:
+    """Return a user-safe denial reason, or None if the current policy permits scanning."""
+    if not user_id or user_id != project.get("owner_user_id"):
+        return "Project ownership could not be confirmed."
+    if project.get("verification_method") != "dns-txt" or verification_status(project) != "verified":
+        return "Verify domain control before scanning this project."
+    authorization = authorization_status(project)
+    if authorization not in {"auto_cleared", "approved"}:
+        return {
+            "pending_review": "This domain is awaiting review.",
+            "revoked": "Authorization for this domain has been revoked.",
+            "rejected": "Authorization for this domain was rejected.",
+        }.get(authorization, "This domain does not have scan authorization.")
+    try:
+        account = first(db.table("user_status").select("status").eq("user_id", user_id).execute())
+        if not account or account["status"] != "active":
+            return "The account must be active to start or continue a scan."
+        if domain_blocked(db, project["root_domain"]):
+            return "This domain is blocked by platform policy."
+    except Exception:
+        return "Scan authorization could not be checked."
+    return None
+
+
+def domain_blocked(db: Any, root: str) -> bool:
+    labels = root.split(".")
+    parents = [".".join(labels[i:]) for i in range(len(labels))]
+    rules = db.table("domain_blocklist").select("pattern,match").in_("pattern", parents).execute().data
+    return any(entry["pattern"] == root or entry["match"] == "suffix" for entry in rules)
+
+
 def latest_scan_id(db: Any, project_id: str) -> str | None:
     row = first(
         db.table("scans").select("id").eq("project_id", project_id).order("created_at", desc=True).limit(1).execute()
@@ -76,6 +115,7 @@ def project_out(db: Any, project: dict[str, Any]) -> dict[str, Any]:
     return {
         **project,
         "verification_status": verification_status(project),
+        "authorization": authorization_status(project),
         "latest_scan_id": latest_scan_id(db, project["id"]),
     }
 

@@ -7,6 +7,22 @@ export type Priority = "P0" | "P1" | "P2" | "P3";
 export interface AuthUser {
   id: string;
   email: string | null;
+  // Optional: sessions saved before the admin portal don't carry them; /auth/me always does.
+  status?: string;
+  aal?: "aal1" | "aal2";
+}
+
+export interface MfaFactor {
+  id: string;
+  status: "verified" | "unverified";
+  factor_type: string;
+}
+
+export interface MfaEnrollment {
+  factor_id: string;
+  qr_code: string;
+  secret: string;
+  uri: string;
 }
 
 export interface AuthSession {
@@ -30,6 +46,7 @@ export interface Project {
   authorization_confirmed: boolean;
   created_at: string;
   verification_status: VerificationStatus;
+  authorization?: DomainAuthorization;
   verified_at: string | null;
   latest_scan_id: string | null;
 }
@@ -42,6 +59,7 @@ export interface ProjectCreate {
 
 export interface VerificationChallenge {
   status: VerificationStatus;
+  authorization?: DomainAuthorization;
   record_type: "TXT";
   record_name: string;
   record_value: string | null;
@@ -179,4 +197,160 @@ export interface Graph {
 
 export interface Health {
   status: "ok";
+}
+
+// --- admin portal (contract: ADMIN-PANEL.md §9) ---------------------------------------------
+
+export type AdminRole = "viewer" | "operator";
+export type RiskLevel = "low" | "medium" | "high";
+
+export interface Page<T> {
+  items: T[];
+  next_cursor: string | null;
+}
+
+export interface AdminMe {
+  id: string;
+  email: string | null;
+  role: AdminRole;
+  aal: "aal1" | "aal2";
+  mfa_required: boolean;
+}
+
+export interface AdminOverview {
+  users: number;
+  verified_domains: number;
+  pending_reviews: number;
+  scans_24h: number;
+  scan_failures_24h: number;
+  blocklist_hits_24h: number;
+  ai_fallback_rate: number | null;
+  worker_last_seen: string | null;
+  daily_brief: { text: string; source: "gemini" | "template" };
+}
+
+export interface AiVerdict {
+  recommendation: "approve" | "reject" | "needs_more_info";
+  confidence: "low" | "medium" | "high";
+  summary: string;
+  key_signals: string[];
+  missing_information: string[];
+  model: string | null;
+  fallback_used: boolean;
+}
+
+export interface ReviewSignal {
+  id: string;
+  label: string;
+  value: string;
+}
+
+export interface ReviewItem {
+  id: string;
+  kind: "user" | "domain";
+  status: "pending" | "approved" | "rejected";
+  risk_level: "medium" | "high";
+  user_id: string;
+  user_email: string | null;
+  project_id: string | null;
+  root_domain: string | null;
+  signals: ReviewSignal[];
+  ai_verdict: AiVerdict | null;
+  created_at: string;
+  decided_by: string | null;
+  decided_at: string | null;
+  decision_reason: string | null;
+}
+
+export interface AdminUserRow {
+  id: string;
+  email: string | null;
+  status: "active" | "pending_review" | "suspended";
+  risk_level: RiskLevel;
+  risk_reasons: string[];
+  created_at: string;
+  last_seen: string | null;
+  projects: number;
+}
+
+export type DomainAuthorization =
+  "not_routed" | "auto_cleared" | "pending_review" | "approved" | "rejected" | "revoked";
+
+export interface AdminDomain {
+  project_id: string;
+  root_domain: string;
+  owner_id: string | null;
+  owner_email: string | null;
+  dns_proof: "unverified" | "pending" | "verified" | "expired";
+  authorization: DomainAuthorization;
+  verified_at: string | null;
+  risk_level: RiskLevel | null;
+}
+
+export interface SecurityEvent {
+  id: number;
+  type: string;
+  user_id: string | null;
+  user_email: string | null;
+  ip: string | null;
+  subject: string | null;
+  detail: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface BlocklistEntry {
+  pattern: string;
+  match: "exact" | "suffix";
+  reason: string;
+  created_at: string;
+}
+
+export interface AuditEntry {
+  id: number;
+  actor_id: string | null;
+  actor_email: string | null;
+  action: string;
+  target_type: string;
+  target_id: string;
+  reason: string | null;
+  created_at: string;
+}
+
+export interface AdminUserDetail extends AdminUserRow {
+  claims: AdminDomain[];
+  recent_events: SecurityEvent[];
+}
+
+export interface AdminReviewDetail extends ReviewItem {
+  recent_events: SecurityEvent[];
+}
+
+export interface AdminAiMetrics {
+  active_model: string | null;
+  prompt_version: string;
+  purposes: {
+    purpose: string;
+    requests: number;
+    fallbacks: number;
+    input_tokens: number | null;
+    output_tokens: number | null;
+    estimated_cost: number | null;
+    p50_ms: number | null;
+    p95_ms: number | null;
+  }[];
+  errors: { category: string; count: number }[];
+  reanalyses: number;
+}
+
+export interface AdminCopilotAnswer {
+  available: boolean;
+  answer: string;
+  references: string[];
+  stats: {
+    users: number;
+    verified_domains: number;
+    pending_reviews: number;
+    scans_24h: number;
+    blocklist_hits_24h: number;
+  } | null;
 }

@@ -1,4 +1,4 @@
-# AttackSurface API Contract
+# ShadowScope API Contract
 
 Base URL (local): `http://localhost:8000`
 

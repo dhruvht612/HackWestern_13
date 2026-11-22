@@ -8,11 +8,11 @@ web
 
 ## Users
 
-Primary audience right now: HackWestern 13 judges and fellow hackers watching a live demo. They have ~30 seconds to understand what AttackSurface does, believe it works, and click into the demo dashboard. The product is framed as a real tool for teams that need to know what an outsider can see of their infrastructure (small eng teams, AppSec, authorized recon).
+Primary audience right now: HackWestern 13 judges and fellow hackers watching a live demo. They have ~30 seconds to understand what ShadowScope does, believe it works, and click into the demo dashboard. The product is framed as a real tool for teams that need to know what an outsider can see of their infrastructure (small eng teams, AppSec, authorized recon).
 
 ## Product Purpose
 
-AttackSurface is an AI-powered external attack surface intelligence platform. Given an authorized root domain, it passively discovers exposed assets, correlates them with dependency vulnerabilities, and produces a prioritized, actionable remediation plan. Success for the demo: a judge leaves able to repeat the pipeline in one sentence and has seen it working on real-looking data.
+ShadowScope is an AI-powered external attack surface intelligence platform. Given an authorized root domain, it passively discovers exposed assets, correlates them with dependency vulnerabilities, and produces a prioritized, actionable remediation plan. Success for the demo: a judge leaves able to repeat the pipeline in one sentence and has seen it working on real-looking data.
 
 ## Positioning
 
@@ -38,7 +38,7 @@ One chain, told as one story: **discover → correlate → prioritize.**
 
 ## Brand Commitments
 
-- Name: AttackSurface.
+- Name: ShadowScope.
 - Honesty about scope (passive, authorized, potential exposure) is part of the brand, not fine print.
 
 ## Evidence on Hand

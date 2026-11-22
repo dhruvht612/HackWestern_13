@@ -28,12 +28,12 @@ export function AppLayout() {
 
       <div className="mx-auto max-w-[1440px] px-3 pb-10 md:px-6">
         <header className="no-print flex flex-wrap items-center justify-between gap-3 py-4">
-          <Link to="/" className="flex items-center gap-2.5" aria-label="AttackSurface home">
+          <Link to="/" className="flex items-center gap-2.5" aria-label="ShadowScope home">
             <svg viewBox="0 0 32 32" className="h-7 w-7" aria-hidden="true">
               <path className="fill-camel" d="M2 8.5h10l2.5-3H30v22H2z" />
               <path className="fill-navy" d="M6 14h20v3H6zm0 6h13v3H6z" />
             </svg>
-            <span className="display text-[1.35rem] font-extrabold uppercase tracking-[0.02em]">AttackSurface</span>
+            <span className="display text-[1.35rem] font-extrabold uppercase tracking-[0.02em]">ShadowScope</span>
           </Link>
           <div className="flex flex-wrap items-center gap-2">
             <label htmlFor="project-select" className="sr-only">

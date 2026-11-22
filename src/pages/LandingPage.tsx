@@ -122,7 +122,7 @@ function CaseSheet() {
           <div>
             <div className="display text-[2rem] font-extrabold uppercase leading-none">Case file</div>
             <div className="mono mt-1 flex flex-wrap items-center gap-x-3 text-[13px] text-fg-soft">
-              <span>No. AS-{scan.id.slice(0, 8)}</span>
+              <span>No. SS-{scan.id.slice(0, 8)}</span>
               <button
                 type="button"
                 onClick={replay}
@@ -371,7 +371,7 @@ function Memo() {
         <dt className="text-camel">TO:</dt>
         <dd>Engineering, {project.root_domain}</dd>
         <dt className="text-camel">FROM:</dt>
-        <dd>AttackSurface analyst (Gemini)</dd>
+        <dd>ShadowScope analyst (Gemini)</dd>
         <dt className="text-camel">DATE:</dt>
         <dd>{date}</dd>
         <dt className="text-camel">RE:</dt>
@@ -426,11 +426,104 @@ const never = ["Port scans", "Brute force or credential guessing", "Exploit payl
 /* ---------- Page ---------- */
 
 const navLinks = [
-  ["#discover", "Discover"],
-  ["#correlate", "Correlate"],
-  ["#prioritize", "Prioritize"],
+  ["#how-it-works", "How it works"],
+  ["#features", "Features"],
+  ["#gemini", "Gemini"],
+  ["#why", "Why ShadowScope?"],
   ["#scope", "Scope"],
 ] as const;
+
+const steps = [
+  {
+    n: "01",
+    title: "Discover",
+    body: "Verify a domain you own. ShadowScope discovers public-facing assets such as subdomains and related infrastructure.",
+  },
+  {
+    n: "02",
+    title: "Detect",
+    body: "ShadowScope identifies potential security misconfigurations and checks uploaded software dependencies for known vulnerabilities.",
+  },
+  {
+    n: "03",
+    title: "Analyze",
+    body: "Google Gemini AI analyzes collected evidence, explains security risks, and prioritizes what needs attention.",
+  },
+  {
+    n: "04",
+    title: "Secure",
+    body: "Users receive actionable recommendations and security reports to help them address identified risks.",
+  },
+] as const;
+
+const features = [
+  {
+    title: "Attack Surface Discovery",
+    body: "Find publicly visible assets associated with verified domains.",
+  },
+  {
+    title: "Security Risk Detection",
+    body: "Identify potential configuration issues and known vulnerable dependencies.",
+  },
+  {
+    title: "Gemini AI Analysis",
+    body: "Explain findings and prioritize security improvements.",
+  },
+  {
+    title: "Security Intelligence Dashboard",
+    body: "View assets, findings, and supporting evidence.",
+  },
+  {
+    title: "Actionable Security Reports",
+    body: "Understand what to fix and why.",
+  },
+  {
+    title: "Admin Security Controls",
+    body: "Support human review of suspicious accounts and domain claims where implemented.",
+  },
+] as const;
+
+const reasons = [
+  {
+    title: "Plain words, not jargon",
+    body: "Every finding comes with an explanation you can forward to your team, not just a score.",
+  },
+  {
+    title: "Evidence you can check",
+    body: "Each point traces back to the header, certificate, manifest, or advisory it came from.",
+  },
+  {
+    title: "A clear order of work",
+    body: "One prioritized list tells you what deserves attention first instead of handing you another backlog.",
+  },
+  {
+    title: "Restraint by design",
+    body: "Collection is passive and limited to domains you are authorized to assess.",
+  },
+] as const;
+
+type FooterLink = { label: string; href: string };
+type FooterSection = { title: string; links: FooterLink[] };
+
+const footerSections: FooterSection[] = [
+  { title: "Explore", links: navLinks.map(([href, label]) => ({ label, href })) },
+  {
+    title: "Demo",
+    links: [
+      { label: "Open demo file", href: DEMO },
+      { label: "Attack paths", href: `${DEMO}/graph` },
+      { label: "Report", href: `${DEMO}/report` },
+    ],
+  },
+  {
+    title: "Account",
+    links: [
+      { label: "Sign in", href: "/signin" },
+      { label: "Create account", href: "/signup" },
+      { label: "Start a project", href: "/projects/new" },
+    ],
+  },
+];
 
 function Wordmark() {
   return (
@@ -439,52 +532,194 @@ function Wordmark() {
         <path className="fill-camel" d="M2 8.5h10l2.5-3H30v22H2z" />
         <path className="fill-navy" d="M6 14h20v3H6zm0 6h13v3H6z" />
       </svg>
-      <span className="display text-[1.35rem] font-extrabold uppercase tracking-[0.02em]">AttackSurface</span>
+      <span className="display text-[1.35rem] font-extrabold uppercase tracking-[0.02em]">ShadowScope</span>
     </Link>
+  );
+}
+
+function FooterLinks({ title, links }: FooterSection) {
+  return (
+    <div>
+      <h3 className="field-label mb-4 border-b border-camel/30 pb-2">{title}</h3>
+      <ul className="space-y-2.5">
+        {links.map(({ label, href }) => (
+          <li key={`${href}-${label}`}>
+            {href.startsWith("#") ? (
+              <a
+                href={href}
+                className="text-[13px] text-fg-soft transition-colors hover:text-kiwi hover:underline"
+              >
+                {label}
+              </a>
+            ) : (
+              <Link
+                to={href}
+                className="text-[13px] text-fg-soft transition-colors hover:text-kiwi hover:underline"
+              >
+                {label}
+              </Link>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function SectionLabel({ children }: { children: ReactNode }) {
+  return (
+    <span className="field-label inline-flex items-center gap-2">
+      <span className="signal-dot" aria-hidden="true" />
+      {children}
+    </span>
   );
 }
 
 export function LandingPage() {
   return (
     <div className="grain min-h-screen overflow-x-clip text-fg">
-      <ClassificationBand>Passive recon only // Authorized targets // Demo data: acme-demo.com</ClassificationBand>
+      <ClassificationBand>Passive recon only // AI-powered intelligence // Demo data: acme-demo.com</ClassificationBand>
 
       <header className="mx-auto flex max-w-[1320px] items-center justify-between gap-4 px-4 py-5 md:px-8">
         <Wordmark />
-        <nav aria-label="Page sections" className="hidden items-center gap-7 md:flex">
-          {navLinks.map(([href, label]) => (
-            <a key={href} href={href} className="text-sm font-semibold text-fg-soft transition-colors hover:text-kiwi">
-              {label}
-            </a>
-          ))}
-        </nav>
-        <Link to={DEMO} className="btn-primary px-3.5 py-2 text-[13px]">
-          Open demo
-        </Link>
+        <div className="flex items-center gap-4 sm:gap-6">
+          <nav aria-label="Page sections" className="hidden items-center gap-7 lg:flex">
+            {navLinks.map(([href, label]) => (
+              <a key={href} href={href} className="text-sm font-semibold text-fg-soft transition-colors hover:text-kiwi">
+                {label}
+              </a>
+            ))}
+          </nav>
+          <nav aria-label="Account" className="hidden items-center gap-4 sm:flex">
+            <Link to="/signin" className="text-sm font-semibold text-fg-soft transition-colors hover:text-kiwi">
+              Sign in
+            </Link>
+            <Link to="/signup" className="text-sm font-semibold text-fg-soft transition-colors hover:text-kiwi">
+              Create account
+            </Link>
+          </nav>
+          <Link to={DEMO} className="btn-primary px-3.5 py-2 text-[13px]">
+            Open demo
+          </Link>
+        </div>
       </header>
 
       <main>
         {/* Hero: the file itself */}
         <section className="mx-auto grid max-w-[1320px] items-center gap-12 px-4 pb-24 pt-6 md:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)] lg:gap-16 lg:pb-28 lg:pt-10">
           <div>
-            <h1 className="display max-w-[11ch] text-[clamp(3.1rem,7.4vw,5.6rem)] font-extrabold leading-[0.9] tracking-[-0.02em] [text-wrap:balance]">
-              The file an attacker keeps on you.
+            <SectionLabel>AI-Powered Cybersecurity Intelligence</SectionLabel>
+            <h1 className="display mt-5 max-w-[11ch] text-[clamp(3.1rem,7.4vw,5.6rem)] font-extrabold leading-[0.9] tracking-[-0.02em] [text-wrap:balance]">
+              See Beyond the Surface.
             </h1>
             <p className="mt-7 max-w-[34rem] text-[1.05rem] leading-relaxed text-fg-soft">
-              AttackSurface builds it first. It finds every host you expose, links each one to the vulnerable code running
-              behind it, and tells you what to fix first, from passive signals only.
+              Discover your digital exposure, uncover potential security risks, and get AI-powered insights to secure
+              what matters.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Link to={DEMO} className="btn-primary px-6 py-3.5 text-[15px]">
-                Open the demo file <ArrowRight size={17} aria-hidden="true" />
+              <Link to="/projects/new" className="btn-primary px-6 py-3.5 text-[15px]">
+                Start Your Security Scan <ArrowRight size={17} aria-hidden="true" />
               </Link>
-              <Link to="/projects/new" className="btn-secondary px-6 py-3.5 text-[15px]">
-                Start on your domain
-              </Link>
+              <a href="#features" className="btn-secondary px-6 py-3.5 text-[15px]">
+                Explore Features
+              </a>
             </div>
-            <p className="mt-5 text-sm text-fg-soft">The demo runs on synthetic data for acme-demo.com.</p>
+            <p className="mt-5 text-sm text-fg-soft">
+              Passive signals only. The case file alongside uses synthetic data for acme-demo.com.
+            </p>
           </div>
           <CaseSheet />
+        </section>
+
+        {/* How ShadowScope Works */}
+        <section id="how-it-works" className="scroll-mt-4 border-t-2 border-camel">
+          <div className="mx-auto max-w-[1320px] px-4 py-20 md:px-8 lg:py-28">
+            <SectionLabel>Four steps, from domain to action</SectionLabel>
+            <h2 className="display mt-4 max-w-[18ch] text-[clamp(2.3rem,4.6vw,3.9rem)] font-extrabold leading-[0.92] [text-wrap:balance]">
+              How ShadowScope Works
+            </h2>
+            <p className="mt-6 max-w-[52ch] text-[1.05rem] leading-relaxed text-fg-soft">
+              No security background needed. Verify what you own, see what an outsider could see, and get a short,
+              evidence-backed list of what to do next.
+            </p>
+            <ol className="mt-12 grid gap-px border border-camel/30 bg-camel/20 sm:grid-cols-2 lg:grid-cols-4">
+              {steps.map((s) => (
+                <li key={s.n} className="bg-navy-raised p-5 sm:p-6">
+                  <span className="mono text-[13px] font-bold text-kiwi">{s.n}</span>
+                  <h3 className="display mt-3 border-b border-camel/30 pb-2 text-xl font-extrabold uppercase">
+                    {s.title}
+                  </h3>
+                  <p className="mt-3 text-[14px] leading-relaxed text-fg-soft">{s.body}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        {/* Key Features */}
+        <section id="features" className="scroll-mt-4 border-t-2 border-camel">
+          <div className="mx-auto max-w-[1320px] px-4 py-20 md:px-8 lg:py-28">
+            <div className="flex flex-wrap items-end justify-between gap-6">
+              <div>
+                <SectionLabel>Capabilities on file</SectionLabel>
+                <h2 className="display mt-4 max-w-[14ch] text-[clamp(2.3rem,4.6vw,3.9rem)] font-extrabold leading-[0.92] [text-wrap:balance]">
+                  Key Features
+                </h2>
+              </div>
+              <p className="max-w-[42ch] text-[1.05rem] leading-relaxed text-fg-soft">
+                These capabilities are part of the working demo. Each one stays tied to the evidence behind it.
+              </p>
+            </div>
+            <ul className="mt-12 grid gap-px border border-camel/30 bg-camel/20 sm:grid-cols-2 lg:grid-cols-3">
+              {features.map((f, i) => (
+                <li key={f.title} className="bg-navy-raised p-5 sm:p-6">
+                  <div className="field-label flex items-center justify-between">
+                    <span>Capability {String(i + 1).padStart(2, "0")}</span>
+                    <span className="signal-dot" aria-hidden="true" />
+                  </div>
+                  <h3 className="display mt-3 text-[1.15rem] font-extrabold uppercase leading-snug">{f.title}</h3>
+                  <p className="mt-2 text-[14px] leading-relaxed text-fg-soft">{f.body}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* Powered by Google Gemini */}
+        <section id="gemini" className="scroll-mt-4 border-t-2 border-camel">
+          <div className="mx-auto grid max-w-[1320px] gap-12 px-4 py-20 md:px-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:py-28">
+            <div>
+              <SectionLabel>Powered by Google Gemini</SectionLabel>
+              <h2 className="display mt-4 text-[clamp(2.3rem,4.6vw,3.9rem)] font-extrabold leading-[0.92] [text-wrap:balance]">
+                An analyst that shows its sources.
+              </h2>
+              <p className="mt-6 max-w-[42ch] text-[1.05rem] leading-relaxed text-fg-soft">
+                Gemini reads the evidence collected by the scan, explains what each finding means in plain language, and
+                suggests what to fix first. Its output is checked before it reaches your report, and a deterministic
+                summary keeps the report usable when the model is unavailable.
+              </p>
+              <p className="mt-5 max-w-[42ch] text-sm leading-relaxed text-fg-soft">
+                Treat the memo as triage, not a verdict. Severity and evidence come from the scan, not the model.
+              </p>
+            </div>
+            <div className="sheet trace-line p-5 sm:p-8">
+              <dl className="divide-y divide-camel/15 border-y-2 border-camel">
+                {[
+                  ["In", "Headers, certificates, hosts, advisories, and manifests collected for the project"],
+                  ["Model", "Google Gemini reads only that collected evidence"],
+                  ["Check", "Structured output is validated before it is shown"],
+                  ["Fallback", "A deterministic summary is used when AI is unavailable"],
+                  ["Out", "A prioritized memo with remediation and evidence references"],
+                ].map(([k, v]) => (
+                  <div key={k} className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-4 py-3.5 text-[14px] sm:grid-cols-[7rem_minmax(0,1fr)]">
+                    <dt className="field-label">{k}</dt>
+                    <dd className="text-fg-soft">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="mono mt-6 text-[13px] text-fg-faint">EVIDENCE IN → EXPLANATION OUT</p>
+            </div>
+          </div>
         </section>
 
         {/* Exhibit A — Discover */}
@@ -523,7 +758,7 @@ export function LandingPage() {
                 Exhibit B: two lists aren’t a map.
               </h2>
               <p className="max-w-[46ch] text-[1.05rem] leading-relaxed text-fg-soft">
-                Scanners hand you hostnames. Dependency tools hand you CVEs. AttackSurface joins them, so a critical advisory
+                Scanners hand you hostnames. Dependency tools hand you CVEs. ShadowScope joins them, so a critical advisory
                 gets an address: the production API that ships it.
               </p>
             </div>
@@ -560,6 +795,29 @@ export function LandingPage() {
               <p className="mt-5 max-w-[36ch] text-sm leading-relaxed text-fg-soft">
                 Memos are generated from collected evidence. Treat them as triage, not a verdict.
               </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Why ShadowScope */}
+        <section id="why" className="scroll-mt-4 border-t-2 border-camel">
+          <div className="mx-auto max-w-[1320px] px-4 py-20 md:px-8 lg:py-28">
+            <SectionLabel>Why ShadowScope?</SectionLabel>
+            <h2 className="display mt-4 max-w-[18ch] text-[clamp(2.3rem,4.6vw,3.9rem)] font-extrabold leading-[0.92] [text-wrap:balance]">
+              Clarity is the feature.
+            </h2>
+            <p className="mt-6 max-w-[52ch] text-[1.05rem] leading-relaxed text-fg-soft">
+              ShadowScope is built for people who need to act on security findings, not just collect them. Our mission is
+              making cybersecurity smarter, simpler, and more accessible through AI-powered security intelligence.
+            </p>
+            <div className="mt-12 grid gap-x-10 gap-y-8 border-t-2 border-camel sm:grid-cols-2">
+              {reasons.map((r, i) => (
+                <div key={r.title} className="border-b border-camel/30 pb-6">
+                  <span className="mono text-[13px] font-bold text-kiwi">0{i + 1}</span>
+                  <h3 className="display mt-2 text-xl font-extrabold uppercase">{r.title}</h3>
+                  <p className="mt-2 text-[14px] leading-relaxed text-fg-soft">{r.body}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -603,28 +861,43 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* Close */}
-        <section className="mx-auto max-w-[1320px] px-4 py-24 md:px-8 lg:py-32">
-          <h2 className="display max-w-[16ch] text-[clamp(2.6rem,6vw,5rem)] font-extrabold leading-[0.9] [text-wrap:balance]">
-            Read your own file before anyone else does.
+        {/* Final call to action */}
+        <section id="get-started" className="mx-auto max-w-[1320px] px-4 py-24 md:px-8 lg:py-32">
+          <SectionLabel>See Beyond the Surface.</SectionLabel>
+          <h2 className="display mt-4 max-w-[16ch] text-[clamp(2.6rem,6vw,5rem)] font-extrabold leading-[0.9] [text-wrap:balance]">
+            Know what’s exposed before someone else does.
           </h2>
+          <p className="mt-6 max-w-[52ch] text-[1.05rem] leading-relaxed text-fg-soft">
+            Start with a domain you own. ShadowScope shows you the public-facing assets, the potential risks, and a
+            prioritized plan to address them.
+          </p>
           <div className="mt-10 flex flex-wrap gap-3">
-            <Link to={DEMO} className="btn-primary px-6 py-3.5 text-[15px]">
-              Open the demo file <ArrowRight size={17} aria-hidden="true" />
+            <Link to="/projects/new" className="btn-primary px-6 py-3.5 text-[15px]">
+              Start Your Security Scan <ArrowRight size={17} aria-hidden="true" />
             </Link>
-            <Link to="/projects/new" className="btn-secondary px-6 py-3.5 text-[15px]">
-              Start on your domain
+            <Link to={DEMO} className="btn-secondary px-6 py-3.5 text-[15px]">
+              Open the demo
             </Link>
           </div>
         </section>
       </main>
 
       <footer className="border-t-2 border-camel">
-        <div className="mx-auto flex max-w-[1320px] flex-wrap items-center justify-between gap-4 px-4 py-6 text-[13px] text-fg-soft md:px-8">
-          <Wordmark />
-          <p>Built at HackWestern 13. acme-demo.com, 203.0.113.0/24, and every scan shown here are synthetic demo data.</p>
+        <div className="mx-auto max-w-[1320px] px-4 py-14 md:px-8">
+          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(3,1fr)] lg:gap-12">
+            <div>
+              <Wordmark />
+              <p className="mt-4 max-w-[34ch] text-[13px] leading-relaxed text-fg-soft">
+                See Beyond the Surface. AI-powered cybersecurity intelligence, built at HackWestern 13. acme-demo.com,
+                203.0.113.0/24, and every scan shown here are synthetic demo data.
+              </p>
+            </div>
+            {footerSections.map((section) => (
+              <FooterLinks key={section.title} {...section} />
+            ))}
+          </div>
         </div>
-        <ClassificationBand>Passive recon only // Authorized targets // Demo data: acme-demo.com</ClassificationBand>
+        <ClassificationBand>Passive recon only // AI-powered intelligence // Demo data: acme-demo.com</ClassificationBand>
       </footer>
     </div>
   );

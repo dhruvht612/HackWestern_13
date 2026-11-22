@@ -1,4 +1,4 @@
-# AttackSurface Report — acme-demo.com
+# ShadowScope Report — acme-demo.com
 
 **Project:** Acme Demo  
 **Scan:** 22222222-2222-4222-8222-222222222222  
