@@ -7,6 +7,22 @@ export type Priority = "P0" | "P1" | "P2" | "P3";
 export interface AuthUser {
   id: string;
   email: string | null;
+  // Optional: sessions saved before the admin portal don't carry them; /auth/me always does.
+  status?: string;
+  aal?: "aal1" | "aal2";
+}
+
+export interface MfaFactor {
+  id: string;
+  status: "verified" | "unverified";
+  factor_type: string;
+}
+
+export interface MfaEnrollment {
+  factor_id: string;
+  qr_code: string;
+  secret: string;
+  uri: string;
 }
 
 export interface AuthSession {

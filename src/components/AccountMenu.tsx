@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { LogOut } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { LogOut, ShieldCheck } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { api, apiConfig } from "@/lib/api";
 import { session, useSession } from "@/lib/session";
 
@@ -23,6 +23,9 @@ export function AccountMenu() {
       <span className="mono hidden max-w-[14rem] truncate text-[13px] text-fg-soft sm:inline" title={current.user.email ?? ""}>
         {current.user.email}
       </span>
+      <Link to="/account/security" className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-fg-soft transition-colors hover:text-kiwi">
+        <ShieldCheck size={14} aria-hidden="true" /> Security
+      </Link>
       <button onClick={signOut} className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-fg-soft transition-colors hover:text-kiwi">
         <LogOut size={14} aria-hidden="true" /> Sign out
       </button>

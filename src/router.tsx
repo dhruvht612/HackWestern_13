@@ -13,6 +13,7 @@ import { DependenciesPage } from "@/pages/DependenciesPage";
 import { GraphPage } from "@/pages/GraphPage";
 import { ReportPage } from "@/pages/ReportPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
+import { SecurityPage } from "@/pages/SecurityPage";
 
 export const router = createBrowserRouter([
   { path: "/", element: <LandingPage /> },
@@ -21,6 +22,7 @@ export const router = createBrowserRouter([
     element: <RequireAuth />,
     children: [
       { path: "/projects", element: <ProjectsPage /> },
+      { path: "/account/security", element: <SecurityPage /> },
       { path: "/projects/new", element: <NewProjectPage /> },
       {
         path: "/projects/:id",

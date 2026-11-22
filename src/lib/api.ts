@@ -10,6 +10,8 @@ import type {
   Evidence,
   Finding,
   Graph,
+  MfaEnrollment,
+  MfaFactor,
   Project,
   ProjectCreate,
   Scan,
@@ -101,6 +103,22 @@ export const api = {
   signIn: (email: string, password: string) => request<AuthSession>("/auth/signin", json("POST", { email, password })),
   signOut: () => request<void>("/auth/signout", { method: "POST" }).catch(() => undefined),
   me: () => request<AuthUser>("/auth/me"),
+
+  // --- two-factor
+  async mfaFactors(): Promise<MfaFactor[]> {
+    if (USE_MOCKS) return [];
+    return request<MfaFactor[]>("/auth/mfa/factors");
+  },
+  async mfaEnroll(): Promise<MfaEnrollment> {
+    if (USE_MOCKS) throw new ApiError("Two-factor isn't available in demo mode", 400);
+    return request<MfaEnrollment>("/auth/mfa/enroll", { method: "POST" });
+  },
+  async mfaVerify(factorId: string, code: string): Promise<AuthSession> {
+    if (USE_MOCKS) throw new ApiError("Two-factor isn't available in demo mode", 400);
+    const next = await request<AuthSession>("/auth/mfa/verify", json("POST", { factor_id: factorId, code }));
+    session.set(next); // only reached on success: a wrong code leaves the current session as it was
+    return next;
+  },
 
   // --- projects
   async listProjects(): Promise<Project[]> {
