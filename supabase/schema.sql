@@ -323,7 +323,8 @@ create table if not exists auth_outbox (
   created_at timestamptz not null default now(),
   done_at timestamptz
 );
-create index if not exists auth_outbox_pending on auth_outbox (status, created_at);
+alter table auth_outbox add column if not exists next_attempt_at timestamptz not null default now();
+create index if not exists auth_outbox_pending on auth_outbox (status, next_attempt_at);
 
 create table if not exists ai_admin_runs (
   id uuid primary key default gen_random_uuid(),

@@ -76,6 +76,10 @@ class _Query:
         self.filters.append(lambda r: r.get(col) is None)
         return self
 
+    def lte(self, col: str, val: Any) -> _Query:
+        self.filters.append(lambda r: r.get(col) is not None and str(r[col]) <= str(val))
+        return self
+
     def lt(self, col: str, val: Any) -> _Query:
         self.filters.append(lambda r: r.get(col) is not None and str(r[col]) < str(val))
         return self
