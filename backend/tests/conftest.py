@@ -11,6 +11,8 @@ os.environ.update({
     "RUN_JOBS_INLINE": "false",
     "SCAN_RATE_LIMIT_PER_MIN": "5",
     "RATE_LIMIT_SCALE": "1",
+    "ADMIN_REQUIRE_MFA": "false",
+    "TRUSTED_PROXY_COUNT": "0",
 })
 
 import time  # noqa: E402

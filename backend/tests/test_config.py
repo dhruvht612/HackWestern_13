@@ -25,3 +25,15 @@ def test_values_legacy_names_and_cors() -> None:
 def test_backend_imports_without_credentials(client) -> None:
     assert client.get("/health").json() == {"status": "ok"}
     assert client.get("/docs").status_code == 200
+
+
+def test_admin_require_mfa_defaults() -> None:
+    assert settings_from_env({"APP_ENV": "production"}).admin_require_mfa is True
+    assert settings_from_env({"APP_ENV": "development"}).admin_require_mfa is False
+    assert settings_from_env({"APP_ENV": "production", "ADMIN_REQUIRE_MFA": "false"}).admin_require_mfa is False
+
+
+def test_trusted_proxy_count() -> None:
+    assert settings_from_env({}).trusted_proxy_count == 0
+    assert settings_from_env({"TRUSTED_PROXY_COUNT": "2"}).trusted_proxy_count == 2
+    assert settings_from_env({"TRUSTED_PROXY_COUNT": "-3"}).trusted_proxy_count == 0

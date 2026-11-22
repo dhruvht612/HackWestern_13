@@ -61,3 +61,26 @@ def test_rate_limiter_scale() -> None:
         limiter.check("k", 3)
     with pytest.raises(HTTPException):
         limiter.check("k", 3)
+
+
+def _request(forwarded: str | None) -> "Request":
+    from starlette.requests import Request
+
+    headers = [(b"x-forwarded-for", forwarded.encode())] if forwarded else []
+    return Request({"type": "http", "headers": headers, "client": ("10.0.0.1", 1)})
+
+
+def test_client_ip_ignores_forwarded_without_trusted_proxy() -> None:
+    from attacksurface.netinfo import client_ip
+
+    assert client_ip(_request("6.6.6.6"), trusted_proxies=0) == "10.0.0.1"
+
+
+def test_client_ip_trusted_proxy() -> None:
+    from attacksurface.netinfo import client_ip
+
+    req = _request("1.1.1.1, 2.2.2.2")
+    assert client_ip(req, trusted_proxies=1) == "2.2.2.2"
+    assert client_ip(req, trusted_proxies=2) == "1.1.1.1"
+    assert client_ip(req, trusted_proxies=3) == "10.0.0.1"
+    assert client_ip(_request(None), trusted_proxies=1) == "10.0.0.1"
