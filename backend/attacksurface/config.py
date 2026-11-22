@@ -56,6 +56,8 @@ class Settings(BaseModel):
     gemini_api_key: str = ""
     gemini_model: str = "gemini-3.8-flash"
 
+    # Multiplies every per-minute rate limit. Raise it for local testing only; keep 1 in production.
+    rate_limit_scale: int = 1
     scan_rate_limit_per_min: int = 5
     scan_max_concurrent_hosts: int = 3
     scan_http_timeout_seconds: float = 5.0
@@ -94,6 +96,7 @@ def settings_from_env(env: Mapping[str, str]) -> Settings:
         supabase_jwt_secret=get("SUPABASE_JWT_SECRET") or get("JWT_SECRET") or "",
         gemini_api_key=get("GEMINI_API_KEY") or "",
         gemini_model=get("GEMINI_MODEL") or "gemini-3.8-flash",
+        rate_limit_scale=max(1, int(get("RATE_LIMIT_SCALE") or 1)),
         scan_rate_limit_per_min=int(get("SCAN_RATE_LIMIT_PER_MIN") or 5),
         scan_max_concurrent_hosts=int(get("SCAN_MAX_CONCURRENT_HOSTS") or 3),
         scan_http_timeout_seconds=float(get("SCAN_HTTP_TIMEOUT_SECONDS") or 5),
