@@ -6,7 +6,7 @@ from . import events
 from .config import settings
 from .database import ConfigError
 from .ratelimit import limiter
-from .routers import analysis, auth, dependencies, projects, reports, scans
+from .routers import admin, analysis, auth, dependencies, projects, reports, scans
 from .schemas import Health
 
 app = FastAPI(title=settings.app_name, debug=settings.debug)
@@ -33,6 +33,7 @@ app.include_router(scans.router)
 app.include_router(dependencies.router)
 app.include_router(analysis.router)
 app.include_router(reports.router)
+app.include_router(admin.router)
 
 
 @app.get("/health", response_model=Health)

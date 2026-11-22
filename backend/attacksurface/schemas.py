@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 Severity = Literal["critical", "high", "medium", "low", "info"]
 Environment = Literal["prod", "staging", "dev", "unknown"]
@@ -246,3 +246,32 @@ class ClientApiDocs(BaseModel):
     """An uploaded API description (e.g. an OpenAPI file) stored on the project."""
 
     file_contents: str | None = Field(default=None, max_length=1_000_000)
+
+
+# --- admin -------------------------------------------------------------------------------
+
+
+class AdminMe(BaseModel):
+    id: str
+    email: str | None = None
+    role: Literal["viewer", "operator"]
+    aal: str
+    mfa_required: bool
+
+
+class ReasonModel(BaseModel):
+    reason: str = Field(max_length=500)
+
+    @field_validator("reason")
+    @classmethod
+    def _meaningful(cls, value: str) -> str:
+        value = value.strip()
+        if len(value) < 5:
+            raise ValueError("Give a reason of at least 5 characters.")
+        return value
+
+
+class UserStatusChange(BaseModel):
+    user_id: str
+    status: Literal["active", "suspended"]
+    previous_status: str | None = None
