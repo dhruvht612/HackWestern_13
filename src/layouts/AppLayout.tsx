@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { LayoutDashboard, Server, AlertTriangle, Package, Network, FileText } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { useProject } from "@/hooks/useProject";
@@ -6,6 +6,7 @@ import { ClassificationBand } from "@/components/ClassificationBand";
 import { Logo } from "@/components/Logo";
 import { AccountMenu } from "@/components/AccountMenu";
 import { StartScanButton } from "@/components/ScanGate";
+import { ApiError } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -22,7 +23,10 @@ export function AppLayout() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { data: projects } = useProjects();
-  const { data: project } = useProject(projectId);
+  const { data: project, error } = useProject(projectId);
+
+  // Not this account's project (e.g. a sign-in redirect back to the previous account's page).
+  if (error instanceof ApiError && error.status === 404) return <Navigate to="/projects" replace />;
 
   return (
     <div className="grain min-h-screen text-fg">

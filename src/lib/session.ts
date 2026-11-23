@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { queryClient } from "./queryClient";
 import type { AuthSession } from "./types";
 
 // ponytail: tokens in localStorage keep the session across reloads; move to httpOnly cookies
@@ -28,6 +29,9 @@ function read(): AuthSession | null {
 export const session = {
   get: read,
   set(value: AuthSession | null) {
+    // Different account (or none): drop cached data so nobody sees the previous user's projects.
+    // A token refresh keeps the same user and keeps the cache.
+    if (value?.user.id !== read()?.user.id) queryClient.clear();
     cached = value;
     try {
       if (value) localStorage.setItem(KEY, JSON.stringify(value));
