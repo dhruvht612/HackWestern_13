@@ -1,0 +1,12 @@
+backend
+.venv
+.env
+node_modules
+dist
+nul
+.playwright-mcp
+.superpowers
+.impeccable
+.pytest_cache
+.ruff_cache
+.env.local
